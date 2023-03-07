@@ -10,7 +10,7 @@ A memory-efficient and modular text editor
 > 
 > I will be brief.
 > 
-  – Hamlet, Act II, scene II
+  – Hamlet, Act II, Scene II
 
 ## About
 Polonius is a text editor with a focus on memory efficiency.
