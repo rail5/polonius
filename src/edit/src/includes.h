@@ -17,7 +17,6 @@
 #include "../../shared_functions/file_exists.cpp"
 #include "../../shared_functions/isolate_path_from_filename.cpp"
 #include "../../shared_functions/to_lower.cpp"
-#include "../../shared_functions/extract_quoted_substring.cpp"
 #include "../../shared_functions/explode.cpp"
 #include "../../shared_functions/is_number.cpp"
 
