@@ -3,13 +3,14 @@ THIS REPO IS CURRENTLY A WORK-IN-PROGRESS. Polonius is not yet functional
 # polonius
 A memory-efficient and modular text editor
 
+
 > Therefore, since brevity is the soul of wit
 > 
 > And tediousness the limbs and outward flourishes,
 > 
 > I will be brief.
 > 
- -- Hamlet, Act II scene ii
+  – Hamlet, Act II scene ii
 
 ## About
 Polonius is a text editor with a focus on memory efficiency.
