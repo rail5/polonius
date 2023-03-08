@@ -1,3 +1,8 @@
+#ifndef FILESYSTEM
+	#define FILESYSTEM
+	#include <filesystem>
+#endif
+
 using namespace std;
 
 bool editor::file::set_file(string file_path) {

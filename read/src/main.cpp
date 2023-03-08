@@ -1,5 +1,15 @@
 #include "includes.h"
 
+#ifndef IOSTREAM
+	#define IOSTREAM
+	#include <iostream>
+#endif
+
+#ifndef GETOPT_H
+	#define GETOPT_H
+	#include <getopt.h>
+#endif
+
 using namespace std;
 
 int main(int argc, char* argv[]) {

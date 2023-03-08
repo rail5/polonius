@@ -1,3 +1,13 @@
+#ifndef SSTREAM
+	#define SSTREAM
+	#include <sstream>
+#endif
+
+#ifndef VECTOR
+	#define VECTOR	
+	#include <vector>
+#endif
+
 std::vector<std::string> explode(std::string const &input, char delimiter, int maximum_number_of_elements = 0) {
 	/***
 	vector<string> explode(string &input, char delimiter, int maximum_number_of_elements):

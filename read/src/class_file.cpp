@@ -1,3 +1,8 @@
+#ifndef FSTREAM
+	#define FSTREAM
+	#include <fstream>
+#endif
+
 using namespace std;
 
 bool reader::file::init(string path) {
