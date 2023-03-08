@@ -1,15 +1,15 @@
 all: reader editor
 	
 reader:
-	cd src/read && $(MAKE)
-	mv src/read/bin/reader ./
+	cd read && $(MAKE)
+	mv read/bin/reader ./
 
 editor:
-	cd src/edit && $(MAKE)
-	mv src/edit/bin/editor ./
+	cd edit && $(MAKE)
+	mv edit/bin/editor ./
 
 clean:
 	rm -f ./reader
-	cd src/read && $(MAKE) clean
+	cd read && $(MAKE) clean
 	rm -f ./editor
-	cd src/edit && $(MAKE) clean
+	cd edit && $(MAKE) clean
