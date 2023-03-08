@@ -66,10 +66,7 @@ int main(int argc, char* argv[]) {
 			
 			case 's':
 				temp_instruction_set = parse_instruction_set_string(optarg);
-				for (editor::instruction i : temp_instruction_set) {
-					instructions_to_add.push_back(i);
-				}
-				temp_instruction_set.clear();
+				move(temp_instruction_set.begin(), temp_instruction_set.end(), inserter(instructions_to_add, instructions_to_add.end()));
 				break;
 			
 			case 'c':
