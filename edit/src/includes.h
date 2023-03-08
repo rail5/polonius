@@ -18,6 +18,11 @@
 	#define SSTREAM
 	#include <sstream>
 #endif
+/* Needed for explode() function */
+#ifndef VECTOR
+	#define VECTOR	
+	#include <vector>
+#endif
 /* Needed for class_file & isolate_path_from_filename() function */
 #ifndef FILESYSTEM
 	#define FILESYSTEM
@@ -33,7 +38,7 @@
 #include "../../shared_functions/file_exists.cpp"
 /* inline std::string isolate_path_from_filename(std::string filename) returns the path to the directory a given file is in */
 #include "../../shared_functions/isolate_path_from_filename.cpp"
-/* inline std::string to_lower(std::string input) returns the input string in all-lowercase */
+/* inline std::string to_lower(std::string &input) returns the input string in all-lowercase */
 #include "../../shared_functions/to_lower.cpp"
 /* std::vector<std::string> explode(std::string const &input, char delimiter, int maximum_number_of_elements = 0) returns a vector<string> split based on the given delimiter. Similar to PHP's explode() */
 #include "../../shared_functions/explode.cpp"
