@@ -4,7 +4,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-	string program_name = argv[0];
+	string program_name = "polonius-reader";
 	
 	string program_version = "0.1";
 	

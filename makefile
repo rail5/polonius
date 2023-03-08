@@ -2,14 +2,14 @@ all: reader editor
 	
 reader:
 	cd read && $(MAKE)
-	mv read/bin/reader ./
+	mv read/bin/polonius-reader ./
 
 editor:
 	cd edit && $(MAKE)
-	mv edit/bin/editor ./
+	mv edit/bin/polonius-editor ./
 
 clean:
-	rm -f ./reader
+	rm -f ./polonius-reader
 	cd read && $(MAKE) clean
-	rm -f ./editor
+	rm -f ./polonius-editor
 	cd edit && $(MAKE) clean
