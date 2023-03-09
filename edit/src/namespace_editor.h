@@ -21,6 +21,7 @@ namespace editor {
 				2 = insert
 				3 = remove
 			*/
+			
 			int start_position = -1;
 			int end_position = -1;
 			string text_input = "";
@@ -28,6 +29,7 @@ namespace editor {
 			string error_message = "";
 		public:
 			void clear_instruction();
+			void process_special_chars();
 			bool set_replace_instruction(int start, string text);
 			bool set_insert_instruction(int start, string text);
 			bool set_remove_instruction(int start, int end);
@@ -40,6 +42,7 @@ namespace editor {
 			int get_start_position();
 			int get_end_position();
 			string get_text();
+
 	};
 	
 	instruction create_replace_instruction(int start_position, string text);

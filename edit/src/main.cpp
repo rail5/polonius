@@ -109,6 +109,11 @@ int main(int argc, char* argv[]) {
 	editor::file test_file = add_file(file_to_edit);
 	
 	for (int i = 0; i < instructions_to_add.size(); i++) {
+	
+		if (interpret_special_chars) {
+			instructions_to_add[i].process_special_chars();
+		}
+		
 		if (!test_file.add_instruction(instructions_to_add[i])) {
 			cerr << program_name << ": " << instructions_to_add[i].get_error_message() << endl;
 			return 1;
@@ -116,7 +121,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	cout << endl << "DEBUG INFO:" << endl;
-	cout << "  Object editor::file test_file = add_file('./testfile')" << endl;
+	cout << "  Object editor::file test_file = add_file('" << file_to_edit << "')" << endl;
 	cout << "    initialized  =  " << test_file.is_initialized() << endl;
 	cout << "    file_name  =  " << test_file.get_file_name() << endl;
 	cout << "    file_directory   =  " << test_file.get_file_directory() << endl;
