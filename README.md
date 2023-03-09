@@ -3,8 +3,6 @@ THIS REPO IS CURRENTLY A WORK-IN-PROGRESS. Polonius is not yet functional
 # polonius
 A memory-efficient and modular text editor
 
-Designed primarily for editing **very large files** on systems with **very little RAM**
-
 
 > Therefore, since brevity is the soul of wit
 > 
