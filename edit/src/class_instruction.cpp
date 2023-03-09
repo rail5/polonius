@@ -210,7 +210,7 @@ editor::instruction parse_instruction_string(string instruction_string) {
 		
 		The string must be formatted in one of the following ways:
 			1.
-				REPLACE 5 "hello"
+				REPLACE 5 hello
 					(
 					This would replace bytes #5 - #9 with "hello"
 						Example:
@@ -220,7 +220,7 @@ editor::instruction parse_instruction_string(string instruction_string) {
 								01234hello0123
 					)
 			2.
-				INSERT 6 "ni hao"
+				INSERT 6 ni hao
 					(
 					This would shift bytes #6 - EOF rightward and insert "ni hao" at position #6 without replacing
 					(Or, if #6 is EOF, this would insert "ni hao" at the end of the file)
@@ -245,8 +245,7 @@ editor::instruction parse_instruction_string(string instruction_string) {
 			- The first key is the instruction name (REPLACE, INSERT, or REMOVE)
 			- The second key is the start position
 			- The third key is either:
-				- A quote-escaped string (in the case of REPLACE or INSERT)
-					[Can be either double-quotes or single-quotes]
+				- A string (in the case of REPLACE or INSERT)
 				- The end position (in the case of REMOVE)
 	*/
 	
@@ -294,29 +293,9 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	}
 	
 	/*
-	In a replace or insert instruction, the third element should be a quote-encased string
-	In a remove instruction, it should be an integer
+	If it's a remove instruction, the third element should also be an integer
 	*/
-	if (is_replace_instruction || is_insert_instruction) {
-		// Check that there's actually data to "insert" or "replace" with
-		// The quote-marks will take up 2 characters, so there should be at least 3
-		if (!(instruction_vector[2].size() > 2)) {
-			invalid_instruction.set_error_message("Invalid instruction: No argument given");
-			return invalid_instruction;
-		}
-	
-		// Check that the first and last chars are matching quote-marks
-		bool double_quotes_encased = ((instruction_vector[2][0] == '"') && (instruction_vector[2][instruction_vector[2].size()-1] == '"'));
-		bool single_quotes_encased = ((instruction_vector[2][0] == '\'') && (instruction_vector[2][instruction_vector[2].size()-1] == '\''));
-		
-		bool encased_in_quotes = (double_quotes_encased || single_quotes_encased);
-		
-		if (!encased_in_quotes) {
-			invalid_instruction.set_error_message("Invalid instruction: Argument is not encased in quotes");
-			return invalid_instruction;
-		}
-		
-	} else if (is_remove_instruction) {
+	if (is_remove_instruction) {
 		if (!is_number(instruction_vector[2])) {
 			invalid_instruction.set_error_message("Invalid REMOVE instruction: '" + instruction_vector[2] + "' is not a positive integer");
 			return invalid_instruction;
@@ -328,20 +307,15 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	*/
 	if (is_replace_instruction) {
 		int start_position = (int)stol(instruction_vector[1]);
+
 		
-		// Remove the quote-marks from the text input (first and last chars)
-		string text_input = instruction_vector[2].substr(1, instruction_vector[2].size()-2);
-		
-		return create_replace_instruction(start_position, text_input);
+		return create_replace_instruction(start_position, instruction_vector[2]);
 	}
 	
 	if (is_insert_instruction) {
 		int start_position = (int)stol(instruction_vector[1]);
-
-		// Remove the quote-marks from the text input (first and last chars)
-		string text_input = instruction_vector[2].substr(1, instruction_vector[2].size()-2);
 		
-		return create_insert_instruction(start_position, text_input);
+		return create_insert_instruction(start_position, instruction_vector[2]);
 	}
 	
 	if (is_remove_instruction) {
