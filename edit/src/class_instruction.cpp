@@ -307,7 +307,6 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	*/
 	if (is_replace_instruction) {
 		int start_position = (int)stol(instruction_vector[1]);
-
 		
 		return create_replace_instruction(start_position, instruction_vector[2]);
 	}
@@ -338,8 +337,8 @@ vector<editor::instruction> parse_instruction_set_string(string instruction_set_
 		Create a vector of 'instruction' objects from a newline-delimited string of properly-formatted instructions
 		
 		Example of ONE properly-formatted "instruction set" string:
-			REPLACE 5 "hello"
-			INSERT 6 "ni hao"
+			REPLACE 5 hello
+			INSERT 6 ni hao
 			REMOVE 7 10
 		
 		Each line must follow the normal rules for properly-formatted instructions

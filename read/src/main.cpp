@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	
 	string program_author = "rail5";
 
-	string helpstring = "Usage: " + program_name + " -i filename\n\nOptions:\n  -i\n  --input\n    Specify input file to read\n\n  -s\n  --start\n    Specify byte number to start reading from\n\n  -l\n  --length\n    Specify how many bytes to read\n\n  -h\n  --help\n    Display this message\n";
+	string helpstring = program_name + "\nCopyright (C) 2023 rail5\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename\n\nOptions:\n  -i\n  --input\n    Specify input file to read\n\n  -s\n  --start\n    Specify byte number to start reading from\n\n  -l\n  --length\n    Specify how many bytes to read\n\n  -h\n  --help\n    Display this message\n\nExample:\n  " + program_name + " --input ./file.txt --start 50 --length 10\n";
 	
 	/*
 	Necessary info for the program to do its job
