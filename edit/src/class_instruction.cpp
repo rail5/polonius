@@ -250,7 +250,13 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	*/
 	
 	/*
-	First, split the string into a vector<string> delimited by spaces
+	Remove leading whitespace
+	*/
+	
+	instruction_string = remove_leading_whitespace(instruction_string);
+	
+	/*
+	Split the string into a vector<string> delimited by spaces
 		See: shared_functions/explode.cpp
 	*/
 	vector<string> instruction_vector = explode(instruction_string, ' ', 3);

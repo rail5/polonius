@@ -44,6 +44,8 @@
 #include "../../shared_functions/explode.cpp"
 /* inline bool is_number(const std::string &s) returns true if all chars in string are digits */
 #include "../../shared_functions/is_number.cpp"
+/* void remove_leading_whitespace(string &input) removes whitespace from the beginning of an input string */
+#include "../../shared_functions/remove_leading_whitespace.cpp"
 
 /* Contains the 'meat' of the program */
 #include "namespace_editor.h"
