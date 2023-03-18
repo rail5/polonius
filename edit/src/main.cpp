@@ -137,6 +137,7 @@ int main(int argc, char* argv[]) {
 		cout << "    end_position  =  " << instruction_set[i].get_end_position() << endl;
 		cout << "    text_input  =  " << instruction_set[i].get_text() << endl;
 		cout << "    error_message  =  " << instruction_set[i].get_error_message() << endl;
+		test_file.execute_single_instruction(instruction_set[i]);
 	}
 	return 0;
 

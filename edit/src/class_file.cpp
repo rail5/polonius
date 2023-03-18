@@ -109,6 +109,21 @@ vector<editor::instruction> editor::file::get_instruction_set() {
 	return instruction_set;
 }
 
+bool editor::file::replace(int start_position, string replacement_text) {
+	fstream edit_file(file_name, ios::binary | ios::out | ios::in);
+	edit_file.seekp(start_position, ios::beg);
+	edit_file.write(replacement_text.c_str(), replacement_text.length());
+	return true;
+}
+
+bool editor::file::execute_single_instruction(instruction instruction_to_execute) {
+	if (instruction_to_execute.get_operation_type() == replace_operation) {
+		replace(instruction_to_execute.get_start_position(), instruction_to_execute.get_text());
+		return true;
+	}
+	return false;
+}
+
 editor::file add_file(string file_path) {
 	editor::file new_file;
 	

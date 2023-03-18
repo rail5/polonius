@@ -33,6 +33,11 @@
 	#define ALGORITHM
 	#include <algorithm>
 #endif
+/* Needed for actual file edits */
+#ifndef FSTREAM
+	#define FSTREAM
+	#include <fstream>
+#endif
 
 /* inline bool file_exists(std::string name) returns true if the file exists */
 #include "../../shared_functions/file_exists.cpp"

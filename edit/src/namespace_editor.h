@@ -62,10 +62,11 @@ namespace editor {
 			vector<instruction> instruction_set;
 		public:
 			bool set_file(string file_path);
-			bool insert(int start_position, string text_to_insert);
 			bool replace(int start_position, string replacement_text);
+			bool insert(int start_position, string text_to_insert);
 			bool remove(int start_position, int end_position);
 			bool add_instruction(instruction &input_instruction);
+			bool execute_single_instruction(instruction instruction_to_execute);
 			bool execute_instructions();
 			
 			bool is_initialized();
