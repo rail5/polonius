@@ -54,6 +54,12 @@ std::vector<std::string> explode(std::string const &input, char delimiter, int m
 			output_vector[last_permissible_element] = output_vector[last_permissible_element] + delimiter + output_vector[last_permissible_element + 1];
 			output_vector.erase(output_vector.begin() + (last_permissible_element + 1));
 		}
+		
+		// If the input string originally ended with the delimiter char,
+		// Let's put that back in place at the end
+		if (input[input.length()-1] == delimiter) {
+			output_vector[last_permissible_element] = output_vector[last_permissible_element] + delimiter;
+		}
 	}
 	
 	return output_vector;
