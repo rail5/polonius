@@ -160,6 +160,11 @@ void editor::file::insert(int start_position, string text_to_insert) {
 	fstream edit_file(file_name, ios::binary | ios::out | ios::in);
 	
 	if (edit_file.is_open()) {
+	
+		int insert_length = text_to_insert.length();
+			
+		int new_file_length = file_length + insert_length;
+		
 		// Are we writing to EOF, or in the middle of the file?
 		if (start_position == (file_length - 1)) {
 			// Writing TO EOF
@@ -169,46 +174,71 @@ void editor::file::insert(int start_position, string text_to_insert) {
 			
 			// Insert
 			edit_file.write(text_to_insert.c_str(), text_to_insert.length());
+			
+			// Add a newline char
+			edit_file.seekp(new_file_length - 1, ios::beg);
+			edit_file.write("\n", 1);
 		} else {
 			// Writing BEFORE EOF
 			
-			// Calculate the amount we have to shift text
-			int shift_by_amount = text_to_insert.length();
+			// Which is smaller? Length of insert, or block_size?
+			int amount_to_store = min(insert_length, block_size);
 			
-			// Calculate distance from start_position to current EOF
-			int distance = (file_length - 1) - start_position;
-			
-			// What will be the new file length?
-			int new_file_length = file_length + shift_by_amount;
-			
-			// Open read stream
-			ifstream edit_file_ifstream(file_name, ifstream::binary);
-			
-			// Allocate memory
-			string buffer(distance, ' ');
-			
-			// Set position
-			edit_file_ifstream.seekg(start_position);
-			
-			// Read data into buffer
-			edit_file_ifstream.read(&buffer[0], distance);
-			edit_file_ifstream.close();
-			
-			cout << "buffer: " << buffer << endl << endl;
-			
-			for (int i = 0; i < (new_file_length - file_length - 1); i++) {
-				edit_file.seekp(file_length + i, ios::beg);
+			// Adjust the length of the file by adding 0s to the end
+			for (int i = (file_length - 1); i < (new_file_length - 1); i++) {
+				edit_file.seekp(i, ios::beg);
 				edit_file.write("0", 1);
 			}
 			
-			cout << endl << "replace " << (new_file_length - 1) - buffer.length() << " " << buffer << endl;
-			replace((new_file_length - 1) - buffer.length(), buffer);
+			// Add a newline char
+			edit_file.seekp(new_file_length - 1, ios::beg);
+			edit_file.write("\n", 1);
 			
-			replace(start_position, text_to_insert);
+			for (int i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
+				
+				int copy_to_this_position = (i - (amount_to_store - 1)) - 1;
+				int copy_from_this_position = (copy_to_this_position - insert_length);
+				
+				// Final iteration:
+				// If we discover that our "copy_from" position is before our start_position,
+					// (Due to block_size shenanigans --
+					// E.g: block_size = 1024, but we only have 512 bytes left in the loop)
+				// Then we re-set the copy_from to the start_position,
+				// Fix the copy_to, change amount_to_store to what's LEFT
+					// (In the above example, 512 rather than 1024)
+				// And set i = start_position to make sure the loop doesn't run again after this
+				if (copy_from_this_position < start_position) {
+				
+					int difference = start_position - copy_from_this_position;
+					
+					copy_from_this_position = start_position;
+					
+					copy_to_this_position = copy_to_this_position + difference;
+					
+					amount_to_store = amount_to_store - difference;
+					
+					i = start_position; // Terminate loop
+				}
+				
+				char* temp_data_storage = new char[amount_to_store + 1]{0}; // Allocate memory
+				
+				// Store read portion into allocated memory
+				edit_file.seekg(copy_from_this_position, ios::beg);
+				edit_file.read(temp_data_storage, amount_to_store);
+				
+				// Add a NUL char to the end to terminate the string
+				temp_data_storage[amount_to_store] = 0;
+				
+				// Copy it to its new proper place
+				edit_file.seekp(copy_to_this_position, ios::beg);
+				edit_file.write(temp_data_storage, amount_to_store);
+				
+				delete[] temp_data_storage; // Free memory
+			}
 			
-			// Calculate amount to load into memory
-				// Expl.: Which is smaller? Distance, or block_size?
-			int amount_to_load_into_memory = min(distance, block_size);
+			// Now, finally, insert the damn data (user inputted data)
+			edit_file.seekp(start_position, ios::beg);
+			edit_file.write(text_to_insert.c_str(), text_to_insert.length());
 		}
 	}
 }
