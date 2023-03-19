@@ -181,8 +181,7 @@ void editor::file::insert(int start_position, string text_to_insert) {
 		} else {
 			// Writing BEFORE EOF
 			
-			// Which is smaller? Length of insert, or block_size?
-			int amount_to_store = min(insert_length, block_size);
+			int amount_to_store = block_size;
 			
 			// Adjust the length of the file by adding 0s to the end
 			for (int i = (file_length - 1); i < (new_file_length - 1); i++) {
