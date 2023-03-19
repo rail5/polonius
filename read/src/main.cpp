@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 		"amount_to_read" == -1 will result in reading from the start position to the end of the file
 	*/
 	string file_to_read = "";
-	int start_position = 0;
+	long long int start_position = 0;
 	int amount_to_read = -1;
 	
 	/*

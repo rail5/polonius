@@ -22,32 +22,32 @@ namespace editor {
 				3 = remove
 			*/
 			
-			int start_position = -1;
-			int end_position = -1;
+			long long int start_position = -1;
+			long long int end_position = -1;
 			string text_input = "";
 			
 			string error_message = "";
 		public:
 			void clear_instruction();
 			void process_special_chars();
-			bool set_replace_instruction(int start, string text);
-			bool set_insert_instruction(int start, string text);
-			bool set_remove_instruction(int start, int end);
+			bool set_replace_instruction(long long int start, string text);
+			bool set_insert_instruction(long long int start, string text);
+			bool set_remove_instruction(long long int start, long long int end);
 			void set_error_message(string message);
 			
 			string get_error_message();
 			
 			bool is_initialized();
 			int get_operation_type();
-			int get_start_position();
-			int get_end_position();
+			long long int get_start_position();
+			long long int get_end_position();
 			string get_text();
 
 	};
 	
-	instruction create_replace_instruction(int start_position, string text);
-	instruction create_insert_instruction(int start_position, string text);
-	instruction create_remove_instruction(int start_position, int end_position);
+	instruction create_replace_instruction(long long int start_position, string text);
+	instruction create_insert_instruction(long long int start_position, string text);
+	instruction create_remove_instruction(long long int start_position, long long int end_position);
 	
 	instruction parse_instruction_string(string instruction_string);
 	
@@ -58,15 +58,15 @@ namespace editor {
 			bool initialized = false;
 			string file_name;
 			string file_directory;
-			int file_length = 0;
+			long long int file_length = 0;
 			int block_size = 1024;
 			vector<instruction> instruction_set;
 		public:
 			bool set_file(string file_path);
 			void set_block_size(int specified_blocksize);
-			void replace(int start_position, string replacement_text);
-			void insert(int start_position, string text_to_insert);
-			void remove(int start_position, int end_position);
+			void replace(long long int start_position, string replacement_text);
+			void insert(long long int start_position, string text_to_insert);
+			void remove(long long int start_position, long long int end_position);
 			bool add_instruction(instruction &input_instruction);
 			bool execute_single_instruction(instruction instruction_to_execute);
 			bool execute_instructions();
@@ -75,7 +75,7 @@ namespace editor {
 			string get_file_name();
 			string get_file_directory();
 			int get_block_size();
-			int get_file_length();
+			long long int get_file_length();
 			vector<instruction> get_instruction_set();
 	};
 

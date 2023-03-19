@@ -29,7 +29,7 @@ bool reader::file::init(string path) {
 	return true;
 }
 
-string reader::file::read(int start_position, int amount_to_read) {
+string reader::file::read(long long int start_position, int amount_to_read) {
 
 	if (!initialized) {
 		string error = "Error reading file";
@@ -47,7 +47,7 @@ string reader::file::read(int start_position, int amount_to_read) {
 	}
 	
 	// Now check the end position
-	int end_position = (start_position + amount_to_read);
+	long long int end_position = (start_position + amount_to_read);
 	
 	if (end_position > file_length) {
 		// Just set it to read till the end of the file & not further
@@ -75,6 +75,6 @@ string reader::file::get_init_error_message() {
 	return init_error_message;
 }
 
-int reader::file::get_file_length() {
+long long int reader::file::get_file_length() {
 	return file_length;
 }

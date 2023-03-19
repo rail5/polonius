@@ -123,7 +123,7 @@ int editor::file::get_block_size() {
 	return block_size;
 }
 
-int editor::file::get_file_length() {
+long long int editor::file::get_file_length() {
 	return file_length;
 }
 
@@ -131,9 +131,9 @@ vector<editor::instruction> editor::file::get_instruction_set() {
 	return instruction_set;
 }
 
-void editor::file::replace(int start_position, string replacement_text) {
+void editor::file::replace(long long int start_position, string replacement_text) {
 	/***
-	void editor::file::replace(int start_position, string replacement_text):
+	void editor::file::replace(long long int start_position, string replacement_text):
 		Execute a "REPLACE" instruction
 		Opens a file stream & replaces text inside the file, starting from start_position, with replacement_text
 	***/
@@ -149,9 +149,9 @@ void editor::file::replace(int start_position, string replacement_text) {
 	}
 }
 
-void editor::file::insert(int start_position, string text_to_insert) {
+void editor::file::insert(long long int start_position, string text_to_insert) {
 	/***
-	void editor::file::insert(int start_position, string text_to_insert):
+	void editor::file::insert(long long int start_position, string text_to_insert):
 		Execute an "INSERT" instruction
 		Opens a file stream & inserts text_to_insert into the file at position start_position, without replacing
 	***/
@@ -161,9 +161,9 @@ void editor::file::insert(int start_position, string text_to_insert) {
 	
 	if (edit_file.is_open()) {
 	
-		int insert_length = text_to_insert.length();
+		long long int insert_length = text_to_insert.length();
 			
-		int new_file_length = file_length + insert_length;
+		long long int new_file_length = file_length + insert_length;
 		
 		// Are we writing to EOF, or in the middle of the file?
 		if (start_position == (file_length - 1)) {
@@ -193,10 +193,10 @@ void editor::file::insert(int start_position, string text_to_insert) {
 			edit_file.seekp(new_file_length - 1, ios::beg);
 			edit_file.write("\n", 1);
 			
-			for (int i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
+			for (long long int i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
 				
-				int copy_to_this_position = (i - (amount_to_store - 1)) - 1;
-				int copy_from_this_position = (copy_to_this_position - insert_length);
+				long long int copy_to_this_position = (i - (amount_to_store - 1)) - 1;
+				long long int copy_from_this_position = (copy_to_this_position - insert_length);
 				
 				// Final iteration:
 				// If we discover that our "copy_from" position is before our start_position,
@@ -208,7 +208,7 @@ void editor::file::insert(int start_position, string text_to_insert) {
 				// And set i = start_position to make sure the loop doesn't run again after this
 				if (copy_from_this_position < start_position) {
 				
-					int difference = start_position - copy_from_this_position;
+					long long int difference = start_position - copy_from_this_position;
 					
 					copy_from_this_position = start_position;
 					
