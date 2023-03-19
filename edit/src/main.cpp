@@ -79,6 +79,14 @@ int main(int argc, char* argv[]) {
 				move(temp_instruction_set.begin(), temp_instruction_set.end(), inserter(instructions_to_add, instructions_to_add.end()));
 				break;
 			
+			case 'b':
+				if (!is_number(optarg)) {
+					cerr << program_name << ": Error: '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
+					return 1;
+				}
+				block_size = (int)stol(optarg);
+				break;
+			
 			case 'c':
 				interpret_special_chars = true;
 				break;
@@ -107,6 +115,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	editor::file test_file = add_file(file_to_edit);
+	
+	test_file.set_block_size(block_size);
 	
 	for (int i = 0; i < instructions_to_add.size(); i++) {
 	

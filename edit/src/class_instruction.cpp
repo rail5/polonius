@@ -40,6 +40,7 @@ bool editor::instruction::set_replace_instruction(int start, string text) {
 	Make sure the start position is valid.
 	Meaning:
 		- Not less than zero
+		- Not beyond EOF
 	*/
 	if (start < 0) {
 		error_message = "Invalid start position";
@@ -76,6 +77,7 @@ bool editor::instruction::set_insert_instruction(int start, string text) {
 	Make sure the start position is valid
 	Meaning:
 		- Not less than zero
+		- Not beyond EOF
 	*/
 	if (start < 0) {
 		error_message = "Invalid start position";

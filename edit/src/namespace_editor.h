@@ -59,12 +59,14 @@ namespace editor {
 			string file_name;
 			string file_directory;
 			int file_length = 0;
+			int block_size = 1024;
 			vector<instruction> instruction_set;
 		public:
 			bool set_file(string file_path);
-			bool replace(int start_position, string replacement_text);
-			bool insert(int start_position, string text_to_insert);
-			bool remove(int start_position, int end_position);
+			void set_block_size(int specified_blocksize);
+			void replace(int start_position, string replacement_text);
+			void insert(int start_position, string text_to_insert);
+			void remove(int start_position, int end_position);
 			bool add_instruction(instruction &input_instruction);
 			bool execute_single_instruction(instruction instruction_to_execute);
 			bool execute_instructions();
@@ -72,6 +74,7 @@ namespace editor {
 			bool is_initialized();
 			string get_file_name();
 			string get_file_directory();
+			int get_block_size();
 			int get_file_length();
 			vector<instruction> get_instruction_set();
 	};

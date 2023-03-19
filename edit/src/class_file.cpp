@@ -40,6 +40,16 @@ bool editor::file::set_file(string file_path) {
 	return initialized;
 }
 
+void editor::file::set_block_size(int specified_blocksize) {
+	/***
+	bool set_block_size(int specified_blocksize):
+		Set the block size to inputted blocksize
+			The "block size" is how much of the file (in bytes) we're willing to load into memory at one time
+	***/
+	
+	block_size = specified_blocksize;
+}
+
 bool editor::file::add_instruction(instruction &input_instruction) {
 	/***
 	bool add_instruction(instruction input_instruction):
@@ -68,6 +78,14 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	First, make sure the instruction is initialized
 	*/
 	if (!input_instruction.is_initialized()) {
+		return false;
+	}
+	
+	/*
+	Now, make sure that the start position isn't further than the end of the file
+	*/
+	if (input_instruction.get_start_position() > file_length) {
+		input_instruction.set_error_message("Invalid start position");
 		return false;
 	}
 
@@ -101,6 +119,10 @@ string editor::file::get_file_directory() {
 	return file_directory;
 }
 
+int editor::file::get_block_size() {
+	return block_size;
+}
+
 int editor::file::get_file_length() {
 	return file_length;
 }
@@ -109,18 +131,100 @@ vector<editor::instruction> editor::file::get_instruction_set() {
 	return instruction_set;
 }
 
-bool editor::file::replace(int start_position, string replacement_text) {
+void editor::file::replace(int start_position, string replacement_text) {
+	/***
+	void editor::file::replace(int start_position, string replacement_text):
+		Execute a "REPLACE" instruction
+		Opens a file stream & replaces text inside the file, starting from start_position, with replacement_text
+	***/
+	
+	// Open the file stream
 	fstream edit_file(file_name, ios::binary | ios::out | ios::in);
-	edit_file.seekp(start_position, ios::beg);
-	edit_file.write(replacement_text.c_str(), replacement_text.length());
-	return true;
+	
+	if (edit_file.is_open()) {
+		// Seek to start_position
+		edit_file.seekp(start_position, ios::beg);
+		// Replace
+		edit_file.write(replacement_text.c_str(), replacement_text.length());
+	}
+}
+
+void editor::file::insert(int start_position, string text_to_insert) {
+	/***
+	void editor::file::insert(int start_position, string text_to_insert):
+		Execute an "INSERT" instruction
+		Opens a file stream & inserts text_to_insert into the file at position start_position, without replacing
+	***/
+	
+	// Open the file stream
+	fstream edit_file(file_name, ios::binary | ios::out | ios::in);
+	
+	if (edit_file.is_open()) {
+		// Are we writing to EOF, or in the middle of the file?
+		if (start_position == (file_length - 1)) {
+			// Writing TO EOF
+			
+			// Seek to EOF
+			edit_file.seekp(start_position, ios::beg);
+			
+			// Insert
+			edit_file.write(text_to_insert.c_str(), text_to_insert.length());
+		} else {
+			// Writing BEFORE EOF
+			
+			// Calculate the amount we have to shift text
+			int shift_by_amount = text_to_insert.length();
+			
+			// Calculate distance from start_position to current EOF
+			int distance = (file_length - 1) - start_position;
+			
+			// What will be the new file length?
+			int new_file_length = file_length + shift_by_amount;
+			
+			// Open read stream
+			ifstream edit_file_ifstream(file_name, ifstream::binary);
+			
+			// Allocate memory
+			string buffer(distance, ' ');
+			
+			// Set position
+			edit_file_ifstream.seekg(start_position);
+			
+			// Read data into buffer
+			edit_file_ifstream.read(&buffer[0], distance);
+			edit_file_ifstream.close();
+			
+			cout << "buffer: " << buffer << endl << endl;
+			
+			for (int i = 0; i < (new_file_length - file_length - 1); i++) {
+				edit_file.seekp(file_length + i, ios::beg);
+				edit_file.write("0", 1);
+			}
+			
+			cout << endl << "replace " << (new_file_length - 1) - buffer.length() << " " << buffer << endl;
+			replace((new_file_length - 1) - buffer.length(), buffer);
+			
+			replace(start_position, text_to_insert);
+			
+			// Calculate amount to load into memory
+				// Expl.: Which is smaller? Distance, or block_size?
+			int amount_to_load_into_memory = min(distance, block_size);
+		}
+	}
 }
 
 bool editor::file::execute_single_instruction(instruction instruction_to_execute) {
+
 	if (instruction_to_execute.get_operation_type() == replace_operation) {
 		replace(instruction_to_execute.get_start_position(), instruction_to_execute.get_text());
 		return true;
 	}
+	
+	if (instruction_to_execute.get_operation_type() == insert_operation) {
+		insert(instruction_to_execute.get_start_position(), instruction_to_execute.get_text());
+		return true;
+	}
+	
 	return false;
 }
 
