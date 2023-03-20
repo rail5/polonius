@@ -28,6 +28,8 @@ Polonius is made up of separate **binary modules**:
 
 
 ## Development Progress
+Development is done on **Debian**. Builds are also tested on **OpenBSD**. Target systems for release versions will be: **GNU/Linux**, **OpenBSD**, **FreeBSD**, **MacOS**, and **Windows**
+
 **polonius-reader**:
 
   ![99%](https://progress-bar.dev/99)
