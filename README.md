@@ -28,7 +28,7 @@ Polonius is made up of separate **binary modules**:
 
 
 ## Development Progress
-Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD**. Target systems for release versions will be: **GNU/Linux**, **OpenBSD**, **FreeBSD**, **MacOS**, and **Windows**. I'm hoping to provide **x86-64** as well as **arm64** releases.
+Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD**. Target systems for release versions will be: **GNU/Linux**, **OpenBSD**, **FreeBSD**, **MacOS**, and **Windows**. I'm hoping to provide **x86-64** as well as **arm64** builds.
 
 **polonius-reader**:
 
