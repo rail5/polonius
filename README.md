@@ -25,3 +25,10 @@ Polonius is made up of separate **binary modules**:
   - The *"reader"*, which outputs a *selected portion* of the contents of a file
   - The *"editor"*, which interprets editing instructions (*replace*, *insert*, and *remove*) and makes the requested changes to the file
   - And the interactive *UI*, which the user interfaces with and which ties together the functionality of the other modules.
+
+
+## Development
+**polonius-reader**: ![100%](https://progress-bar.dev/100)
+**polonius-editor**: ![70%](https://progress-bar.dev/70)
+**CLI**: ![0%](https://progress-bar.dev/0)
+**GUI**: ![0%](https://progress-bar.dev/0)
