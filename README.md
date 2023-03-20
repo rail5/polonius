@@ -30,19 +30,19 @@ Polonius is made up of separate **binary modules**:
 ## Development Progress
 **polonius-reader**:
 
-    ![99%](https://progress-bar.dev/99)
+  ![99%](https://progress-bar.dev/99)
   
 
 **polonius-editor**:
 
-    ![70%](https://progress-bar.dev/70)
+  ![70%](https://progress-bar.dev/70)
   
 
 **CLI**:
 
-    ![0%](https://progress-bar.dev/0)
+  ![0%](https://progress-bar.dev/0)
   
 
 **GUI**:
 
-    ![0%](https://progress-bar.dev/0)
+  ![0%](https://progress-bar.dev/0)
