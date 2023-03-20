@@ -184,7 +184,7 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 			int amount_to_store = block_size;
 			
 			// Adjust the length of the file by adding 0s to the end
-			for (int i = (file_length - 1); i < (new_file_length - 1); i++) {
+			for (long long int i = (file_length - 1); i < (new_file_length - 1); i++) {
 				edit_file.seekp(i, ios::beg);
 				edit_file.write("0", 1);
 			}
@@ -194,10 +194,10 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 			edit_file.write("\n", 1);
 			
 			for (long long int i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
-				
+			
 				long long int copy_to_this_position = (i - (amount_to_store - 1)) - 1;
 				long long int copy_from_this_position = (copy_to_this_position - insert_length);
-				
+
 				// Final iteration:
 				// If we discover that our "copy_from" position is before our start_position,
 					// (Due to block_size shenanigans --
