@@ -24,7 +24,7 @@ In order to achieve this, it never loads any more data into RAM than is currentl
 Polonius is made up of separate **binary modules**:
   - The *"reader"*, which outputs a *selected portion* of the contents of a file
   - The *"editor"*, which interprets editing instructions (*replace*, *insert*, and *remove*) and makes the requested changes to the file
-  - And the interactive *UI*, which the user interfaces with and which ties together the functionality of the other modules.
+  - And the interactive *UI*, which ties together the functionality of the other modules.
 
 
 ## Development Progress
