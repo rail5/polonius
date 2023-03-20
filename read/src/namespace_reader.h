@@ -11,7 +11,7 @@ namespace reader {
 		
 		public:
 			bool init(string path);
-			string read(long long int start_position, int amount_to_read);
+			string read(long long int start_position, long long int amount_to_read);
 			string get_init_error_message();
 			long long int get_file_length();
 	};

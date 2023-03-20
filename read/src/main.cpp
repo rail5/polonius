@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 	*/
 	string file_to_read = "";
 	long long int start_position = 0;
-	int amount_to_read = -1;
+	long long int amount_to_read = -1;
 	
 	/*
 	GETOPT
@@ -97,10 +97,8 @@ int main(int argc, char* argv[]) {
 	if (amount_to_read == -1) {
 		amount_to_read = the_file.get_file_length();
 	}
-	
-	string buffer = the_file.read(start_position, amount_to_read);
-	
-	cout << buffer;
+
+	cout << the_file.read(start_position, amount_to_read);
 
 	return 0;
 }

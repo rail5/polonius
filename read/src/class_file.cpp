@@ -29,7 +29,7 @@ bool reader::file::init(string path) {
 	return true;
 }
 
-string reader::file::read(long long int start_position, int amount_to_read) {
+string reader::file::read(long long int start_position, long long int amount_to_read) {
 
 	if (!initialized) {
 		string error = "Error reading file";
