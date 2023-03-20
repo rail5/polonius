@@ -27,22 +27,22 @@ Polonius is made up of separate **binary modules**:
   - And the interactive *UI*, which the user interfaces with and which ties together the functionality of the other modules.
 
 
-## Development
+## Development Progress
 **polonius-reader**:
 
-  ![100%](https://progress-bar.dev/100)
+    ![99%](https://progress-bar.dev/99)
   
 
 **polonius-editor**:
 
-  ![70%](https://progress-bar.dev/70)
+    ![70%](https://progress-bar.dev/70)
   
 
 **CLI**:
 
-  ![0%](https://progress-bar.dev/0)
+    ![0%](https://progress-bar.dev/0)
   
 
 **GUI**:
 
-  ![0%](https://progress-bar.dev/0)
+    ![0%](https://progress-bar.dev/0)
