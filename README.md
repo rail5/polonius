@@ -38,11 +38,11 @@ Polonius is made up of separate **binary modules**:
   ![70%](https://progress-bar.dev/70)
   
 
-**CLI**:
+**CLI (polonius)**:
 
   ![0%](https://progress-bar.dev/0)
   
 
-**GUI**:
+**GUI (polonius-gui)**:
 
   ![0%](https://progress-bar.dev/0)
