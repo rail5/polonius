@@ -8,8 +8,6 @@
 	#define GETOPT_H
 	#include <getopt.h>
 #endif
-/* get rid of this asap */
-#include <unistd.h>
 /* Needed for file_exists() function */
 #ifndef SYS_STAT_H
 	#define SYS_STAT_H
