@@ -1,7 +1,7 @@
 THIS REPO IS CURRENTLY A WORK-IN-PROGRESS. Polonius is not yet functional
 
 # polonius
-A memory-efficient and modular text editor
+A uniquely memory-efficient and modular text editor
 
 
 > Therefore, since brevity is the soul of wit
