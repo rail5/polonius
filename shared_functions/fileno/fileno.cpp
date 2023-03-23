@@ -1,3 +1,15 @@
+/***
+inline int fileno_hack(const std::basic_ios<charT, traits>& stream):
+	Returns the integer file descriptor of the provided C++ file stream
+	
+	Written by Richard. B Kreckel
+	https://www.ginac.de/~kreckel/fileno/
+
+
+I absolutely hate this code.
+But, I'm very grateful for what it does.
+***/
+
 #include "fileno.hpp"
 #include <cstdio>  // declaration of ::fileno
 #include <fstream>  // for basic_filebuf template
