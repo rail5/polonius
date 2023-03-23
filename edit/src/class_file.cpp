@@ -3,6 +3,11 @@
 	#include <filesystem>
 #endif
 
+#ifndef SYS_FILE_H
+	#define SYS_FILE_H
+	#include <sys/file.h>
+#endif
+
 using namespace std;
 
 bool editor::file::set_file(string file_path) {
@@ -23,16 +28,42 @@ bool editor::file::set_file(string file_path) {
 	file_directory = directory;
 	
 	/*
-	If we're not creating a new file, set file_length
+	Return error if the directory doesn't exist
 	*/
-	if (file_exists(file_name)) {
-		file_length = filesystem::file_size(file_path);
+	if (!file_exists(directory)) {
+		initialized = false;
+		return initialized;
 	}
 	
 	/*
-	Set "initialized" to true if the directory exists, false if not
+	Create the file if it doesn't already exist
 	*/
-	initialized = file_exists(directory);
+	if (!file_exists(file_name)) {
+		ofstream new_file(file_name);
+		new_file.close();
+	}
+	
+	/*
+	Set file_length, initialize the file stream, and set a POSIX file lock
+	*/
+	file_length = filesystem::file_size(file_path);
+	
+	file_stream = fstream(file_name, ios::binary | ios::out | ios::in);
+	
+	/*
+	Obtain file_descriptor in order to lock the file
+	*/
+	file_descriptor = fileno_hack(file_stream);
+	
+	if (flock(file_descriptor, LOCK_EX) == -1) {
+		initialized = false;
+		return initialized;
+	}
+	
+	/*
+	Set "initialized" to true if we've made it this far
+	*/
+	initialized = true;
 	
 	/*
 	Return likewise
@@ -137,15 +168,12 @@ void editor::file::replace(long long int start_position, string replacement_text
 		Execute a "REPLACE" instruction
 		Opens a file stream & replaces text inside the file, starting from start_position, with replacement_text
 	***/
-	
-	// Open the file stream
-	fstream edit_file(file_name, ios::binary | ios::out | ios::in);
-	
-	if (edit_file.is_open()) {
+
+	if (file_stream.is_open()) {
 		// Seek to start_position
-		edit_file.seekp(start_position, ios::beg);
+		file_stream.seekp(start_position, ios::beg);
 		// Replace
-		edit_file.write(replacement_text.c_str(), replacement_text.length());
+		file_stream.write(replacement_text.c_str(), replacement_text.length());
 	}
 }
 
@@ -156,28 +184,34 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 		Opens a file stream & inserts text_to_insert into the file at position start_position, without replacing
 	***/
 	
-	// Open the file stream
-	fstream edit_file(file_name, ios::binary | ios::out | ios::in);
-	
-	if (edit_file.is_open()) {
+	if (file_stream.is_open()) {
 	
 		long long int insert_length = text_to_insert.length();
 			
 		long long int new_file_length = file_length + insert_length;
 		
-		// Are we writing to EOF, or in the middle of the file?
-		if (start_position == (file_length - 1)) {
+		bool creating_new_file = (start_position == 0 && file_length == 0);
+		
+		bool writing_to_eof = (start_position == (file_length - 1));
+		
+		// Are we writing to EOF, or before EOF?
+		if (writing_to_eof || creating_new_file) {
 			// Writing TO EOF
 			
 			// Seek to EOF
-			edit_file.seekp(start_position, ios::beg);
+			file_stream.seekp(start_position, ios::beg);
 			
 			// Insert
-			edit_file.write(text_to_insert.c_str(), text_to_insert.length());
+			file_stream.write(text_to_insert.c_str(), text_to_insert.length());
+			
+			if (creating_new_file) {
+				// Compensate for the fact that we have to add a newline char to the end
+				new_file_length = new_file_length + 1;
+			}
 			
 			// Add a newline char
-			edit_file.seekp(new_file_length - 1, ios::beg);
-			edit_file.write("\n", 1);
+			file_stream.seekp(new_file_length - 1, ios::beg);
+			file_stream.write("\n", 1);
 		} else {
 			// Writing BEFORE EOF
 			
@@ -185,13 +219,13 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 			
 			// Adjust the length of the file by adding 0s to the end
 			for (long long int i = (file_length - 1); i < (new_file_length - 1); i++) {
-				edit_file.seekp(i, ios::beg);
-				edit_file.write("0", 1);
+				file_stream.seekp(i, ios::beg);
+				file_stream.write("0", 1);
 			}
 			
 			// Add a newline char
-			edit_file.seekp(new_file_length - 1, ios::beg);
-			edit_file.write("\n", 1);
+			file_stream.seekp(new_file_length - 1, ios::beg);
+			file_stream.write("\n", 1);
 			
 			for (long long int i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
 			
@@ -222,22 +256,22 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 				char* temp_data_storage = new char[amount_to_store + 1]{0}; // Allocate memory
 				
 				// Store read portion into allocated memory
-				edit_file.seekg(copy_from_this_position, ios::beg);
-				edit_file.read(temp_data_storage, amount_to_store);
+				file_stream.seekg(copy_from_this_position, ios::beg);
+				file_stream.read(temp_data_storage, amount_to_store);
 				
 				// Add a NUL char to the end to terminate the string
 				temp_data_storage[amount_to_store] = 0;
 				
 				// Copy it to its new proper place
-				edit_file.seekp(copy_to_this_position, ios::beg);
-				edit_file.write(temp_data_storage, amount_to_store);
+				file_stream.seekp(copy_to_this_position, ios::beg);
+				file_stream.write(temp_data_storage, amount_to_store);
 				
 				delete[] temp_data_storage; // Free memory
 			}
 			
 			// Now, finally, insert the damn data (user inputted data)
-			edit_file.seekp(start_position, ios::beg);
-			edit_file.write(text_to_insert.c_str(), text_to_insert.length());
+			file_stream.seekp(start_position, ios::beg);
+			file_stream.write(text_to_insert.c_str(), text_to_insert.length());
 		}
 	}
 }
@@ -263,4 +297,11 @@ editor::file add_file(string file_path) {
 	new_file.set_file(file_path);
 	
 	return new_file;
+}
+
+void editor::file::close() {
+	/* Close the fstream */
+	file_stream.close();
+	/* Unlock the file */
+	flock(file_descriptor, LOCK_UN);
 }

@@ -61,6 +61,8 @@ namespace editor {
 			long long int file_length = 0;
 			int block_size = 1024;
 			vector<instruction> instruction_set;
+			fstream file_stream;
+			int file_descriptor;
 		public:
 			bool set_file(string file_path);
 			void set_block_size(int specified_blocksize);
@@ -77,6 +79,8 @@ namespace editor {
 			int get_block_size();
 			long long int get_file_length();
 			vector<instruction> get_instruction_set();
+			
+			void close();
 	};
 
 	file add_file(string file_path);

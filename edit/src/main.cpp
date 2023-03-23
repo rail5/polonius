@@ -149,6 +149,9 @@ int main(int argc, char* argv[]) {
 		cout << "    error_message  =  " << instruction_set[i].get_error_message() << endl;
 		test_file.execute_single_instruction(instruction_set[i]);
 	}
+	
+	/* Close file */
+	test_file.close();
 	return 0;
 
 }
