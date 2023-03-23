@@ -44,9 +44,8 @@ bool editor::file::set_file(string file_path) {
 	}
 	
 	/*
-	Set file_length, initialize the file stream, and set a POSIX file lock
+	Initialize the file stream, set a POSIX file lock, and set file_length
 	*/
-	file_length = filesystem::file_size(file_path);
 	
 	file_stream = fstream(file_name, ios::binary | ios::out | ios::in);
 	
@@ -59,6 +58,8 @@ bool editor::file::set_file(string file_path) {
 		initialized = false;
 		return initialized;
 	}
+	
+	file_length = filesystem::file_size(file_path);
 	
 	/*
 	Set "initialized" to true if we've made it this far
