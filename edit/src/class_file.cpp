@@ -75,7 +75,7 @@ bool editor::file::set_file(string file_path) {
 		rather than continuing with our luxury C++ fstream
 	This FILE* will never be used, except to get the file descriptor so that we can lock the file during editing
 	*/
-	c_type_file = fopen(file_name.c_str(), "rw");
+	c_type_file = fopen(file_name.c_str(), "a+");
 	file_descriptor = fileno(c_type_file);
 	
 	if (flock(file_descriptor, LOCK_EX) == -1) {
@@ -146,7 +146,7 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	/*
 	Now, make sure that the start position isn't further than the end of the file
 	*/
-	if (input_instruction.get_start_position() > file_length) {
+	if (input_instruction.get_start_position() >= file_length) {
 		input_instruction.set_error_message("Invalid start position");
 		return false;
 	}
@@ -155,7 +155,7 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	Next, make sure that the end position isn't further than the end of the file IF we're doing anything other than an insert (operation type #1, see namespace_editor.h for list of operation types)
 	*/
 	if (input_instruction.get_operation_type() != insert_operation) {
-		if (input_instruction.get_end_position() > file_length) {
+		if (input_instruction.get_end_position() >= file_length) {
 			input_instruction.set_error_message("Invalid end position");
 			return false;
 		}
@@ -257,10 +257,7 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 		int amount_to_store = block_size;
 		
 		// Adjust the length of the file by adding 0s to the end
-		for (long long int i = (file_length - 1); i < (new_file_length - 1); i++) {
-			file_stream.seekp(i, ios::beg);
-			file_stream.write("0", 1);
-		}
+		ftruncate(file_descriptor, new_file_length);
 		
 		// Add a newline char
 		file_stream.seekp(new_file_length - 1, ios::beg);
@@ -326,13 +323,29 @@ void editor::file::remove(long long int start_position, long long int end_positi
 		return;
 	}
 	
-	long long int remove_length = (end_position - start_position);
+	long long int remove_length = (end_position - start_position) + 1;
 	
-	long long int new_file_length = (file_length - remove_length);
+	long long int new_file_length = (file_length - remove_length) + 1;
 	
 	int amount_to_store = block_size;
 	
-	// cont
+	cout << "file length: " << file_length << endl
+		<< "start position: " << start_position << endl
+		<< "end position: " << end_position << endl
+		<< "remove length: " << remove_length << endl
+		<< "new file length: " << new_file_length << endl;
+	
+	// Are we deleting the end of the file, or something before the end of the file?
+	if (end_position == (file_length - 1)) {
+		// Delete the end of the file (truncate to new_file_length)
+		ftruncate(file_descriptor, new_file_length);
+		
+		// Add a newline char
+		file_stream.seekp(new_file_length - 1, ios::beg);
+		file_stream.write("\n", 1);
+	} else {
+		// Before EOF
+	}
 }
 
 bool editor::file::execute_single_instruction(instruction instruction_to_execute) {
