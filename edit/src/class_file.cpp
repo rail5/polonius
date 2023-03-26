@@ -403,14 +403,6 @@ bool editor::file::execute_single_instruction(instruction instruction_to_execute
 	return false;
 }
 
-editor::file add_file(string file_path) {
-	editor::file new_file;
-	
-	new_file.set_file(file_path);
-	
-	return new_file;
-}
-
 void editor::file::close() {
 	/* Close the fstream */
 	file_stream.close();

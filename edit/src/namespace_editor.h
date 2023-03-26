@@ -85,8 +85,14 @@ namespace editor {
 			string get_error_message();
 			
 			void close();
+			
+			/*
+			Constructor
+			*/
+			file(string path, int blocksize = 1024) {
+				block_size = blocksize;
+				set_file(path);
+			}
 	};
-
-	file add_file(string file_path);
 
 }
