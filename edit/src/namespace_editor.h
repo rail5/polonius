@@ -64,6 +64,7 @@ namespace editor {
 			fstream file_stream;
 			FILE* c_type_file;
 			int file_descriptor;
+			string error_message = "";
 		public:
 			bool set_file(string file_path);
 			void set_block_size(int specified_blocksize);
@@ -80,6 +81,8 @@ namespace editor {
 			int get_block_size();
 			long long int get_file_length();
 			vector<instruction> get_instruction_set();
+			
+			string get_error_message();
 			
 			void close();
 	};

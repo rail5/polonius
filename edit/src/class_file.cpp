@@ -31,6 +31,7 @@ bool editor::file::set_file(string file_path) {
 	Return error if the directory doesn't exist
 	*/
 	if (!file_exists(directory)) {
+		error_message = "Path '" + directory + "' does not exist";
 		initialized = false;
 		return initialized;
 	}
@@ -41,6 +42,25 @@ bool editor::file::set_file(string file_path) {
 	if (!file_exists(file_name)) {
 		ofstream new_file(file_name);
 		new_file.close();
+		
+		/*
+		If the file still doesn't exist, we don't have write permissions to the directory
+		*/
+		if (!file_exists(file_name)) {
+			error_message = "File could not be created";
+			initialized = false;
+			return initialized;
+		}
+		
+	}
+	
+	/*
+	Check if we have write permissions to the file
+	*/
+	if (!file_is_writable(file_name)) {
+		error_message = "File is not writable by current user";
+		initialized = false;
+		return initialized;
 	}
 	
 	/*
@@ -59,6 +79,7 @@ bool editor::file::set_file(string file_path) {
 	file_descriptor = fileno(c_type_file);
 	
 	if (flock(file_descriptor, LOCK_EX) == -1) {
+		error_message = "Could not obtain file lock";
 		initialized = false;
 		return initialized;
 	}
@@ -69,6 +90,11 @@ bool editor::file::set_file(string file_path) {
 	Set "initialized" to true if we've made it this far
 	*/
 	initialized = true;
+	
+	/*
+	Clear any error message
+	*/
+	error_message = "";
 	
 	/*
 	Return likewise
@@ -165,6 +191,10 @@ long long int editor::file::get_file_length() {
 
 vector<editor::instruction> editor::file::get_instruction_set() {
 	return instruction_set;
+}
+
+string editor::file::get_error_message() {
+	return error_message;
 }
 
 void editor::file::replace(long long int start_position, string replacement_text) {

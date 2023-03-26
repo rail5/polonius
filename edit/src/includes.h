@@ -28,6 +28,11 @@
 	#define FILESYSTEM
 	#include <filesystem>
 #endif
+/* Needed for access() in bool file_is_writable() */
+#ifndef UNISTD_H
+	#define UNISTD_H
+	#include <unistd.h>
+#endif
 /* Needed for POSIX file locks */
 #ifndef SYS_FILE_H
 	#define SYS_FILE_H
@@ -48,6 +53,8 @@
 #include "../../shared_functions/file_exists.cpp"
 /* inline std::string isolate_path_from_filename(std::string filename) returns the path to the directory a given file is in */
 #include "../../shared_functions/isolate_path_from_filename.cpp"
+/* inline bool file_is_writable(std::string filename) returns true if current UID has write permissions to that path */
+#include "../../shared_functions/file_is_writable.cpp"
 /* inline std::string to_lower(std::string &input) returns the input string in all-lowercase */
 #include "../../shared_functions/to_lower.cpp"
 /* std::vector<std::string> explode(std::string const &input, char delimiter, int maximum_number_of_elements = 0) returns a vector<string> split based on the given delimiter. Similar to PHP's explode() */

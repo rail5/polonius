@@ -116,6 +116,11 @@ int main(int argc, char* argv[]) {
 
 	editor::file test_file = add_file(file_to_edit);
 	
+	if (!test_file.is_initialized()) {
+		cerr << program_name << ": " << test_file.get_error_message() << endl;
+		return 1;
+	}
+	
 	test_file.set_block_size(block_size);
 	
 	for (int i = 0; i < instructions_to_add.size(); i++) {
