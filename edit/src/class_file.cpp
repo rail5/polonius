@@ -411,3 +411,9 @@ void editor::file::close() {
 	/* Unlock the file */
 	flock(file_descriptor, LOCK_UN);
 }
+
+
+editor::file::file(string path, int blocksize) {
+	block_size = blocksize;
+	set_file(path);
+}

@@ -89,10 +89,7 @@ namespace editor {
 			/*
 			Constructor
 			*/
-			file(string path, int blocksize = 1024) {
-				block_size = blocksize;
-				set_file(path);
-			}
+			file(string path, int blocksize = 1024);
 	};
 
 }
