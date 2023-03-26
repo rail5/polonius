@@ -58,14 +58,14 @@ int main(int argc, char* argv[]) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
 					return 1;
 				}
-				start_position = (int)atol(optarg);
+				start_position = (long long int)atol(optarg);
 				break;
 			case 'l':
 				if (!is_number(optarg)) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
 					return 1;
 				}
-				amount_to_read = (int)atol(optarg);
+				amount_to_read = (long long int)atol(optarg);
 				break;
 			case 'h':
 				cout << helpstring;
