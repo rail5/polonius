@@ -314,7 +314,7 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 void editor::file::remove(long long int start_position, long long int end_position) {
 	/***
 	void editor::file::remove(long long int start_position, long long int end_position):
-		Execute an "REMOVE" instruction
+		Execute a "REMOVE" instruction
 		Opens a file stream & removes text from start_position to end_position,
 			shifting everything after end_position to the left
 	***/
@@ -323,17 +323,11 @@ void editor::file::remove(long long int start_position, long long int end_positi
 		return;
 	}
 	
-	long long int remove_length = (end_position - start_position) + 1;
+	long long int remove_length = (end_position - start_position);
 	
-	long long int new_file_length = (file_length - remove_length) + 1;
+	long long int new_file_length = (file_length - remove_length);
 	
 	int amount_to_store = block_size;
-	
-	cout << "file length: " << file_length << endl
-		<< "start position: " << start_position << endl
-		<< "end position: " << end_position << endl
-		<< "remove length: " << remove_length << endl
-		<< "new file length: " << new_file_length << endl;
 	
 	// Are we deleting the end of the file, or something before the end of the file?
 	if (end_position == (file_length - 1)) {
@@ -345,6 +339,43 @@ void editor::file::remove(long long int start_position, long long int end_positi
 		file_stream.write("\n", 1);
 	} else {
 		// Before EOF
+		
+		cout << endl << endl;
+		for (long long int i = start_position; i < (new_file_length - 1); i = (i + amount_to_store)) {
+			
+			long long int copy_to_this_position = i;
+			
+			long long int copy_from_this_position = (i + remove_length);
+			
+			// Final iteration:
+			// If we discover that our block_size is more than all the data that's left,
+			// we just reset it to the amount of data that's left.
+			if ((copy_from_this_position + amount_to_store) > (file_length - 1)) {
+				amount_to_store = ((file_length - 1) - copy_from_this_position);
+			}
+			
+			char* temp_data_storage = new char[amount_to_store + 1]{0}; // Allocate memory
+			
+			// Store read portion into allocated memory
+			file_stream.seekg(copy_from_this_position, ios::beg);
+			file_stream.read(temp_data_storage, amount_to_store);
+			
+			// Add a NUL char to the end to terminate the string
+			temp_data_storage[amount_to_store] = 0;
+			
+			// Copy it to its new proper place
+			file_stream.seekp(copy_to_this_position, ios::beg);
+			file_stream.write(temp_data_storage, amount_to_store);
+			
+			delete[] temp_data_storage; // Free memory
+		}
+		
+		// Now, finally, truncate the file to its new length
+		ftruncate(file_descriptor, new_file_length);
+		
+		// Add a newline char
+		file_stream.seekp(new_file_length - 1, ios::beg);
+		file_stream.write("\n", 1);
 	}
 }
 

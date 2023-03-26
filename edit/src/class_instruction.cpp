@@ -144,7 +144,7 @@ bool editor::instruction::set_remove_instruction(long long int start, long long 
 	*/
 	operation = remove_operation;
 	start_position = start;
-	end_position = end;
+	end_position = end + 1;
 	initialized = true;
 	
 	/* Clear any earlier error messages */
