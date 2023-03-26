@@ -340,7 +340,6 @@ void editor::file::remove(long long int start_position, long long int end_positi
 	} else {
 		// Before EOF
 		
-		cout << endl << endl;
 		for (long long int i = start_position; i < (new_file_length - 1); i = (i + amount_to_store)) {
 			
 			long long int copy_to_this_position = i;
