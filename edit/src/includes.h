@@ -44,9 +44,6 @@
 	#include <fstream>
 #endif
 
-/* Needed to obtain file descriptors from C++ file streams */
-/* inline int fileno_hack(const std::basic_ios<charT, traits>& stream) returns the integer file descriptor associated with the provided C++ file stream */
-#include "../../shared_functions/fileno/fileno.cpp"
 /* inline bool file_exists(std::string name) returns true if the file exists */
 #include "../../shared_functions/file_exists.cpp"
 /* inline std::string isolate_path_from_filename(std::string filename) returns the path to the directory a given file is in */

@@ -51,8 +51,12 @@ bool editor::file::set_file(string file_path) {
 	
 	/*
 	Obtain file_descriptor in order to lock the file
+	Unfortunately, the only portable way to do this is to open a SECOND file stream with the C-type FILE*
+		rather than continuing with our luxury C++ fstream
+	This FILE* will never be used, except to get the file descriptor so that we can lock the file during editing
 	*/
-	file_descriptor = fileno_hack(file_stream);
+	c_type_file = fopen(file_name.c_str(), "rw");
+	file_descriptor = fileno(c_type_file);
 	
 	if (flock(file_descriptor, LOCK_EX) == -1) {
 		initialized = false;
@@ -303,6 +307,8 @@ editor::file add_file(string file_path) {
 void editor::file::close() {
 	/* Close the fstream */
 	file_stream.close();
+	/* Close the C-type FILE* */
+	fclose(c_type_file);
 	/* Unlock the file */
 	flock(file_descriptor, LOCK_UN);
 }

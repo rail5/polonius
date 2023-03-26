@@ -62,6 +62,7 @@ namespace editor {
 			int block_size = 1024;
 			vector<instruction> instruction_set;
 			fstream file_stream;
+			FILE* c_type_file;
 			int file_descriptor;
 		public:
 			bool set_file(string file_path);
