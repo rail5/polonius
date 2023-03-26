@@ -37,7 +37,7 @@ Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD
 
 **polonius-editor**:
 
-  ![80%](https://progress-bar.dev/70)
+  ![80%](https://progress-bar.dev/80)
   
 
 **CLI (polonius)**:
