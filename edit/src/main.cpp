@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	
 	string program_author = "rail5";
 	
-	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename -a \"{INSTRUCTION}\"\n\nOptions:\n  -i\n  --input\n    Specify input file to edit\n\n  -a\n  --add-instruction\n    Instruct the program on how to edit your file\n      Example instructions:\n      REPLACE 5 hello world\n        (Replaces text, starting from byte #5, with \"hello world\")\n      INSERT 7 salut a tous\n        (Inserts \"salut a tous\" at byte #7, shifting the rest of the file without replacing it)\n      REMOVE 9 15\n        (Removes bytes #9 to #15 from the file)\n\n  -s\n  --add-instruction-set\n    Provide a set of multiple instructions for editing the file\n      Each instruction in the set should be on its own line, as in the following example:\n        --add-instruction-set \"REPLACE 20 hello world\n        INSERT 50 hello again\n        REMOVE 70 75\"\n\n  -c\n  --special-chars\n    Interpret escaped character sequences (\\n, \\t and \\\\)\n\n  -b\n  --block-size\n    Specify the amount of data from the file we're willing to load into memory at any given time\n      Example:\n        -b 10M\n        -b 200K\n      (Default 1 kilobyte)\n\n  -h\n  --help\n    Display this message\n\nExample:\n  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n";
+	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename -a \"{INSTRUCTION}\"\n\nOptions:\n  -i\n  --input\n    Specify input file to edit\n\n  -a\n  --add-instruction\n    Instruct the program on how to edit your file\n      Example instructions:\n      REPLACE 5 hello world\n        (Replaces text, starting from byte #5, with \"hello world\")\n      INSERT 7 salut a tous\n        (Inserts \"salut a tous\" at byte #7, shifting the rest of the file without replacing it)\n      REMOVE 9 15\n        (Removes bytes #9 to #15 from the file)\n\n  -s\n  --add-instruction-set\n    Provide a set of multiple instructions for editing the file\n      Each instruction in the set should be on its own line, as in the following example:\n        --add-instruction-set \"REPLACE 20 hello world\n        INSERT 50 hello again\n        REMOVE 70 75\"\n\n  -c\n  --special-chars\n    Interpret escaped character sequences (\\n, \\t and \\\\)\n\n  -b\n  --block-size\n    Specify the amount of data from the file we're willing to load into memory at any given time\n      Example:\n        -b 10M\n        -b 200K\n      (Default 1 kilobyte)\n\n  -v\n  --verbose\n    Verbose mode\n\n  -V\n  --version\n    Print version number\n\n  -h\n  --help\n    Display this message\n\nExample:\n  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n";
 	
 	
 	/*
@@ -30,6 +30,8 @@ int main(int argc, char* argv[]) {
 	vector<editor::instruction> instructions_to_add;
 	int block_size = 1024;
 	bool interpret_special_chars = false;
+	
+	bool verbose = false;
 	
 	/*
 	temp_instruction_set vector
@@ -59,10 +61,14 @@ int main(int argc, char* argv[]) {
 		
 		{"special-chars", no_argument, 0, 'c'},
 		
+		{"verbose", no_argument, 0, 'v'},
+		
+		{"version", no_argument, 0, 'V'},
+		
 		{"help", no_argument, 0, 'h'}
 	};
 	
-	while ((c = getopt_long(argc, argv, "i:s:a:b:ch", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "i:s:a:b:cvVh", long_options, &option_index)) != -1) {
 		switch(c) {
 			case 'i':
 				file_to_edit = optarg;
@@ -89,6 +95,15 @@ int main(int argc, char* argv[]) {
 				interpret_special_chars = true;
 				break;
 			
+			case 'v':
+				verbose = true;
+				break;
+			
+			case 'V':
+				cout << program_version << endl;
+				return 0;
+				break;
+			
 			case 'h':
 				cout << helpstring;
 				return 0;
@@ -108,7 +123,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	editor::file test_file(file_to_edit, block_size);
+	editor::file test_file(file_to_edit, block_size, verbose);
 	
 	if (!test_file.is_initialized()) {
 		cerr << program_name << ": " << test_file.get_error_message() << endl;
@@ -127,23 +142,9 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	
-	cout << endl << "DEBUG INFO:" << endl;
-	cout << "  Object editor::file test_file = add_file('" << file_to_edit << "')" << endl;
-	cout << "    initialized  =  " << test_file.is_initialized() << endl;
-	cout << "    file_name  =  " << test_file.get_file_name() << endl;
-	cout << "    file_directory   =  " << test_file.get_file_directory() << endl;
-	cout << "    file_length  =  " << test_file.get_file_length() << endl << endl;
-	
 	vector<editor::instruction> instruction_set = test_file.get_instruction_set();
 	
 	for (int i = 0; i < instruction_set.size(); i++) {
-		cout << "  Object INSTRUCTION #" << i << endl;
-		cout << "    initialized  =  " << instruction_set[i].is_initialized() << endl;
-		cout << "    operation_type  =  " << instruction_set[i].get_operation_type() << endl;
-		cout << "    start_position  =  " << instruction_set[i].get_start_position() << endl;
-		cout << "    end_position  =  " << instruction_set[i].get_end_position() << endl;
-		cout << "    text_input  =  " << instruction_set[i].get_text() << endl;
-		cout << "    error_message  =  " << instruction_set[i].get_error_message() << endl;
 		test_file.execute_single_instruction(instruction_set[i]);
 	}
 	

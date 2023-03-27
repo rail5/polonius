@@ -97,6 +97,10 @@ bool editor::file::set_file(string file_path) {
 	*/
 	error_message = "";
 	
+	if (verbose) {
+		cout << "Set file to " << file_path << endl;
+	}
+	
 	/*
 	Return likewise
 	*/
@@ -225,6 +229,10 @@ void editor::file::replace(long long int start_position, string replacement_text
 	// Flush changes
 	file_stream.flush();
 	fflush(c_type_file);
+	
+	if (verbose) {
+		cout << "Executed REPLACE instruction (" << start_position << ", " << replacement_text << ")" << endl;
+	}
 }
 
 void editor::file::insert(long long int start_position, string text_to_insert) {
@@ -272,6 +280,10 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 		// Update file_length for future instructions
 		file_length = new_file_length;
 		
+		if (verbose) {
+			cout << "Executed INSERT instruction (" << start_position << ", " << text_to_insert << ")" << endl;
+		}
+		
 		return;
 	}
 	
@@ -281,6 +293,10 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 	
 	// Adjust the length of the file by adding 0s to the end
 	ftruncate(file_descriptor, new_file_length);
+	
+	if (verbose) {
+		cout << "Adjusted file length to " << new_file_length << endl;
+	}
 	
 	// Add a newline char
 	file_stream.seekp(new_file_length - 1, ios::beg);
@@ -326,6 +342,10 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 		file_stream.write(temp_data_storage, amount_to_store);
 		
 		delete[] temp_data_storage; // Free memory
+		
+		if (verbose) {
+			cout << "Moved " << amount_to_store << " bytes to position #" << copy_to_this_position << " for INSERT instruction" << endl;
+		}
 	}
 	
 	// Now, finally, insert the damn data (user inputted data)
@@ -338,6 +358,10 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 	
 	// Update file_length for future instructions
 	file_length = new_file_length;
+	
+	if (verbose) {
+		cout << "Executed INSERT instruction (" << start_position << ", " << text_to_insert << ")" << endl;
+	}
 }
 
 void editor::file::remove(long long int start_position, long long int end_position) {
@@ -376,6 +400,10 @@ void editor::file::remove(long long int start_position, long long int end_positi
 		// Update file_length for future instructions
 		file_length = new_file_length;
 		
+		if (verbose) {
+			cout << "Executed REMOVE instruction (" << start_position << ", " << end_position << ")" << endl;
+		}
+		
 		return;
 	}
 	
@@ -407,6 +435,10 @@ void editor::file::remove(long long int start_position, long long int end_positi
 		file_stream.write(temp_data_storage, amount_to_store);
 		
 		delete[] temp_data_storage; // Free memory
+		
+		if (verbose) {
+			cout << "Moved " << amount_to_store << " bytes to position #" << copy_to_this_position << " for REMOVE instruction" << endl;
+		}
 	}
 	
 	// Now, finally, truncate the file to its new length
@@ -422,6 +454,10 @@ void editor::file::remove(long long int start_position, long long int end_positi
 	
 	// Update file_length for future instructions
 	file_length = new_file_length;
+	
+	if (verbose) {
+		cout << "Executed REMOVE instruction (" << start_position << ", " << end_position << ")" << endl;
+	}
 }
 
 bool editor::file::execute_single_instruction(instruction instruction_to_execute) {
@@ -454,7 +490,8 @@ void editor::file::close() {
 }
 
 
-editor::file::file(string path, int blocksize) {
+editor::file::file(string path, int blocksize, bool verbose_mode) {
 	block_size = blocksize;
+	verbose = verbose_mode;
 	set_file(path);
 }

@@ -16,7 +16,7 @@ inline int parse_block_units(const std::string &user_input) {
 	
 	std::string all_but_last_character = user_input.substr(0, user_input.length()-1);
 	
-	if (!is_number(all_but_last_character)) {
+	if (!is_number(all_but_last_character) && user_input.length() > 1) {
 		return -1;
 	}
 	

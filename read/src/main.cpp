@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	
 	string program_author = "rail5";
 
-	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename\n\nOptions:\n  -i\n  --input\n    Specify input file to read\n\n  -s\n  --start\n    Specify byte number to start reading from\n\n  -l\n  --length\n    Specify how many bytes to read\n\n  -h\n  --help\n    Display this message\n\nExample:\n  " + program_name + " --input ./file.txt --start 50 --length 10\n";
+	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename\n\nOptions:\n  -i\n  --input\n    Specify input file to read\n\n  -s\n  --start\n    Specify byte number to start reading from\n\n  -l\n  --length\n    Specify how many bytes to read\n\n  -V\n  --version\n    Print version number\n\n  -h\n  --help\n    Display this message\n\nExample:\n  " + program_name + " --input ./file.txt --start 50 --length 10\n";
 	
 	/*
 	Necessary info for the program to do its job
@@ -45,14 +45,16 @@ int main(int argc, char* argv[]) {
 		{"input", required_argument, 0, 'i'},
 		{"start", required_argument, 0, 's'},
 		{"length", required_argument, 0, 'l'},
+		{"version", no_argument, 0, 'V'},
 		{"help", no_argument, 0, 'h'}
 	};
 	
-	while ((c = getopt_long(argc, argv, "i:s:l:h", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "i:s:l:Vh", long_options, &option_index)) != -1) {
 		switch(c) {
 			case 'i':
 				file_to_read = optarg;
 				break;
+				
 			case 's':
 				if (!is_number(optarg)) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
@@ -60,6 +62,7 @@ int main(int argc, char* argv[]) {
 				}
 				start_position = (long long int)atol(optarg);
 				break;
+				
 			case 'l':
 				if (!is_number(optarg)) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
@@ -67,10 +70,17 @@ int main(int argc, char* argv[]) {
 				}
 				amount_to_read = (long long int)atol(optarg);
 				break;
+				
+			case 'V':
+				cout << program_version << endl;
+				return 0;
+				break;
+				
 			case 'h':
 				cout << helpstring;
 				return 0;
 				break;
+				
 			case '?':
 				if (optopt == 'i' || optopt == 's' || optopt == 'l') {
 					cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << endl << "Use -h for help" << endl;

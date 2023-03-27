@@ -72,6 +72,8 @@ namespace editor {
 			long long int file_length_after_last_instruction = 0;
 			
 			string error_message = "";
+			
+			bool verbose = false;
 		public:
 			bool set_file(string file_path);
 			
@@ -105,7 +107,7 @@ namespace editor {
 			/*
 			Constructor
 			*/
-			file(string path, int blocksize = 1024);
+			file(string path, int blocksize = 1024, bool verbose_mode = false);
 	};
 
 }
