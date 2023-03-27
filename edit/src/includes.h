@@ -61,6 +61,8 @@
 #include "../../shared_functions/explode.cpp"
 /* inline bool is_number(const std::string &s) returns true if all chars in string are digits */
 #include "../../shared_functions/is_number.cpp"
+/* inline int parse_block_units(const std::string &user_input) converts sizes such as '10K' or '16M' to equivalent in bytes */
+#include "../../shared_functions/parse_block_units.cpp"
 /* void remove_leading_whitespace(string &input) removes whitespace from the beginning of an input string */
 #include "../../shared_functions/remove_leading_whitespace.cpp"
 
