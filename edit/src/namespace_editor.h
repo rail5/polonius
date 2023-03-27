@@ -56,30 +56,47 @@ namespace editor {
 	class file {
 		private:
 			bool initialized = false;
+			
 			string file_name;
 			string file_directory;
+			
 			long long int file_length = 0;
-			int block_size = 1024;
-			vector<instruction> instruction_set;
+			
 			fstream file_stream;
 			FILE* c_type_file;
 			int file_descriptor;
+			
+			int block_size = 1024;
+			
+			vector<instruction> instruction_set;
+			long long int file_length_after_last_instruction = 0;
+			bool follow_position_logic = false;
+			
 			string error_message = "";
 		public:
 			bool set_file(string file_path);
+			
 			void set_block_size(int specified_blocksize);
+			
 			void replace(long long int start_position, string replacement_text);
 			void insert(long long int start_position, string text_to_insert);
 			void remove(long long int start_position, long long int end_position);
+			
 			bool add_instruction(instruction &input_instruction);
+			
 			bool execute_single_instruction(instruction instruction_to_execute);
+			
 			bool execute_instructions();
 			
 			bool is_initialized();
+			
 			string get_file_name();
 			string get_file_directory();
+			
 			int get_block_size();
+			
 			long long int get_file_length();
+			
 			vector<instruction> get_instruction_set();
 			
 			string get_error_message();

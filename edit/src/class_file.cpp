@@ -85,6 +85,7 @@ bool editor::file::set_file(string file_path) {
 	}
 	
 	file_length = filesystem::file_size(file_path);
+	file_length_after_last_instruction = file_length;
 	
 	/*
 	Set "initialized" to true if we've made it this far
@@ -146,8 +147,8 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	/*
 	Now, make sure that the start position isn't further than the end of the file
 	*/
-	if ( (input_instruction.get_start_position() >= file_length && file_length > 0) ||
-		(input_instruction.get_start_position() > 0 && file_length == 0) ) {
+	if ( (input_instruction.get_start_position() >= file_length_after_last_instruction && file_length_after_last_instruction > 0) ||
+		(input_instruction.get_start_position() > 0 && file_length_after_last_instruction == 0) ) {
 		input_instruction.set_error_message("Invalid start position");
 		return false;
 	}
@@ -156,16 +157,23 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	Next, make sure that the end position isn't further than the end of the file IF we're doing anything other than an insert (operation type #1, see namespace_editor.h for list of operation types)
 	*/
 	if (input_instruction.get_operation_type() != insert_operation) {
-		if (input_instruction.get_end_position() >= file_length) {
+		if (input_instruction.get_end_position() >= file_length_after_last_instruction) {
 			input_instruction.set_error_message("Invalid end position");
 			return false;
 		}
 	}
 	
 	/*
-	Add the instruction to the set and return true
+	Add the instruction to the set, update file_length_after_last_instruction, and return true
 	*/
 	instruction_set.push_back(input_instruction);
+	
+	if (input_instruction.get_operation_type() == insert_operation) {
+		file_length_after_last_instruction = (file_length_after_last_instruction + input_instruction.get_text().length());
+	} else if (input_instruction.get_operation_type() == remove_operation) {
+		long long int remove_length = (input_instruction.get_end_position() - input_instruction.get_start_position());
+		file_length_after_last_instruction = (file_length_after_last_instruction - remove_length);
+	}
 	
 	return true;
 }
@@ -213,6 +221,10 @@ void editor::file::replace(long long int start_position, string replacement_text
 	file_stream.seekp(start_position, ios::beg);
 	// Replace
 	file_stream.write(replacement_text.c_str(), replacement_text.length());
+	
+	// Flush changes
+	file_stream.flush();
+	fflush(c_type_file);
 }
 
 void editor::file::insert(long long int start_position, string text_to_insert) {
@@ -252,6 +264,13 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 		// Add a newline char
 		file_stream.seekp(new_file_length - 1, ios::beg);
 		file_stream.write("\n", 1);
+		
+		// Flush changes
+		file_stream.flush();
+		fflush(c_type_file);
+		
+		// Update file_length for future instructions
+		file_length = new_file_length;
 		
 		return;
 	}
@@ -312,6 +331,13 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 	// Now, finally, insert the damn data (user inputted data)
 	file_stream.seekp(start_position, ios::beg);
 	file_stream.write(text_to_insert.c_str(), text_to_insert.length());
+	
+	// Flush changes
+	file_stream.flush();
+	fflush(c_type_file);
+	
+	// Update file_length for future instructions
+	file_length = new_file_length;
 }
 
 void editor::file::remove(long long int start_position, long long int end_position) {
@@ -342,6 +368,13 @@ void editor::file::remove(long long int start_position, long long int end_positi
 		// Add a newline char
 		file_stream.seekp(new_file_length - 1, ios::beg);
 		file_stream.write("\n", 1);
+		
+		// Flush changes
+		file_stream.flush();
+		fflush(c_type_file);
+		
+		// Update file_length for future instructions
+		file_length = new_file_length;
 		
 		return;
 	}
@@ -382,6 +415,13 @@ void editor::file::remove(long long int start_position, long long int end_positi
 	// Add a newline char
 	file_stream.seekp(new_file_length - 1, ios::beg);
 	file_stream.write("\n", 1);
+	
+	// Flush changes
+	file_stream.flush();
+	fflush(c_type_file);
+	
+	// Update file_length for future instructions
+	file_length = new_file_length;
 }
 
 bool editor::file::execute_single_instruction(instruction instruction_to_execute) {
