@@ -10,5 +10,4 @@
 
 inline bool file_is_writable(std::string filename) {
 	return (access(filename.c_str(), W_OK) == 0);
-	#endif
 }
