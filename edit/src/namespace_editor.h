@@ -70,7 +70,6 @@ namespace editor {
 			
 			vector<instruction> instruction_set;
 			long long int file_length_after_last_instruction = 0;
-			bool follow_position_logic = false;
 			
 			string error_message = "";
 		public:
