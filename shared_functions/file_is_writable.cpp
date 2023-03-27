@@ -9,11 +9,6 @@
 #endif
 
 inline bool file_is_writable(std::string filename) {
-
-	#ifdef _WIN32
-	return true;
-	#else
-	
 	return (access(filename.c_str(), W_OK) == 0);
 	#endif
 }
