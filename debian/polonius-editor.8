@@ -1,0 +1,79 @@
+.\" Manpage for polonius-editor
+.\" Contact andrew@rail5.org to correct errors or typos.
+.TH man 8 "27 March 2023" "0.1" "polonius-editor man page"
+.SH NAME
+polonius-editor
+.SH SYNOPSIS
+polonius-editor -i FILE -a "{INSTRUCTION}"
+.SH DESCRIPTION
+polonius-editor sequentially executes editing instructions on a file
+.SH OPTIONS
+  -i
+  --input
+    Specify file to edit
+
+  -a
+  --add-instruction
+    Instruct the program on how to edit your file
+
+      Example instructions:
+
+        REPLACE 5 hello world
+          (Replaces text, starting from byte #5, with "hello world")
+
+        INSERT 7 salut a tous
+          (Inserts "salut a tous" at byte #7, shifting the rest of the file without replacing it)
+
+        REMOVE 9 15
+          (Removes bytes #9 to #15 from the file)
+
+  -s
+  --add-instruction-set
+    Provide a set of multiple instructions for editing the file
+
+      Each instruction in the set should be on its own line, as in the following example:
+
+        --add-instruction-set "REPLACE 20 hello world
+        INSERT 50 hello again
+        REMOVE 70 75"
+
+  -c
+  --special-chars
+    Interpret escaped character sequences (\n, \t, and \\)
+
+  -b
+  --block-size
+    Specify the maximum amount of data we can load from the file into memory at any given time
+
+      Example:
+
+        -b 10M
+          Sets block size to 10 megabytes
+        -b 200K
+          Sets block size to 200 kilobytes
+        -b 512
+          Sets block size to 512 bytes
+
+      Defaults to 1 kilobyte
+
+  -v
+  --verbose
+    Verbose mode
+
+  -V
+  --version
+    Print version number
+
+  -h
+  --help
+    Display help menu
+
+
+  Examples:
+
+    polonius-editor --input ./file.txt --add-instruction "REPLACE 20 hello \n world" --add-instruction "REMOVE 10 12" --block-size 10K --special-chars
+
+    polonius-editor -i ./file.txt -s "INSERT 30 hello \n world
+    REPLACE 10 replacement" -v -b 10M -c
+.SH AUTHOR
+rail5 (andrew@rail5.org)

@@ -123,10 +123,10 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	editor::file test_file(file_to_edit, block_size, verbose);
+	editor::file document(file_to_edit, block_size, verbose);
 	
-	if (!test_file.is_initialized()) {
-		cerr << program_name << ": " << test_file.get_error_message() << endl;
+	if (!document.is_initialized()) {
+		cerr << program_name << ": " << document.get_error_message() << endl;
 		return 1;
 	}
 	
@@ -136,20 +136,20 @@ int main(int argc, char* argv[]) {
 			instructions_to_add[i].process_special_chars();
 		}
 		
-		if (!test_file.add_instruction(instructions_to_add[i])) {
+		if (!document.add_instruction(instructions_to_add[i])) {
 			cerr << program_name << ": " << instructions_to_add[i].get_error_message() << endl;
 			return 1;
 		}
 	}
 	
-	vector<editor::instruction> instruction_set = test_file.get_instruction_set();
+	vector<editor::instruction> instruction_set = document.get_instruction_set();
 	
 	for (int i = 0; i < instruction_set.size(); i++) {
-		test_file.execute_single_instruction(instruction_set[i]);
+		document.execute_single_instruction(instruction_set[i]);
 	}
 	
 	/* Close file */
-	test_file.close();
+	document.close();
 	return 0;
 
 }

@@ -1,0 +1,14 @@
+Source: polonius
+Maintainer: rail5 <andrew@rail5.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Section: utils
+
+Package: polonius
+Version: 0.1
+License: GPL-3.0
+Vendor: rail5 <andrew@rail5.org>
+Priority: optional
+Architecture: any
+Depends: libstdc++6, libgcc-s1, libc6
+Description: A uniquely memory-efficient text editor

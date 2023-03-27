@@ -1,0 +1,46 @@
+.\" Manpage for polonius-reader
+.\" Contact andrew@rail5.org to correct errors or typos.
+.TH man 8 "27 March 2023" "0.1" "polonius-reader man page"
+.SH NAME
+polonius-reader
+.SH SYNOPSIS
+polonius-reader -i FILE
+.SH DESCRIPTION
+polonius-reader outputs a selected portion of the contents of a file
+.SH OPTIONS
+  -i
+  --input
+    Specify file to read
+
+  -s
+  --start
+    Specify start position (byte number in the file)
+
+      Example:
+        -s 50
+          (Starts reading at byte #50 in the file)
+
+  -l
+  --length
+    Specify how many bytes to read
+
+  -V
+  --version
+    Print version number
+
+  -h
+  --help
+    Display help message
+
+
+  Examples:
+
+    polonius-reader --input ./file.txt --start 50 --length 10
+
+    polonius-reader -i ./file.txt -s 50
+
+    polonius-reader -i ./file.txt -l 10
+
+    polonius-reader -i ./file.txt
+.SH AUTHOR
+rail5 (andrew@rail5.org)

@@ -1,0 +1,12 @@
+polonius (0.1) bullseye; urgency=low
+
+  * Initial release
+  polonius-reader and polonius-editor
+  are functional, however the editor
+  does not yet support Multi-Byte
+  Character Sets (ASCII only),
+  and there is not yet any
+  interactive CLI or GUI
+  Those will come in time
+
+ -- rail5 <andrew@rail5.org>  Tue, 27 Mar 2023 01:42:07 -0400
