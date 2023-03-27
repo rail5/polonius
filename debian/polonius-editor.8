@@ -39,7 +39,7 @@ polonius-editor sequentially executes editing instructions on a file
 
   -c
   --special-chars
-    Interpret escaped character sequences (\n, \t, and \\)
+    Interpret escaped character sequences (\\n, \\t, and \\\\)
 
   -b
   --block-size
@@ -71,9 +71,9 @@ polonius-editor sequentially executes editing instructions on a file
 
   Examples:
 
-    polonius-editor --input ./file.txt --add-instruction "REPLACE 20 hello \n world" --add-instruction "REMOVE 10 12" --block-size 10K --special-chars
+    polonius-editor --input ./file.txt --add-instruction "REPLACE 20 hello \\n world" --add-instruction "REMOVE 10 12" --block-size 10K --special-chars
 
-    polonius-editor -i ./file.txt -s "INSERT 30 hello \n world
+    polonius-editor -i ./file.txt -s "INSERT 30 hello \\n world
     REPLACE 10 replacement" -v -b 10M -c
 .SH AUTHOR
 rail5 (andrew@rail5.org)
