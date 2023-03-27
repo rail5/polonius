@@ -146,7 +146,8 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	/*
 	Now, make sure that the start position isn't further than the end of the file
 	*/
-	if (input_instruction.get_start_position() >= file_length) {
+	if ( (input_instruction.get_start_position() >= file_length && file_length > 0) ||
+		(input_instruction.get_start_position() > 0 && file_length == 0) ) {
 		input_instruction.set_error_message("Invalid start position");
 		return false;
 	}
