@@ -1,3 +1,8 @@
+#ifndef FN_IS_NUMBER
+	#define FN_IS_NUMBER
+	#include "is_number.cpp"
+#endif
+
 inline int parse_block_units(const std::string &user_input) {
 	/***
 	inline int parse_block_units(std::string user_input):
