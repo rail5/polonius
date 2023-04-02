@@ -22,32 +22,32 @@ namespace editor {
 				3 = remove
 			*/
 			
-			long long int start_position = -1;
-			long long int end_position = -1;
+			int64_t start_position = -1;
+			int64_t end_position = -1;
 			string text_input = "";
 			
 			string error_message = "";
 		public:
 			void clear_instruction();
 			void process_special_chars();
-			bool set_replace_instruction(long long int start, string text);
-			bool set_insert_instruction(long long int start, string text);
-			bool set_remove_instruction(long long int start, long long int end);
+			bool set_replace_instruction(int64_t start, string text);
+			bool set_insert_instruction(int64_t start, string text);
+			bool set_remove_instruction(int64_t start, int64_t end);
 			void set_error_message(string message);
 			
 			string get_error_message();
 			
 			bool is_initialized();
 			int get_operation_type();
-			long long int get_start_position();
-			long long int get_end_position();
+			int64_t get_start_position();
+			int64_t get_end_position();
 			string get_text();
 
 	};
 	
-	instruction create_replace_instruction(long long int start_position, string text);
-	instruction create_insert_instruction(long long int start_position, string text);
-	instruction create_remove_instruction(long long int start_position, long long int end_position);
+	instruction create_replace_instruction(int64_t start_position, string text);
+	instruction create_insert_instruction(int64_t start_position, string text);
+	instruction create_remove_instruction(int64_t start_position, int64_t end_position);
 	
 	instruction parse_instruction_string(string instruction_string);
 	
@@ -60,7 +60,7 @@ namespace editor {
 			string file_name;
 			string file_directory;
 			
-			long long int file_length = 0;
+			int64_t file_length = 0;
 			
 			fstream file_stream;
 			FILE* c_type_file;
@@ -69,7 +69,7 @@ namespace editor {
 			int block_size = 1024;
 			
 			vector<instruction> instruction_set;
-			long long int file_length_after_last_instruction = 0;
+			int64_t file_length_after_last_instruction = 0;
 			
 			string error_message = "";
 			
@@ -79,9 +79,9 @@ namespace editor {
 			
 			void set_block_size(int specified_blocksize);
 			
-			void replace(long long int start_position, string replacement_text);
-			void insert(long long int start_position, string text_to_insert);
-			void remove(long long int start_position, long long int end_position);
+			void replace(int64_t start_position, string replacement_text);
+			void insert(int64_t start_position, string text_to_insert);
+			void remove(int64_t start_position, int64_t end_position);
 			
 			bool add_instruction(instruction &input_instruction);
 			
@@ -96,7 +96,7 @@ namespace editor {
 			
 			int get_block_size();
 			
-			long long int get_file_length();
+			int64_t get_file_length();
 			
 			vector<instruction> get_instruction_set();
 			

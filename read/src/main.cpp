@@ -30,8 +30,8 @@ int main(int argc, char* argv[]) {
 		"amount_to_read" == -1 will result in reading from the start position to the end of the file
 	*/
 	string file_to_read = "";
-	long long int start_position = 0;
-	long long int amount_to_read = -1;
+	int64_t start_position = 0;
+	int64_t amount_to_read = -1;
 	
 	/*
 	GETOPT
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
 					return 1;
 				}
-				start_position = (long long int)atol(optarg);
+				start_position = (int64_t)atol(optarg);
 				break;
 				
 			case 'l':
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
 					return 1;
 				}
-				amount_to_read = (long long int)atol(optarg);
+				amount_to_read = (int64_t)atol(optarg);
 				break;
 				
 			case 'V':

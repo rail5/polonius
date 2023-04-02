@@ -33,7 +33,7 @@ void editor::instruction::process_special_chars() {
 
 }
 
-bool editor::instruction::set_replace_instruction(long long int start, string text) {
+bool editor::instruction::set_replace_instruction(int64_t start, string text) {
 	/***
 	bool set_replace_instruction():
 		- Sets the current instruction to type "replace"
@@ -70,7 +70,7 @@ bool editor::instruction::set_replace_instruction(long long int start, string te
 	return true;
 }
 
-bool editor::instruction::set_insert_instruction(long long int start, string text) {
+bool editor::instruction::set_insert_instruction(int64_t start, string text) {
 	/***
 	bool set_insert_instruction():
 		- Sets the current instruction to type "insert"
@@ -107,7 +107,7 @@ bool editor::instruction::set_insert_instruction(long long int start, string tex
 	return true;
 }
 
-bool editor::instruction::set_remove_instruction(long long int start, long long int end) {
+bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 	/***
 	bool set_remove_instruction():
 		- Sets the current instruction to type "remove"
@@ -174,11 +174,11 @@ int editor::instruction::get_operation_type() {
 	return operation;
 }
 
-long long int editor::instruction::get_start_position() {
+int64_t editor::instruction::get_start_position() {
 	return start_position;
 }
 
-long long int editor::instruction::get_end_position() {
+int64_t editor::instruction::get_end_position() {
 	return end_position;
 }
 
@@ -186,7 +186,7 @@ string editor::instruction::get_text() {
 	return text_input;
 }
 
-editor::instruction create_replace_instruction(long long int start_position, string text) {
+editor::instruction create_replace_instruction(int64_t start_position, string text) {
 	editor::instruction new_instruction;
 	
 	new_instruction.set_replace_instruction(start_position, text);
@@ -194,7 +194,7 @@ editor::instruction create_replace_instruction(long long int start_position, str
 	return new_instruction;
 }
 
-editor::instruction create_insert_instruction(long long int start_position, string text) {
+editor::instruction create_insert_instruction(int64_t start_position, string text) {
 	editor::instruction new_instruction;
 	
 	new_instruction.set_insert_instruction(start_position, text);
@@ -202,7 +202,7 @@ editor::instruction create_insert_instruction(long long int start_position, stri
 	return new_instruction;
 }
 
-editor::instruction create_remove_instruction(long long int start_position, int end_position) {
+editor::instruction create_remove_instruction(int64_t start_position, int end_position) {
 	editor::instruction new_instruction;
 	
 	new_instruction.set_remove_instruction(start_position, end_position);
@@ -320,21 +320,21 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	Now, to actually create the 'instruction' object
 	*/
 	if (is_replace_instruction) {
-		long long int start_position = (long long int)stol(instruction_vector[1]);
+		int64_t start_position = (int64_t)stol(instruction_vector[1]);
 		
 		return create_replace_instruction(start_position, instruction_vector[2]);
 	}
 	
 	if (is_insert_instruction) {
-		long long int start_position = (long long int)stol(instruction_vector[1]);
+		int64_t start_position = (int64_t)stol(instruction_vector[1]);
 		
 		return create_insert_instruction(start_position, instruction_vector[2]);
 	}
 	
 	if (is_remove_instruction) {
-		long long int start_position = (long long int)stol(instruction_vector[1]);
+		int64_t start_position = (int64_t)stol(instruction_vector[1]);
 		
-		long long int end_position = (long long int)stol(instruction_vector[2]);
+		int64_t end_position = (int64_t)stol(instruction_vector[2]);
 		
 		return create_remove_instruction(start_position, end_position);
 	}

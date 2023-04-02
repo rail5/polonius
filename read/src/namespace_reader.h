@@ -7,12 +7,12 @@ namespace reader {
 			bool initialized = false;
 			string file_name;
 			string init_error_message = "unknown";
-			long long int file_length = 0;
+			int64_t file_length = 0;
 		
 		public:
 			bool init(string path);
-			string read(long long int start_position, long long int amount_to_read);
+			string read(int64_t start_position, int64_t amount_to_read);
 			string get_init_error_message();
-			long long int get_file_length();
+			int64_t get_file_length();
 	};
 }

@@ -175,7 +175,7 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	if (input_instruction.get_operation_type() == insert_operation) {
 		file_length_after_last_instruction = (file_length_after_last_instruction + input_instruction.get_text().length());
 	} else if (input_instruction.get_operation_type() == remove_operation) {
-		long long int remove_length = (input_instruction.get_end_position() - input_instruction.get_start_position());
+		int64_t remove_length = (input_instruction.get_end_position() - input_instruction.get_start_position());
 		file_length_after_last_instruction = (file_length_after_last_instruction - remove_length);
 	}
 	
@@ -198,7 +198,7 @@ int editor::file::get_block_size() {
 	return block_size;
 }
 
-long long int editor::file::get_file_length() {
+int64_t editor::file::get_file_length() {
 	return file_length;
 }
 
@@ -210,9 +210,9 @@ string editor::file::get_error_message() {
 	return error_message;
 }
 
-void editor::file::replace(long long int start_position, string replacement_text) {
+void editor::file::replace(int64_t start_position, string replacement_text) {
 	/***
-	void editor::file::replace(long long int start_position, string replacement_text):
+	void editor::file::replace(int64_t start_position, string replacement_text):
 		Execute a "REPLACE" instruction
 		Opens a file stream & replaces text inside the file, starting from start_position, with replacement_text
 	***/
@@ -235,9 +235,9 @@ void editor::file::replace(long long int start_position, string replacement_text
 	}
 }
 
-void editor::file::insert(long long int start_position, string text_to_insert) {
+void editor::file::insert(int64_t start_position, string text_to_insert) {
 	/***
-	void editor::file::insert(long long int start_position, string text_to_insert):
+	void editor::file::insert(int64_t start_position, string text_to_insert):
 		Execute an "INSERT" instruction
 		Opens a file stream & inserts text_to_insert into the file at position start_position, without replacing
 	***/
@@ -246,9 +246,9 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 		return;
 	}
 
-	long long int insert_length = text_to_insert.length();
+	int64_t insert_length = text_to_insert.length();
 		
-	long long int new_file_length = file_length + insert_length;
+	int64_t new_file_length = file_length + insert_length;
 	
 	bool creating_new_file = (start_position == 0 && file_length == 0);
 	
@@ -302,10 +302,10 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 	file_stream.seekp(new_file_length - 1, ios::beg);
 	file_stream.write("\n", 1);
 	
-	for (long long int i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
+	for (int64_t i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
 	
-		long long int copy_to_this_position = (i - (amount_to_store - 1)) - 1;
-		long long int copy_from_this_position = (copy_to_this_position - insert_length);
+		int64_t copy_to_this_position = (i - (amount_to_store - 1)) - 1;
+		int64_t copy_from_this_position = (copy_to_this_position - insert_length);
 
 		// Final iteration:
 		// If we discover that our "copy_from" position is before our start_position,
@@ -317,7 +317,7 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 		// And set i = start_position to make sure the loop doesn't run again after this
 		if (copy_from_this_position < start_position) {
 		
-			long long int difference = start_position - copy_from_this_position;
+			int64_t difference = start_position - copy_from_this_position;
 			
 			copy_from_this_position = start_position;
 			
@@ -364,9 +364,9 @@ void editor::file::insert(long long int start_position, string text_to_insert) {
 	}
 }
 
-void editor::file::remove(long long int start_position, long long int end_position) {
+void editor::file::remove(int64_t start_position, int64_t end_position) {
 	/***
-	void editor::file::remove(long long int start_position, long long int end_position):
+	void editor::file::remove(int64_t start_position, int64_t end_position):
 		Execute a "REMOVE" instruction
 		Opens a file stream & removes text from start_position to end_position,
 			shifting everything after end_position to the left
@@ -376,9 +376,9 @@ void editor::file::remove(long long int start_position, long long int end_positi
 		return;
 	}
 	
-	long long int remove_length = (end_position - start_position);
+	int64_t remove_length = (end_position - start_position);
 	
-	long long int new_file_length = (file_length - remove_length);
+	int64_t new_file_length = (file_length - remove_length);
 	
 	int amount_to_store = block_size;
 	
@@ -408,11 +408,11 @@ void editor::file::remove(long long int start_position, long long int end_positi
 	}
 	
 	// Before EOF
-	for (long long int i = start_position; i < (new_file_length - 1); i = (i + amount_to_store)) {
+	for (int64_t i = start_position; i < (new_file_length - 1); i = (i + amount_to_store)) {
 		
-		long long int copy_to_this_position = i;
+		int64_t copy_to_this_position = i;
 		
-		long long int copy_from_this_position = (i + remove_length);
+		int64_t copy_from_this_position = (i + remove_length);
 		
 		// Final iteration:
 		// If we discover that our block_size is more than all the data that's left,
