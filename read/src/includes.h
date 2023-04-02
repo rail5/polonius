@@ -19,9 +19,9 @@
 	#include <fstream>
 #endif
 /* Needed for "file_exists()" function */
-#ifndef SYS_STAT_H
-	#define SYS_STAT_H
-	#include <sys/stat.h>
+#ifndef UNISTD_H
+	#define UNISTD_H
+	#include <unistd.h>
 #endif
 
 /* inline bool is_number(const std::string &s) returns true if all chars in string are digits */

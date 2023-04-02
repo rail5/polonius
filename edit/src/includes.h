@@ -8,11 +8,6 @@
 	#define GETOPT_H
 	#include <getopt.h>
 #endif
-/* Needed for file_exists() function */
-#ifndef SYS_STAT_H
-	#define SYS_STAT_H
-	#include <sys/stat.h>
-#endif
 /* Needed for explode() function */
 #ifndef SSTREAM
 	#define SSTREAM
@@ -28,7 +23,7 @@
 	#define FILESYSTEM
 	#include <filesystem>
 #endif
-/* Needed for access() in bool file_is_writable() */
+/* Needed for access() in bool file_is_writable() & in file_exists() */
 #ifndef UNISTD_H
 	#define UNISTD_H
 	#include <unistd.h>
