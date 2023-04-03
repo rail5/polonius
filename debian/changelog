@@ -1,3 +1,9 @@
+polonius (0.2) bullseye; urgency=medium
+
+  * Adding i386 and arm64 builds
+
+ -- rail5 <andrew@rail5.org>  Sun, 02 Apr 2023 22:18:32 -0400
+
 polonius (0.1) bullseye; urgency=low
 
   * Initial release
