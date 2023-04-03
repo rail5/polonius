@@ -23,9 +23,13 @@ namespace polonius {
 			bool initialized = false;
 			int y_coordinate = 0;
 			int x_coordinate = 0;
+			int y_limit = 0;
+			int x_limit = 0;
 		public:
-			void move(int y, int x);
 			void set_initialized(bool set_value);
+			
+			void move(int y, int x);
+			void set_limits(int y, int x);
 			
 			int get_y_coordinate();
 			int get_x_coordinate();

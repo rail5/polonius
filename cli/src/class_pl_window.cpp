@@ -25,6 +25,7 @@ void polonius::pl_window::init() {
 	polonius_window = newwin(height, width, 0, 0);
 	
 	attached_cursor = create_new_cursor();
+	attached_cursor.set_limits(height, width);
 	
 	initialized = true;
 }
@@ -52,6 +53,7 @@ void polonius::pl_window::move_cursor(movement_plane dimension, int how_far) {
 	} else if (dimension == vertical) {
 		y = (y + how_far);
 	}
+	
 	attached_cursor.move(y, x);
 }
 
