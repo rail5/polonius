@@ -5,3 +5,4 @@
 override_dh_auto_install:
 	install -D -m 0755 polonius-reader $$(pwd)/debian/polonius/usr/bin/polonius-reader
 	install -D -m 0755 polonius-editor $$(pwd)/debian/polonius/usr/bin/polonius-editor
+	install -D -m 0755 polonius $$(pwd)/debian/polonius/usr/bin/polonius

@@ -1,4 +1,4 @@
-all: reader editor cli
+all: reader editor curses
 	
 reader:
 	cd read && $(MAKE)
@@ -8,9 +8,9 @@ editor:
 	cd edit && $(MAKE)
 	mv edit/bin/polonius-editor ./
 
-cli:
+curses:
 	cd cli && $(MAKE)
-	mv ci/bin/polonius ./
+	mv cli/bin/polonius ./
 
 install:
 	install -m 0755 polonius-reader /usr/bin

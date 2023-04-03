@@ -1,6 +1,6 @@
 Source: polonius
 Maintainer: rail5 <andrew@rail5.org>
-Build-Depends: debhelper (>= 8.0.0)
+Build-Depends: debhelper (>= 8.0.0), libncurses-dev
 Standards-Version: 3.9.3
 Section: utils
 
@@ -10,5 +10,5 @@ License: GPL-3.0
 Vendor: rail5 <andrew@rail5.org>
 Priority: optional
 Architecture: any
-Depends: libstdc++6, libgcc-s1, libc6
+Depends: libstdc++6, libgcc-s1, libc6, libncurses6, libncursesw6
 Description: A uniquely memory-efficient text editor
