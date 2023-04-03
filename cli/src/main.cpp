@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
 	polonius::pl_window program_window = create_window();
 	
 	program_window.handle_updates();
+	
+	program_window.close();
 
 	return 0;
 }

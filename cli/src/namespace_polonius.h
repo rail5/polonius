@@ -13,6 +13,11 @@ namespace polonius {
 	class cursor;
 	class pl_window;
 	
+	enum movement_plane {
+		horizontal,
+		vertical
+	};
+	
 	class cursor {
 		private:
 			bool initialized = false;
@@ -24,6 +29,8 @@ namespace polonius {
 			
 			int get_y_coordinate();
 			int get_x_coordinate();
+			
+			bool can_move_left();
 	};
 
 	class pl_window {
@@ -34,14 +41,19 @@ namespace polonius {
 			int height = 0;
 			int width = 0;
 			
-			void move_cursor(int y, int x);
+			void raw_move_cursor(int y, int x);
 		public:
 			bool is_initialized();
 		
 			void init();
 			void refresh_window();
+			void close();
 			
 			cursor attached_cursor;
+			
+			void move_cursor(movement_plane dimension, int how_far);
+			
+			void put_char(int ch);
 			
 			void handle_updates();
 			
