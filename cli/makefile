@@ -1,5 +1,5 @@
 CXX=g++
-PARAMS=-O2 -s
+PARAMS=-O2 -s -Wall -Wextra
 LIBS=-lncurses
 
 all:

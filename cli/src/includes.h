@@ -14,4 +14,5 @@
 #endif
 
 #include "namespace_polonius.h"
-#include "class_window.cpp"
+#include "class_cursor.cpp"
+#include "class_pl_window.cpp"

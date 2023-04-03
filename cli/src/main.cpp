@@ -22,16 +22,9 @@ int main(int argc, char* argv[]) {
 	
 	string helpstring = "No help here.\n";
 	
-	polonius::window program_window = create_window();
+	polonius::pl_window program_window = create_window();
 	
-	while (true) {
-		// Move the cursor one step every quarter second
-		
-		for (int place = 0; place < program_window.get_width(); place++) {
-			program_window.move_cursor(0, place);
-			usleep(250000);
-		}
-	}
+	program_window.handle_updates();
 
 	return 0;
 }
