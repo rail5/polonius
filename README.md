@@ -42,7 +42,7 @@ Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD
 
 **CLI (polonius)**:
 
-  ![0%](https://progress-bar.dev/0)
+  ![1%](https://progress-bar.dev/1)
   
 
 **GUI (polonius-gui)**:
