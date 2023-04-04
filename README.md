@@ -18,9 +18,9 @@ Polonius is a text editor with a focus on memory efficiency.
 Although Polonius can be used as a general-purpose text editor, it is primarily designed for editing **very large files** on systems with **very little RAM**.
 
 Most text editors function by:
-  **(1)** *loading the entire contents of a file into RAM*,
-  **(2)** *making changes to that portion of RAM*,
-  and then **(3)** *writing that portion of RAM back to the disk*.
+  - **(1)** *loading the entire contents of a file into RAM*,
+  - **(2)** *making changes to that portion of RAM*,
+  - and then **(3)** *writing that portion of RAM back to the disk*.
 
 There's nothing wrong with this method -- but it does limit you to how much you can load into RAM at any one time. Try editing a 100GB file in a normal text editor!
 
