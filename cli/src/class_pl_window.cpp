@@ -128,13 +128,13 @@ void polonius::pl_window::put_string(string &input, bool and_move_cursor) {
 		put_char(input.at(i));
 		
 		if (input.at(i) == '\n') {
-			attached_text_display.rows = attached_text_display.rows + 1;
+			attached_text_display.rows = attached_text_display.rows++;
 		} else {
-			attached_text_display.cols_in_row[attached_text_display.rows] = attached_text_display.cols_in_row[attached_text_display.rows] + 1;
+			attached_text_display.cols_in_row[attached_text_display.rows]++;
 		}
 		
 		if (attached_text_display.cols_in_row[attached_text_display.rows] == width) {
-			attached_text_display.rows = attached_text_display.rows + 1;
+			attached_text_display.rows = attached_text_display.rows++;
 		}
 		
 		if (attached_text_display.rows == height) {
