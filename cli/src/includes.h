@@ -18,6 +18,11 @@
 	#include <array>
 #endif
 
+#ifndef MAP
+	#define MAP
+	#include <map>
+#endif
+
 #ifndef UNISTD_H
 	#define UNISTD_H
 	#include <unistd.h>
@@ -44,4 +49,5 @@
 #include "namespace_polonius.h"
 #include "class_cursor.cpp"
 #include "class_pl_file.cpp"
+#include "class_pl_text_display.cpp"
 #include "class_pl_window.cpp"

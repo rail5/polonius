@@ -119,7 +119,8 @@ void polonius::pl_window::put_char(int ch, bool and_move_cursor) {
 
 void polonius::pl_window::put_string(string &input, bool and_move_cursor) {
 
-	int cols = 0;
+	attached_text_display.reset();
+	attached_text_display.data = input;
 	
 	int amount_to_read = min((int)input.length(), maximum_number_of_chars_on_screen);
 	
@@ -127,10 +128,16 @@ void polonius::pl_window::put_string(string &input, bool and_move_cursor) {
 		put_char(input.at(i));
 		
 		if (input.at(i) == '\n') {
-			cols = cols + 1;
+			attached_text_display.rows = attached_text_display.rows + 1;
+		} else {
+			attached_text_display.cols_in_row[attached_text_display.rows] = attached_text_display.cols_in_row[attached_text_display.rows] + 1;
 		}
 		
-		if (cols == height) {
+		if (attached_text_display.cols_in_row[attached_text_display.rows] == width) {
+			attached_text_display.rows = attached_text_display.rows + 1;
+		}
+		
+		if (attached_text_display.rows == height) {
 			break; // Stop printing
 		}
 	}

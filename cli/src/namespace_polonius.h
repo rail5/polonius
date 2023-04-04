@@ -8,6 +8,11 @@
 	#include <array>
 #endif
 
+#ifndef MAP
+	#define MAP
+	#include <map>
+#endif
+
 using namespace std;
 
 namespace polonius {
@@ -18,6 +23,7 @@ namespace polonius {
 	class cursor;
 	class command;
 	class pl_file;
+	class pl_text_display;
 	class pl_window;
 	
 	enum movement_plane {
@@ -99,6 +105,16 @@ namespace polonius {
 			
 			string read(int64_t start_position, int64_t end_position);
 	};
+	
+	class pl_text_display {
+		public:
+			string data = "";
+			
+			int rows = 0;
+			map<int, int> cols_in_row;
+			
+			void reset();
+	};
 
 	class pl_window {
 		private:
@@ -110,6 +126,8 @@ namespace polonius {
 			int maximum_number_of_chars_on_screen = 0;
 			
 			void raw_move_cursor(int y, int x);
+			
+			pl_text_display attached_text_display;
 		public:
 			bool is_initialized();
 			
