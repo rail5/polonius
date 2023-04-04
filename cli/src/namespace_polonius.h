@@ -118,6 +118,7 @@ namespace polonius {
 			static void handle_resume(sig_atomic_t signal);
 			
 			static void setup_terminal();
+			void resize();
 			
 			void init(string file_path);
 			void write_from_file();

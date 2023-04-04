@@ -41,6 +41,19 @@ void polonius::pl_window::setup_terminal() {
 	keypad(stdscr, TRUE);
 }
 
+void polonius::pl_window::resize() {
+	/* Update after user resized terminal */
+	/* Get the maximum number of characters that can fit in our window */
+	getmaxyx(stdscr, height, width);
+	maximum_number_of_chars_on_screen = (height * width);
+	wresize(polonius_window, height, width);
+	attached_cursor.set_limits(height, width);
+	werase(polonius_window);
+	refresh();
+	write_from_file();
+	attached_cursor.move(0, 0);
+}
+
 void polonius::pl_window::init(string file_path) {
 	setup_terminal();
 	
@@ -142,6 +155,11 @@ void polonius::pl_window::handle_updates() {
 		switch(ch) {
 			case KEY_FRESH:
 				/* Ignore this keystroke */
+				break;
+			case KEY_RESIZE:
+				/* When the user resizes their terminal,
+				getch() will receive this key */
+				resize();
 				break;
 			case KEY_LEFT:
 				attached_cursor.move(y, x-1);
