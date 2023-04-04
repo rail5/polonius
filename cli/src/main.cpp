@@ -57,14 +57,14 @@ int main(int argc, char* argv[]) {
 			case 'i':
 				if (received_filename) {
 					cerr << program_name + ": Error: Multiple files specified" << endl;
-					return 1;
+					return EXIT_BADFILE;
 				}
 				file_path = optarg;
 				received_filename = true;
 				break;
 			case 'h':
 				cout << helpstring;
-				return 0;
+				return EXIT_SUCCESS;
 				break;
 		}
 	}
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
 	for (option_index = optind; option_index < argc; option_index++) {
 		if (received_filename) {
 			cerr << program_name + ": Error: Multiple files specified" << endl;
-			return 1;
+			return EXIT_BADFILE;
 		}
 		file_path = argv[option_index];
 		received_filename = true;
@@ -98,5 +98,5 @@ int main(int argc, char* argv[]) {
 
 //	cout << polonius::command::exec("polonius-reader -i " + file_path);
 
-	return 0;
+	return EXIT_SUCCESS;
 }

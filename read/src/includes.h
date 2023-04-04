@@ -24,6 +24,9 @@
 	#include <unistd.h>
 #endif
 
+/* Shared definitions */
+#include "../../shared/definitions.h"
+
 /* inline bool is_number(const std::string &s) returns true if all chars in string are digits */
 #include "../../shared/is_number.cpp"
 

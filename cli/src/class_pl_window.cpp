@@ -16,7 +16,7 @@ bool polonius::pl_window::is_initialized() {
 
 void polonius::pl_window::handle_force_quit(sig_atomic_t signal) {
 	close();
-	exit(1);
+	exit(EXIT_INTERRUPT);
 }
 
 void polonius::pl_window::handle_suspend(sig_atomic_t signal) {

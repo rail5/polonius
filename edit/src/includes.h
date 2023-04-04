@@ -86,6 +86,8 @@
 	#include "../../shared/remove_leading_whitespace.cpp"
 #endif
 
+/* Shared definitions */
+#include "../../shared/definitions.h"
 
 /* Contains the 'meat' of the program */
 #include "namespace_editor.h"

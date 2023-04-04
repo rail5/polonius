@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 			case 'i':
 				if (received_filename) {
 					cerr << "polonius-editor: Error: Multiple files specified" << endl;
-					return 1;
+					return EXIT_BADFILE;
 				}
 				file_to_edit = optarg;
 				received_filename = true;
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
 				block_size = parse_block_units(optarg);
 				if (block_size == -1) {
 					cerr << program_name << ": Block size '" << optarg << "' is not understood" << endl << "Use -h for help" << endl;
-					return 1;
+					return EXIT_BADARG;
 				}
 				break;
 			
@@ -108,18 +108,18 @@ int main(int argc, char* argv[]) {
 			
 			case 'V':
 				cout << program_version << endl;
-				return 0;
+				return EXIT_SUCCESS;
 				break;
 			
 			case 'h':
 				cout << helpstring;
-				return 0;
+				return EXIT_SUCCESS;
 				break;
 			
 			case '?':
 				if (optopt == 'i' || optopt == 's' || optopt == 'a' || optopt == 'b') {
 					cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << endl << "Use -h for help" << endl;
-					return 1;
+					return EXIT_BADOPT;
 				}
 				break;
 		}
@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
 	for (option_index = optind; option_index < argc; option_index++) {
 		if (received_filename) {
 			cerr << "polonius-editor: Error: Multiple files specified" << endl;
-			return 1;
+			return EXIT_BADFILE;
 		}
 		file_to_edit = argv[option_index];
 		received_filename = true;
@@ -136,14 +136,14 @@ int main(int argc, char* argv[]) {
 	
 	if (!received_filename) {
 		cerr << program_name << ": No input file given. Use -h for help" << endl;
-		return 1;
+		return EXIT_BADFILE;
 	}
 
 	editor::file document(file_to_edit, block_size, verbose);
 	
 	if (!document.is_initialized()) {
 		cerr << program_name << ": " << document.get_error_message() << endl;
-		return 1;
+		return EXIT_OTHER;
 	}
 	
 	for (int i = 0; i < instructions_to_add.size(); i++) {
@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
 		
 		if (!document.add_instruction(instructions_to_add[i])) {
 			cerr << program_name << ": " << instructions_to_add[i].get_error_message() << endl;
-			return 1;
+			return EXIT_BADARG;
 		}
 	}
 	
@@ -166,6 +166,6 @@ int main(int argc, char* argv[]) {
 	
 	/* Close file */
 	document.close();
-	return 0;
+	return EXIT_SUCCESS;
 
 }

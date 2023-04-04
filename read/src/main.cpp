@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 			case 'i':
 				if (received_filename) {
 					cerr << "polonius-reader: Error: Multiple files specified" << endl;
-					return 1;
+					return EXIT_BADFILE;
 				}
 				file_to_read = optarg;
 				received_filename = true;
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 			case 's':
 				if (!is_number(optarg)) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
-					return 1;
+					return EXIT_BADARG;
 				}
 				start_position = (int64_t)atol(optarg);
 				break;
@@ -72,25 +72,25 @@ int main(int argc, char* argv[]) {
 			case 'l':
 				if (!is_number(optarg)) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
-					return 1;
+					return EXIT_BADARG;
 				}
 				amount_to_read = (int64_t)atol(optarg);
 				break;
 				
 			case 'V':
 				cout << program_version << endl;
-				return 0;
+				return EXIT_SUCCESS;
 				break;
 				
 			case 'h':
 				cout << helpstring;
-				return 0;
+				return EXIT_SUCCESS;
 				break;
 				
 			case '?':
 				if (optopt == 'i' || optopt == 's' || optopt == 'l') {
 					cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << endl << "Use -h for help" << endl;
-					return 1;
+					return EXIT_BADOPT;
 				}
 				break;
 		}
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 	for (option_index = optind; option_index < argc; option_index++) {
 		if (received_filename) {
 			cerr << "polonius-reader: Error: Multiple files specified" << endl;
-			return 1;
+			return EXIT_BADFILE;
 		}
 		file_to_read = argv[option_index];
 		received_filename = true;
@@ -108,14 +108,14 @@ int main(int argc, char* argv[]) {
 	// Make sure we got an input file
 	if (!received_filename) {
 		cerr << helpstring;
-		return 1;
+		return EXIT_BADFILE;
 	}
 	
 	reader::file the_file;
 	
 	if (!the_file.init(file_to_read)) {
 		cerr << program_name << ": " << the_file.get_init_error_message() << endl;
-		return 1;
+		return EXIT_BADFILE;
 	}
 	
 	// If -l / --length wasn't set, just set it to the full length of the file
@@ -125,5 +125,5 @@ int main(int argc, char* argv[]) {
 
 	cout << the_file.read(start_position, amount_to_read);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
