@@ -112,11 +112,13 @@ namespace polonius {
 			void raw_move_cursor(int y, int x);
 		public:
 			bool is_initialized();
+			
+			static void handle_force_quit(sig_atomic_t signal);
 		
 			void init(string file_path);
 			void write_from_file();
 			void refresh_window();
-			void close();
+			static void close();
 			
 			cursor attached_cursor;
 			pl_file attached_file;

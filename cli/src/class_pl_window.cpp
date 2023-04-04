@@ -14,6 +14,11 @@ bool polonius::pl_window::is_initialized() {
 	return initialized;
 }
 
+void polonius::pl_window::handle_force_quit(sig_atomic_t signal) {
+	close();
+	exit(1);
+}
+
 void polonius::pl_window::init(string file_path) {
 	initscr();
 	cbreak();

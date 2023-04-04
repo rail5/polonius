@@ -10,6 +10,11 @@
 	#include <unistd.h>
 #endif
 
+#ifndef SIGNAL_H
+	#define SIGNAL_H
+	#include <signal.h>
+#endif
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -32,6 +37,13 @@ int main(int argc, char* argv[]) {
 	}
 	
 	polonius::pl_window program_window = create_window(file_path);
+	
+	/*
+	Prepare to catch CTRL-C, CTRL-Z, CTRL-\ events
+	*/
+	signal(SIGINT, program_window.handle_force_quit);
+	signal(SIGTSTP, program_window.handle_force_quit);
+	signal(SIGQUIT, program_window.handle_force_quit);
 	
 	program_window.handle_updates();
 	
