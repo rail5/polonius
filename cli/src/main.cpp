@@ -15,6 +15,11 @@
 	#include <signal.h>
 #endif
 
+#ifndef GETOPT_H
+	#define GETOPT_H
+	#include <getopt.h>
+#endif
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -32,8 +37,37 @@ int main(int argc, char* argv[]) {
 	*/
 	string file_path = "";
 	
-	if (argc > 1) {
-		file_path = string(argv[1]);
+	/*
+	GETOPT
+	*/
+	int c;
+	opterr = 0;
+	int option_index = 0;
+	
+	static struct option long_options[] =
+	{
+		{"help", no_argument, 0, 'h'}
+	};
+	
+	while ((c = getopt_long(argc, argv, "h", long_options, &option_index)) != -1) {
+		switch(c) {
+			case 'h':
+				cout << helpstring;
+				return 0;
+				break;
+		}
+	}
+	
+	for (option_index = optind; option_index < argc; option_index++) {
+		file_path = argv[option_index];
+		/*
+		This has the following disadvantage:
+		If a user runs the command:
+			$ polonius ./somefile ./some-other-file
+		This will take the last-specified (./some-other-file) and ignore the first
+		Nano handles this by opening multiple "file buffers," one for each file
+		Maybe we'll do that later on?
+		*/
 	}
 	
 	polonius::pl_window program_window = create_window(file_path);

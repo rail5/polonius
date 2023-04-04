@@ -28,6 +28,11 @@
 	#include <signal.h>
 #endif
 
+#ifndef GETOPT_H
+	#define GETOPT_H
+	#include <getopt.h>
+#endif
+
 #ifdef __OpenBSD__
 	// On OpenBSD, 'WEXITSTATUS' (used in polonius::command) is declared in sys/wait.h
 	// TODO: Check FreeBSD
