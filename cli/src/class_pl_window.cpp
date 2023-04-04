@@ -19,14 +19,33 @@ void polonius::pl_window::handle_force_quit(sig_atomic_t signal) {
 	exit(1);
 }
 
-void polonius::pl_window::init(string file_path) {
+void polonius::pl_window::handle_suspend(sig_atomic_t signal) {
+	close();
+	cout << "Use 'fg' to return to polonius" << endl;
+	kill(0, SIGSTOP);
+}
+
+void polonius::pl_window::handle_resume(sig_atomic_t signal) {
+	setup_terminal();
+	
+	/* Insert a fake keystroke, to neutralize a key-eating issue. */
+	/* Many thanks to the nano source code for this fix */
+	refresh();
+	ungetch(KEY_FRESH);
+}
+
+void polonius::pl_window::setup_terminal() {
 	initscr();
 	cbreak();
 	noecho();
 	keypad(stdscr, TRUE);
+}
+
+void polonius::pl_window::init(string file_path) {
+	setup_terminal();
 	
+	/* Get the maximum number of characters that can fit in our window */
 	getmaxyx(stdscr, height, width);
-	
 	maximum_number_of_chars_on_screen = (height * width);
 	
 	polonius_window = newwin(height, width, 0, 0);
@@ -121,6 +140,9 @@ void polonius::pl_window::handle_updates() {
 		ch = getch();
 		// User pressed a key
 		switch(ch) {
+			case KEY_FRESH:
+				/* Ignore this keystroke */
+				break;
 			case KEY_LEFT:
 				attached_cursor.move(y, x-1);
 				break;

@@ -34,6 +34,8 @@
 	#include <sys/wait.h>
 #endif
 
+#include "definitions.h"
+
 #include "namespace_polonius.h"
 #include "class_cursor.cpp"
 #include "class_pl_file.cpp"

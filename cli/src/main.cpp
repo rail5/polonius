@@ -39,11 +39,16 @@ int main(int argc, char* argv[]) {
 	polonius::pl_window program_window = create_window(file_path);
 	
 	/*
-	Prepare to catch CTRL-C, CTRL-Z, CTRL-\ events
+	Prepare to catch CTRL-C (SIGINT) and CTRL-\ (SIGQUIT) events
 	*/
 	signal(SIGINT, program_window.handle_force_quit);
-	signal(SIGTSTP, program_window.handle_force_quit);
 	signal(SIGQUIT, program_window.handle_force_quit);
+	
+	/*
+	Prepare to catch CTRL-Z (SIGSTOP, "suspend") and "resume" (SIGCONT) events
+	*/
+	signal(SIGTSTP, program_window.handle_suspend);
+	signal(SIGCONT, program_window.handle_resume);
 	
 	program_window.handle_updates();
 	

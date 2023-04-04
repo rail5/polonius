@@ -1,0 +1,1 @@
+#define KEY_FRESH 0X4FE

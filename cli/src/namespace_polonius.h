@@ -114,7 +114,11 @@ namespace polonius {
 			bool is_initialized();
 			
 			static void handle_force_quit(sig_atomic_t signal);
-		
+			static void handle_suspend(sig_atomic_t signal);
+			static void handle_resume(sig_atomic_t signal);
+			
+			static void setup_terminal();
+			
 			void init(string file_path);
 			void write_from_file();
 			void refresh_window();
