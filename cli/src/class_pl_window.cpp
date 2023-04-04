@@ -14,7 +14,7 @@ bool polonius::pl_window::is_initialized() {
 	return initialized;
 }
 
-void polonius::pl_window::init() {
+void polonius::pl_window::init(string file_path) {
 	initscr();
 	cbreak();
 	noecho();
@@ -27,7 +27,21 @@ void polonius::pl_window::init() {
 	attached_cursor = create_new_cursor();
 	attached_cursor.set_limits(height, width);
 	
+	attached_file = open_file(file_path);
+	
+	refresh();
+	write_from_file();
+	attached_cursor.move(0, 0);
+	
 	initialized = true;
+}
+
+void polonius::pl_window::write_from_file() {
+	int maximum_read_length = (height * width);
+	
+	string file_contents = attached_file.read(0, maximum_read_length);
+	
+	put_string(file_contents, false);
 }
 
 void polonius::pl_window::raw_move_cursor(int y, int x) {
@@ -57,14 +71,31 @@ void polonius::pl_window::move_cursor(movement_plane dimension, int how_far) {
 	attached_cursor.move(y, x);
 }
 
-void polonius::pl_window::put_char(int ch) {
+void polonius::pl_window::put_char(int ch, bool and_move_cursor) {
 	waddch(polonius_window, ch);
-	move_cursor(horizontal, 1);
+	
+	if (and_move_cursor) {
+		move_cursor(horizontal, 1);
+	}
+}
+
+void polonius::pl_window::put_string(string &input, bool and_move_cursor) {
+
+	int current_y = attached_cursor.get_y_coordinate();
+	int current_x = attached_cursor.get_x_coordinate();
+
+	for (int i = 0; i < input.length(); i++) {
+		put_char(input.at(i));
+		refresh_window();
+	}
+	
+	if (!and_move_cursor) {
+		move_cursor(horizontal, -input.length());
+	}
 }
 
 void polonius::pl_window::handle_updates() {
 	int ch;
-	
 	while (true) {
 		/*
 		Update current cursor position
@@ -72,7 +103,7 @@ void polonius::pl_window::handle_updates() {
 		int y = attached_cursor.get_y_coordinate();
 		int x = attached_cursor.get_x_coordinate();
 		raw_move_cursor(y, x);
-	
+
 		ch = getch();
 		// User pressed a key
 		switch(ch) {
@@ -107,10 +138,10 @@ int polonius::pl_window::get_width() {
 	return width;
 }
 
-polonius::pl_window create_window() {
+polonius::pl_window create_window(string open_file_path) {
 	polonius::pl_window new_window;
 	
-	new_window.init();
+	new_window.init(open_file_path);
 	
 	return new_window;
 }

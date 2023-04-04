@@ -22,11 +22,22 @@ int main(int argc, char* argv[]) {
 	
 	string helpstring = "No help here.\n";
 	
-	polonius::pl_window program_window = create_window();
+	/*
+	Setting up to read the provided file (if provided)
+	*/
+	string file_path = "";
+	
+	if (argc > 1) {
+		file_path = string(argv[1]);
+	}
+	
+	polonius::pl_window program_window = create_window(file_path);
 	
 	program_window.handle_updates();
 	
 	program_window.close();
+
+//	cout << polonius::command::exec("polonius-reader -i " + file_path);
 
 	return 0;
 }
