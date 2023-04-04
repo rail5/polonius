@@ -88,6 +88,9 @@ void polonius::pl_window::handle_updates() {
 			case KEY_DOWN:
 				attached_cursor.move(y+1, x);
 				break;
+			case KEY_BACKSPACE:
+				attached_cursor.move(y, x-1);
+				break;
 			default:
 				put_char(ch);
 				break;

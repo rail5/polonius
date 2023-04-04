@@ -27,7 +27,7 @@ void polonius::cursor::move(int y, int x) {
 	
 	if (y < 0) {
 		y = y_limit - 1;
-		x = 0;
+	//	x = 0;
 	}
 
 	y_coordinate = y;
