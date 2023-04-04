@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	
 	string program_author = "rail5";
 
-	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename\n\nOptions:\n  -i\n  --input\n    Specify input file to read\n\n  -s\n  --start\n    Specify byte number to start reading from\n\n  -l\n  --length\n    Specify how many bytes to read\n\n  -V\n  --version\n    Print version number\n\n  -h\n  --help\n    Display this message\n\nExample:\n  " + program_name + " --input ./file.txt --start 50 --length 10\n";
+	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename\n\nOptions:\n  -i\n  --input\n    Specify input file to read\n\n  -s\n  --start\n    Specify byte number to start reading from\n\n  -l\n  --length\n    Specify how many bytes to read\n\n  -V\n  --version\n    Print version number\n\n  -h\n  --help\n    Display this message\n\nExamples:\n  " + program_name + " --input ./file.txt --start 50 --length 10\n\n  " + program_name + " -s 50 -l 10 ./file.txt\n";
 	
 	/*
 	Necessary info for the program to do its job
@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
 		"amount_to_read" == -1 will result in reading from the start position to the end of the file
 	*/
 	string file_to_read = "";
+	bool received_filename = false;
 	int64_t start_position = 0;
 	int64_t amount_to_read = -1;
 	
@@ -52,7 +53,12 @@ int main(int argc, char* argv[]) {
 	while ((c = getopt_long(argc, argv, "i:s:l:Vh", long_options, &option_index)) != -1) {
 		switch(c) {
 			case 'i':
+				if (received_filename) {
+					cerr << "polonius-reader: Error: Multiple files specified" << endl;
+					return 1;
+				}
 				file_to_read = optarg;
+				received_filename = true;
 				break;
 				
 			case 's':
@@ -90,8 +96,17 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	
+	for (option_index = optind; option_index < argc; option_index++) {
+		if (received_filename) {
+			cerr << "polonius-reader: Error: Multiple files specified" << endl;
+			return 1;
+		}
+		file_to_read = argv[option_index];
+		received_filename = true;
+	}
+	
 	// Make sure we got an input file
-	if (file_to_read == "") {
+	if (!received_filename) {
 		cerr << helpstring;
 		return 1;
 	}

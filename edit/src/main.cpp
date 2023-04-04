@@ -20,13 +20,15 @@ int main(int argc, char* argv[]) {
 	
 	string program_author = "rail5";
 	
-	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename -a \"{INSTRUCTION}\"\n\nOptions:\n  -i\n  --input\n    Specify input file to edit\n\n  -a\n  --add-instruction\n    Instruct the program on how to edit your file\n      Example instructions:\n      REPLACE 5 hello world\n        (Replaces text, starting from byte #5, with \"hello world\")\n      INSERT 7 salut a tous\n        (Inserts \"salut a tous\" at byte #7, shifting the rest of the file without replacing it)\n      REMOVE 9 15\n        (Removes bytes #9 to #15 from the file)\n\n  -s\n  --add-instruction-set\n    Provide a set of multiple instructions for editing the file\n      Each instruction in the set should be on its own line, as in the following example:\n        --add-instruction-set \"REPLACE 20 hello world\n        INSERT 50 hello again\n        REMOVE 70 75\"\n\n  -c\n  --special-chars\n    Interpret escaped character sequences (\\n, \\t and \\\\)\n\n  -b\n  --block-size\n    Specify the amount of data from the file we're willing to load into memory at any given time\n      Example:\n        -b 10M\n        -b 200K\n      (Default 1 kilobyte)\n\n  -v\n  --verbose\n    Verbose mode\n\n  -V\n  --version\n    Print version number\n\n  -h\n  --help\n    Display this message\n\nExample:\n  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n";
+	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename -a \"{INSTRUCTION}\"\n\nOptions:\n  -i\n  --input\n    Specify input file to edit\n\n  -a\n  --add-instruction\n    Instruct the program on how to edit your file\n      Example instructions:\n      REPLACE 5 hello world\n        (Replaces text, starting from byte #5, with \"hello world\")\n      INSERT 7 salut a tous\n        (Inserts \"salut a tous\" at byte #7, shifting the rest of the file without replacing it)\n      REMOVE 9 15\n        (Removes bytes #9 to #15 from the file)\n\n  -s\n  --add-instruction-set\n    Provide a set of multiple instructions for editing the file\n      Each instruction in the set should be on its own line, as in the following example:\n        --add-instruction-set \"REPLACE 20 hello world\n        INSERT 50 hello again\n        REMOVE 70 75\"\n\n  -c\n  --special-chars\n    Interpret escaped character sequences (\\n, \\t and \\\\)\n\n  -b\n  --block-size\n    Specify the amount of data from the file we're willing to load into memory at any given time\n      Example:\n        -b 10M\n        -b 200K\n      (Default 1 kilobyte)\n\n  -v\n  --verbose\n    Verbose mode\n\n  -V\n  --version\n    Print version number\n\n  -h\n  --help\n    Display this message\n\nExamples:\n  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n\n  " + program_name + " -a \"insert 0 hello world\" ./file.txt\n";
 	
 	
 	/*
 	Necessary information for the program to do its job
 	*/
 	string file_to_edit = "";
+	bool received_filename = false;
+	
 	vector<editor::instruction> instructions_to_add;
 	int block_size = 1024;
 	bool interpret_special_chars = false;
@@ -71,7 +73,12 @@ int main(int argc, char* argv[]) {
 	while ((c = getopt_long(argc, argv, "i:s:a:b:cvVh", long_options, &option_index)) != -1) {
 		switch(c) {
 			case 'i':
+				if (received_filename) {
+					cerr << "polonius-editor: Error: Multiple files specified" << endl;
+					return 1;
+				}
 				file_to_edit = optarg;
+				received_filename = true;
 				break;
 			
 			case 'a':
@@ -118,7 +125,16 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	
-	if (file_to_edit == "") {
+	for (option_index = optind; option_index < argc; option_index++) {
+		if (received_filename) {
+			cerr << "polonius-editor: Error: Multiple files specified" << endl;
+			return 1;
+		}
+		file_to_edit = argv[option_index];
+		received_filename = true;
+	}
+	
+	if (!received_filename) {
 		cerr << program_name << ": No input file given. Use -h for help" << endl;
 		return 1;
 	}

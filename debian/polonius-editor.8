@@ -4,13 +4,14 @@
 .SH NAME
 polonius-editor
 .SH SYNOPSIS
-polonius-editor -i FILE -a "{INSTRUCTION}"
+polonius-editor -a "{INSTRUCTION}" FILE
 .SH DESCRIPTION
 polonius-editor sequentially executes editing instructions on a file
 .SH OPTIONS
   -i
   --input
     Specify file to edit
+    The file can also be specified without the '-i' option
 
   -a
   --add-instruction
@@ -70,6 +71,8 @@ polonius-editor sequentially executes editing instructions on a file
 
 
   Examples:
+
+    polonius-editor ./file.txt -a "insert 0 hello world"
 
     polonius-editor --input ./file.txt --add-instruction "REPLACE 20 hello \\n world" --add-instruction "REMOVE 10 12" --block-size 10K --special-chars
 

@@ -4,13 +4,14 @@
 .SH NAME
 polonius-reader
 .SH SYNOPSIS
-polonius-reader -i FILE
+polonius-reader FILE
 .SH DESCRIPTION
 polonius-reader outputs a selected portion of the contents of a file
 .SH OPTIONS
   -i
   --input
     Specify file to read
+    The file can also be specified without the '-i' option
 
   -s
   --start
@@ -34,6 +35,8 @@ polonius-reader outputs a selected portion of the contents of a file
 
 
   Examples:
+
+    polonius-reader ./file.txt -s 50 -l 10
 
     polonius-reader --input ./file.txt --start 50 --length 10
 
