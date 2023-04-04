@@ -23,6 +23,12 @@
 	#include <unistd.h>
 #endif
 
+#ifdef __OpenBSD__
+	// On OpenBSD, 'WEXITSTATUS' (used in polonius::command) is declared in sys/wait.h
+	// TODO: Check FreeBSD
+	#include <sys/wait.h>
+#endif
+
 #include "namespace_polonius.h"
 #include "class_cursor.cpp"
 #include "class_pl_file.cpp"
