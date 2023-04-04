@@ -107,6 +107,7 @@ namespace polonius {
 			
 			int height = 0;
 			int width = 0;
+			int maximum_number_of_chars_on_screen = 0;
 			
 			void raw_move_cursor(int y, int x);
 		public:

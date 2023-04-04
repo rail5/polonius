@@ -22,6 +22,8 @@ void polonius::pl_window::init(string file_path) {
 	
 	getmaxyx(stdscr, height, width);
 	
+	maximum_number_of_chars_on_screen = (height * width);
+	
 	polonius_window = newwin(height, width, 0, 0);
 	
 	attached_cursor = create_new_cursor();
@@ -37,9 +39,8 @@ void polonius::pl_window::init(string file_path) {
 }
 
 void polonius::pl_window::write_from_file() {
-	int maximum_read_length = (height * width);
 	
-	string file_contents = attached_file.read(0, maximum_read_length);
+	string file_contents = attached_file.read(0, maximum_number_of_chars_on_screen);
 	
 	put_string(file_contents, false);
 }
@@ -81,12 +82,20 @@ void polonius::pl_window::put_char(int ch, bool and_move_cursor) {
 
 void polonius::pl_window::put_string(string &input, bool and_move_cursor) {
 
-	int current_y = attached_cursor.get_y_coordinate();
-	int current_x = attached_cursor.get_x_coordinate();
-
-	for (int i = 0; i < input.length(); i++) {
+	int cols = 0;
+	
+	int amount_to_read = min((int)input.length(), maximum_number_of_chars_on_screen);
+	
+	for (int i = 0; i < amount_to_read; i++) {
 		put_char(input.at(i));
-		refresh_window();
+		
+		if (input.at(i) == '\n') {
+			cols = cols + 1;
+		}
+		
+		if (cols == height) {
+			break; // Stop printing
+		}
 	}
 	
 	if (!and_move_cursor) {
