@@ -25,10 +25,10 @@
 #endif
 
 /* inline bool is_number(const std::string &s) returns true if all chars in string are digits */
-#include "../../shared_functions/is_number.cpp"
+#include "../../shared/is_number.cpp"
 
 /* file_exists(string name) returns true if the file exists on the system */
-#include "../../shared_functions/file_exists.cpp"
+#include "../../shared/file_exists.cpp"
 
 /* Contains the 'meat' of the program */
 #include "namespace_reader.h"
