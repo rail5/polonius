@@ -122,7 +122,13 @@ namespace polonius {
 					throw;
 				}
 				
+				#ifndef __APPLE__
+				/* Getting the return code on *sensible* (POSIX) systems */
 				exit_code = WEXITSTATUS(pclose(pipe));
+				#else
+				/* Getting the return code from those nutcases at Apple */
+				exit_code = pclose(pipe);
+				#endif
 				return command_result{result, exit_code};
 			}
 	};
