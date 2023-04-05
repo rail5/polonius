@@ -128,7 +128,7 @@ void polonius::pl_window::put_string(string &input, bool and_move_cursor) {
 	for (int i = 0; i < amount_to_read; i++) {
 		character_positions.push_back(attached_cursor.get_position());
 		// TODO: Remove this debug cerr info
-		cerr << attached_cursor.get_position() << ": " << input.at(i) << endl;
+		// cerr << attached_cursor.get_position() << ": " << input.at(i) << endl;
 		put_char(input.at(i));
 		
 		if (input.at(i) == '\n') {
