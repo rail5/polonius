@@ -75,7 +75,7 @@ bool editor::file::set_file(string file_path) {
 		rather than continuing with our luxury C++ fstream
 	This FILE* will never be used, except to get the file descriptor so that we can lock the file during editing
 	*/
-	c_type_file = fopen(file_name.c_str(), "a+");
+	c_type_file = fopen64(file_name.c_str(), "a+");
 	file_descriptor = fileno(c_type_file);
 	
 	if (flock(file_descriptor, LOCK_EX) == -1) {
