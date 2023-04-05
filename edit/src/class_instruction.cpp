@@ -320,21 +320,21 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	Now, to actually create the 'instruction' object
 	*/
 	if (is_replace_instruction) {
-		int64_t start_position = (int64_t)stol(instruction_vector[1]);
+		int64_t start_position = (int64_t)stoll(instruction_vector[1]);
 		
 		return create_replace_instruction(start_position, instruction_vector[2]);
 	}
 	
 	if (is_insert_instruction) {
-		int64_t start_position = (int64_t)stol(instruction_vector[1]);
+		int64_t start_position = (int64_t)stoll(instruction_vector[1]);
 		
 		return create_insert_instruction(start_position, instruction_vector[2]);
 	}
 	
 	if (is_remove_instruction) {
-		int64_t start_position = (int64_t)stol(instruction_vector[1]);
+		int64_t start_position = (int64_t)stoll(instruction_vector[1]);
 		
-		int64_t end_position = (int64_t)stol(instruction_vector[2]);
+		int64_t end_position = (int64_t)stoll(instruction_vector[2]);
 		
 		return create_remove_instruction(start_position, end_position);
 	}

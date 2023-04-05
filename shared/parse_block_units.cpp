@@ -21,12 +21,12 @@ inline int parse_block_units(const std::string &user_input) {
 	}
 	
 	if (last_character == "K" || last_character == "k") {
-		int blocksize = (int)stol(all_but_last_character);
+		int blocksize = (int)stoi(all_but_last_character);
 		return (blocksize * 1024);
 	}
 	
 	if (last_character == "M" || last_character == "m") {
-		int blocksize = (int)stol(all_but_last_character);
+		int blocksize = (int)stoi(all_but_last_character);
 		return (blocksize * 1024 * 1024);
 	}
 	

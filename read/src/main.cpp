@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
 					return EXIT_BADARG;
 				}
-				start_position = (int64_t)atol(optarg);
+				start_position = (int64_t)stoll(optarg);
 				break;
 				
 			case 'l':
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
 					return EXIT_BADARG;
 				}
-				amount_to_read = (int64_t)atol(optarg);
+				amount_to_read = (int64_t)stoll(optarg);
 				break;
 				
 			case 'V':
