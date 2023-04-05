@@ -15,7 +15,6 @@ curses:
 install:
 	install -m 0755 polonius-reader /usr/bin
 	install -m 0755 polonius-editor /usr/bin
-	install -m 0755 polonius /usr/bin
 
 clean:
 	rm -f ./polonius-reader
