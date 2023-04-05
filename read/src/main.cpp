@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
 	string program_name = "polonius-reader";
 	
-	string program_version = "0.2";
+	string program_version = "0.3";
 	
 	string program_author = "rail5";
 
