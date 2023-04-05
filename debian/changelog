@@ -1,3 +1,13 @@
+polonius (0.3) bullseye; urgency=medium
+
+  * Patched a bug which prevented polonius-editor
+  from obtaining file descriptors on files larger
+  than 2GB when running on 32-bit systems
+  Previously, this bug caused a segfault on
+  trying to open large files on 32-bit systems
+
+ -- rail5 <andrew@rail5.org>  Tue, 04 Apr 2023 22:57:03 -0400
+
 polonius (0.2) bullseye; urgency=medium
 
   * Adding i386 and arm64 builds
