@@ -120,14 +120,20 @@ void polonius::pl_window::put_char(int ch, bool and_move_cursor) {
 void polonius::pl_window::put_string(string &input, bool and_move_cursor) {
 
 	attached_text_display.reset();
+	character_positions.clear();
 	attached_text_display.data = input;
 	
 	int amount_to_read = min((int)input.length(), maximum_number_of_chars_on_screen);
 	
 	for (int i = 0; i < amount_to_read; i++) {
+		character_positions.push_back(attached_cursor.get_position());
+		// TODO: Remove this debug cerr info
+		cerr << attached_cursor.get_position() << ": " << input.at(i) << endl;
 		put_char(input.at(i));
 		
 		if (input.at(i) == '\n') {
+			attached_cursor.move_down(1);
+			attached_cursor.move_left(attached_text_display.cols_in_row[attached_text_display.rows] + 1);
 			attached_text_display.rows++;
 		} else {
 			attached_text_display.cols_in_row[attached_text_display.rows]++;
@@ -143,6 +149,7 @@ void polonius::pl_window::put_string(string &input, bool and_move_cursor) {
 	}
 	
 	if (!and_move_cursor) {
+		// Move the cursor back to where it was before we started
 		move_cursor(horizontal, -input.length());
 	}
 }

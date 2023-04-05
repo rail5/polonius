@@ -18,6 +18,11 @@
 	#include <array>
 #endif
 
+#ifndef VECTOR
+	#define VECTOR
+	#include <vector>
+#endif
+
 #ifndef MAP
 	#define MAP
 	#include <map>

@@ -8,6 +8,11 @@
 	#include <array>
 #endif
 
+#ifndef VECTOR
+	#define VECTOR
+	#include <vector>
+#endif
+
 #ifndef MAP
 	#define MAP
 	#include <map>
@@ -31,6 +36,26 @@ namespace polonius {
 		vertical
 	};
 	
+	struct screen_position {
+		int y_coordinate;
+		int x_coordinate;
+		
+		friend ostream &operator<<(ostream &os, const screen_position &pos) {
+			os << "{" << pos.y_coordinate << "," << pos.x_coordinate << "}";
+			return os;
+		}
+		
+		bool operator==(const screen_position &other_position) const {
+			return (y_coordinate == other_position.y_coordinate && x_coordinate == other_position.x_coordinate);
+		}
+		
+		bool operator!=(const screen_position &other_position) const {
+			return !(other_position == *this);
+		}
+		
+		screen_position(int y, int x) : y_coordinate(y), x_coordinate(x) {}
+	};
+	
 	class cursor {
 		private:
 			bool initialized = false;
@@ -42,10 +67,18 @@ namespace polonius {
 			void set_initialized(bool set_value);
 			
 			void move(int y, int x);
+			
+			void move_left(int how_far);
+			void move_right(int how_far);
+			void move_up(int how_far);
+			void move_down(int how_far);
+			
 			void set_limits(int y, int x);
 			
 			int get_y_coordinate();
 			int get_x_coordinate();
+			
+			screen_position get_position();
 			
 			bool can_move_left();
 	};
@@ -112,6 +145,19 @@ namespace polonius {
 			
 			int rows = 0;
 			map<int, int> cols_in_row;
+			/*
+			cols_in_row:
+				First int is the row number
+				Second int is the number of columns in that row
+				ie,
+					Screen:
+						ABC
+						AB
+						A
+					cols_in_row[0] == 3
+					cols_in_row[1] == 2
+					cols_in_row[2] == 1
+			*/
 			
 			void reset();
 	};
@@ -124,6 +170,23 @@ namespace polonius {
 			int height = 0;
 			int width = 0;
 			int maximum_number_of_chars_on_screen = 0;
+			
+			vector<screen_position> character_positions;
+			/*
+			screen_position refers to the X&Y coordinates in the terminal
+			The index of the vector is the byte # of the originally-loaded (unediteD) data on screen
+			ie,
+				Screen:
+					012345
+					ABCD
+				The character 'C' is byte #9 in that data
+					(Counting from zero)
+					(The 6 digits 0-5 + newline char + 'A' + 'B' coming before it)
+				And is at screen position 1,2
+					(Y = 1, X = 2)
+					(0,0 being the top-left)
+			This (pseudo-)map tells us which byte # is at each screen position
+			*/
 			
 			void raw_move_cursor(int y, int x);
 			

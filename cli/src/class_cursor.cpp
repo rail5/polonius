@@ -34,6 +34,26 @@ void polonius::cursor::move(int y, int x) {
 	x_coordinate = x;
 }
 
+void polonius::cursor::move_left(int how_far) {
+	int new_x_coordinate = (x_coordinate - how_far);
+	move(y_coordinate, new_x_coordinate);
+}
+
+void polonius::cursor::move_right(int how_far) {
+	int new_x_coordinate = (x_coordinate + how_far);
+	move(y_coordinate, new_x_coordinate);
+}
+
+void polonius::cursor::move_up(int how_far) {
+	int new_y_coordinate = (y_coordinate - how_far);
+	move(new_y_coordinate, x_coordinate);
+}
+
+void polonius::cursor::move_down(int how_far) {
+	int new_y_coordinate = (y_coordinate + how_far);
+	move(new_y_coordinate, x_coordinate);
+}
+
 void polonius::cursor::set_limits(int y, int x) {
 	y_limit = y;
 	x_limit = x;
@@ -45,6 +65,10 @@ int polonius::cursor::get_y_coordinate() {
 
 int polonius::cursor::get_x_coordinate() {
 	return x_coordinate;
+}
+
+polonius::screen_position polonius::cursor::get_position() {
+	return screen_position(y_coordinate, x_coordinate);
 }
 
 polonius::cursor create_new_cursor() {
