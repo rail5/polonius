@@ -91,15 +91,11 @@ void reader::file::do_job() {
 			return;
 		}
 		
-		for (int64_t i = start_position; i <= end_position; (i = i + block_size)) {
+		for (int64_t i = start_position; i < end_position; (i = i + block_size)) {
 			int64_t amount_left_in_file = (end_position - i);
 			
 			if (block_size > amount_left_in_file) {
 				block_size = amount_left_in_file;
-			}
-			
-			if (block_size == 0) {
-				return; // Terminate loop
 			}
 			
 			cout << read(i, block_size);
