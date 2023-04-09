@@ -29,7 +29,7 @@ bool reader::file::init(string path) {
 	return true;
 }
 
-string reader::file::read(int64_t start_position, int64_t amount_to_read) {
+string reader::file::read() {
 
 	if (!initialized) {
 		string error = "Error reading file";
@@ -52,8 +52,18 @@ string reader::file::read(int64_t start_position, int64_t amount_to_read) {
 	if (end_position > file_length) {
 		// Just set it to read till the end of the file & not further
 		amount_to_read = (file_length - start_position);
+		end_position = (start_position + amount_to_read);
 	}
 	
+	/*
+	If just_outputting_positions == true,
+	Then we don't need to actually read the file,
+	Just output in the format startposition,endposition
+	*/
+	if (just_outputting_positions) {
+		string result = to_string(start_position) + "," + to_string(end_position);
+		return result;
+	}
 
 	ifstream file_stream(file_name, ifstream::binary);
 	
@@ -71,10 +81,26 @@ string reader::file::read(int64_t start_position, int64_t amount_to_read) {
 	return buffer;
 }
 
+string reader::file::search(string query) {
+	
+}
+
 string reader::file::get_init_error_message() {
 	return init_error_message;
 }
 
 int64_t reader::file::get_file_length() {
 	return file_length;
+}
+
+void reader::file::set_start_position(int64_t position) {
+	start_position = position;
+}
+
+void reader::file::set_amount_to_read(int64_t amount) {
+	amount_to_read = amount;
+}
+
+void reader::file::set_just_outputting_positions(bool flag) {
+	just_outputting_positions = flag;
 }
