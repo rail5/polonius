@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 	
 	int block_size = 1024;
 	
-	bool searching = false;
+	reader::job_type job = reader::read_job;
 	string searching_for = "";
 	
 	bool output_position = false;
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 				break;
 			
 			case 'f':
-				searching = true;
+				job = reader::search_job;
 				searching_for = optarg;
 				break;
 			
@@ -155,8 +155,10 @@ int main(int argc, char* argv[]) {
 	the_file.set_start_position(start_position);
 	the_file.set_amount_to_read(amount_to_read);
 	the_file.set_just_outputting_positions(output_position);
+	the_file.set_block_size(block_size);
+	the_file.set_job_type(job);
 
-	cout << the_file.read();
+	the_file.do_job();
 
 	return EXIT_SUCCESS;
 }
