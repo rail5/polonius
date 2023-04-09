@@ -21,6 +21,8 @@ namespace reader {
 			
 			int block_size = 1024;
 			
+			string search_query = "";
+			
 			job_type job = read_job;
 		
 		public:
@@ -38,6 +40,7 @@ namespace reader {
 			void set_amount_to_read(int64_t amount);
 			void set_just_outputting_positions(bool flag);
 			void set_block_size(int size);
+			void set_search_query(string query);
 			void set_job_type(job_type input_job);
 	};
 }

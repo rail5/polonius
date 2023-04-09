@@ -154,8 +154,13 @@ int main(int argc, char* argv[]) {
 	
 	the_file.set_start_position(start_position);
 	the_file.set_amount_to_read(amount_to_read);
+	
 	the_file.set_just_outputting_positions(output_position);
+	
 	the_file.set_block_size(block_size);
+	
+	the_file.set_search_query(searching_for);
+	
 	the_file.set_job_type(job);
 
 	the_file.do_job();

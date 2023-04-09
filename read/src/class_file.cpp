@@ -52,10 +52,6 @@ string reader::file::read(int64_t start_position, int64_t length) {
 	return buffer;
 }
 
-string reader::file::search(string query) {
-	
-}
-
 void reader::file::do_job() {
 	if (!initialized) {
 		cout << "Error reading file" << endl;
@@ -102,6 +98,60 @@ void reader::file::do_job() {
 		}
 		return;
 	}
+	
+	if (job == search_job) {
+		int64_t match_start = 0;
+		int64_t match_end = 0;
+		
+		// Only call the .length() function ONCE and store it
+		// To save on resources
+		int search_query_length = search_query.length();
+		
+		if (block_size <= search_query_length) {
+			// If the block size is smaller than the length of the search query,
+			// The user is just being silly.
+			// We'll reset it to 1 larger than the length of the search query
+			block_size = search_query_length + 1;
+		}
+		
+		int shift_by_this_much = (block_size - search_query_length);
+			
+		for (int64_t i = start_position; i < end_position; (i = i + shift_by_this_much)) {
+			int64_t amount_left_in_file = (end_position - i);
+			
+			if (block_size > amount_left_in_file || shift_by_this_much > amount_left_in_file) {
+				block_size = amount_left_in_file;
+				shift_by_this_much = amount_left_in_file;
+			}
+			
+			string block_data = read(i, block_size);
+			
+			// Check if the WHOLE search query is in the block
+			// And if so, just output it
+			size_t search_result = block_data.find(search_query);
+			
+			// Next cycle if no match was found
+			if (search_result == -1) {
+				continue;
+			}
+				// Start & end position RELATIVE to this block
+				start_position = search_result;
+				end_position = (start_position + search_query_length);
+				
+				// ABSOLUTE start & end position
+				// (that is, relative to the start of the file)
+				match_start = (i + start_position);
+				match_end = (match_start + search_query_length);
+				
+				if (just_outputting_positions) {
+					cout << match_start << "," << match_end;
+					return;
+				}
+				
+				cout << block_data.substr(start_position, search_query_length);
+				return;
+		}
+	}
 }
 
 string reader::file::get_init_error_message() {
@@ -126,6 +176,10 @@ void reader::file::set_just_outputting_positions(bool flag) {
 
 void reader::file::set_block_size(int size) {
 	block_size = size;
+}
+
+void reader::file::set_search_query(string query) {
+	search_query = query;
 }
 
 void reader::file::set_job_type(job_type input_job) {
