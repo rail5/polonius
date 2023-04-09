@@ -66,6 +66,11 @@ int main(int argc, char* argv[]) {
 				cout << helpstring;
 				return EXIT_SUCCESS;
 				break;
+			case '?':
+				if (optopt == 'i') {
+					cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << endl << "Use -h for help" << endl;
+					return EXIT_BADOPT;
+				}
 		}
 	}
 	
