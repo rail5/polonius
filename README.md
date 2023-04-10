@@ -27,7 +27,7 @@ Polonius is made up of separate **binary modules**:
   - The *"editor"*, which interprets editing instructions (*replace*, *insert*, and *remove*) and makes the requested changes to the file
   - And the interactive *UI*, which ties together the functionality of the other modules.
 
-<a href="wiki/">See the wiki</a> **for full documentation**. Manual pages are also available in the Debian packages.
+<a href="/rail5/polonius/wiki/">See the wiki</a> **for full documentation**. Manual pages are also available in the Debian packages.
 
 ## Development Progress
 Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD**. Releases will be provided for **amd64**, **i386**, and **arm64** architectures.
