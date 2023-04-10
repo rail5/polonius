@@ -66,7 +66,7 @@ namespace editor {
 			FILE* c_type_file;
 			int file_descriptor;
 			
-			int block_size = 1024;
+			int block_size = 10240;
 			
 			vector<instruction> instruction_set;
 			int64_t file_length_after_last_instruction = 0;
@@ -107,7 +107,7 @@ namespace editor {
 			/*
 			Constructor
 			*/
-			file(string path, int blocksize = 1024, bool verbose_mode = false);
+			file(string path, int blocksize = 10240, bool verbose_mode = false);
 	};
 
 }

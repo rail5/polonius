@@ -19,7 +19,7 @@ namespace reader {
 			int64_t start_position = 0;
 			int64_t amount_to_read = -1;
 			
-			int block_size = 1024;
+			int block_size = 10240;
 			
 			string search_query = "";
 			
