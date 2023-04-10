@@ -16,6 +16,7 @@ polonius-reader outputs a selected portion of the contents of a file
   -s
   --start
     Specify start position (byte number in the file)
+      Defaults to 0 if not specified
 
       Example:
         -s 50
@@ -24,6 +25,41 @@ polonius-reader outputs a selected portion of the contents of a file
   -l
   --length
     Specify how many bytes to read
+      Defaults to full length of the file if not specified
+
+  -b
+  --block-size
+    Specify the maximum amount of data we can load from the file into memory at any given time
+      Defaults to 1 kilobyte if not specified
+
+      Example:
+
+        -b 10M
+          Sets block size to 10 megabytes
+        -b 200K
+          Sets block size to 200 kilobytes
+        -b 512
+          Sets block size to 512 bytes
+
+  -f
+  --find
+  --search
+    Search for a string in the file
+      Returns nothing (blank) if no matches were found
+
+      If a start position is given with -s / --start, the program will only search for matches after that start position
+
+      If a length is given with -l / --length, the program will only search for matches within that range from the start position
+
+  -p
+  --output-pos
+    Output the start and end positions, rather than the actual text
+      Will output in the format: start,end
+      For example: 0,5
+
+      If used with searches, this will output the start and end position of the found match
+
+      If used outside of searches, this will output the start and end position of the file read
 
   -V
   --version
