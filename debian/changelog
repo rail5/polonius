@@ -1,3 +1,9 @@
+polonius (0.4.1) bullseye; urgency=medium
+
+  * Updated manual pages based on GH wiki
+
+ -- rail5 <andrew@rail5.org>  Mon, 10 Apr 2023 16:43:59 -0400
+
 polonius (0.4) bullseye; urgency=medium
 
   * Added a search function to polonius-reader
