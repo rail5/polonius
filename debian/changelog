@@ -1,3 +1,14 @@
+polonius (0.4) bullseye; urgency=medium
+
+  * Added a search function to polonius-reader
+  which can be used via the --search or -f option.
+  Added a -p / --output-pos option to polonius-reader
+  which outputs read positions in the format start,end.
+  Added blocksize support to polonius-reader.
+  Updated manual pages
+
+ -- rail5 <andrew@rail5.org>  Sun, 09 Apr 2023 20:16:11 -0400
+
 polonius (0.3) bullseye; urgency=medium
 
   * Patched a bug which prevented polonius-editor
