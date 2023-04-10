@@ -1,5 +1,14 @@
-all: reader editor curses
-	
+all: update-version reader editor curses
+
+update-version:
+	# Read the latest version number from debian/changelog
+	# And update shared/version.h with that number
+	# This ensures that the output of the --version arg
+	# For each of the binaries is always up-to-date
+	# On each compilation
+	VERSION=`grep -P -o -e "([0-9\.]*)" debian/changelog | head -n 1`; \
+	echo "#define program_version \"$$VERSION\"" > shared/version.h
+
 reader:
 	cd read && $(MAKE)
 	mv read/bin/polonius-reader ./

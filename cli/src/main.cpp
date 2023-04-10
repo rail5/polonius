@@ -26,10 +26,6 @@ int main(int argc, char* argv[]) {
 	
 	string program_name = "polonius";
 	
-	string program_version = "0.1";
-	
-	string program_author = "rail5";
-	
 	string helpstring = "No help here.\n";
 	
 	/*
