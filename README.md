@@ -1,5 +1,3 @@
-THIS REPO IS CURRENTLY A WORK-IN-PROGRESS. Polonius is not yet fully functional
-
 # polonius
 A uniquely memory-efficient and modular text editor
 
