@@ -1,3 +1,10 @@
+polonius (0.4.2) bullseye; urgency=medium
+
+  * Changed delimiter in polonius-reader from commas to
+  spaces in order to match the delimiters in polonius-editor
+
+ -- rail5 <andrew@rail5.org>  Sat, 22 Apr 2023 18:30:02 -0400
+
 polonius (0.4.1) bullseye; urgency=medium
 
   * Updated manual pages based on GH wiki
