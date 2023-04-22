@@ -1,3 +1,6 @@
+WIKIDIRECTORY=polonius.wiki
+WIKIUPSTREAM=https://github.com/rail5/polonius.wiki.git
+
 all: update-version reader editor curses
 
 update-version:
@@ -7,6 +10,18 @@ update-version:
 	# For each of the binaries is always up-to-date
 	VERSION=`grep -P -o -e "([0-9\.]*)" debian/changelog | head -n 1`; \
 	echo "#define program_version \"$$VERSION\"" > shared/version.h
+
+manual:
+	# Git pull wiki & run pandoc to create manual pages
+	# You must have Git and Pandoc installed for this
+	@ \
+	if [ -d "$(WIKIDIRECTORY)" ]; then \
+		cd "$(WIKIDIRECTORY)" && git pull "$(WIKIUPSTREAM)"; \
+	else \
+		git clone "$(WIKIUPSTREAM)" "$(WIKIDIRECTORY)"; \
+	fi;
+	pandoc --standalone --to man "$(WIKIDIRECTORY)/Polonius-Editor.md" -o debian/polonius-editor.1
+	pandoc --standalone --to man "$(WIKIDIRECTORY)/Polonius-Reader.md" -o debian/polonius-reader.1
 
 reader:
 	cd read && $(MAKE)

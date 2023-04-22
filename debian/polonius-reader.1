@@ -75,9 +75,9 @@ If a length is given with -l / --length, the program will only search for matche
 \f[C]
 Output the start and end positions, rather than the actual text
 
-Will output in the format: start,end
+Will output in the (space-delimited) format: start end
 
-For example: 0,5
+For example: 0 5
 
 If used with searches, this will output the start and end position of the found match. If used outside of searches, this will output the start and end position of the file read
 \f[R]
@@ -136,15 +136,18 @@ search for the string \[lq]hello\[rq] \f[B]only between\f[R] character
 This can also be combined with the \[lq]Output Positions\[rq]
 (\f[I]-p\f[R]) option.
 If the \[lq]Output Positions\[rq] flag is set with -p, Polonius will
-tell you \f[B]where\f[R] it found a match, in the format
-\f[B]startposition,endposition\f[R] (for example: \f[I]510,515\f[R]).
+tell you \f[B]where\f[R] it found a match, in the
+\f[I]space-delimited\f[R] format \f[B]startposition endposition\f[R]
+(for example: \f[I]510 515\f[R]).
 By default, without the \[lq]Output Positions\[rq] flag, Polonius will
 output the match itself.
 .PP
-The search function will output \f[B]either\f[R]: 1.
-The found match 2.
+The search function will output \f[B]either\f[R]:
+.IP "1." 3
+The found match
+.IP "2." 3
 The \f[B]position\f[R] of the found match (\f[I]if -p is specified\f[R])
-3.
+.IP "3." 3
 Nothing (blank) if no match was found
 .PP
 There is a plan to implement Regex searches at a later date
@@ -221,8 +224,8 @@ you the \f[B]start and end positions\f[R] of the content that it
 \f[I]would\[cq]ve\f[R] outputted.
 .PP
 The flag can be set with the -p option.
-Polonius will output the positions in the format
-\f[B]startposition,endposition\f[R], for example: \f[I]10,15\f[R]
+Polonius will output the positions in the space-delimited format
+\f[B]startposition endposition\f[R], for example: \f[I]10 15\f[R]
 .PP
 This is mainly useful in two scenarios:
 .IP
@@ -236,6 +239,6 @@ This is mainly useful in two scenarios:
 
   If polonius-reader is run with **no extra arguments given**, it will output the entire contents of a file.
 
-  In this case, if you set the *-p* flag, it will output something like \[ga]0,700\[ga], where *700* is the number of characters in the file
+  In this case, if you set the *-p* flag, it will output something like \[ga]0 700\[ga], where *700* is the number of characters in the file
 \f[R]
 .fi
