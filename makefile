@@ -1,5 +1,6 @@
 WIKIDIRECTORY=polonius.wiki
 WIKIUPSTREAM=https://github.com/rail5/polonius.wiki.git
+VERSION=`grep -E -o '[0-9\.]+' debian/changelog | head -n 1`
 
 all: update-version reader editor curses
 
@@ -8,8 +9,8 @@ update-version:
 	# And update shared/version.h with that number
 	# This ensures that the output of --version
 	# For each of the binaries is always up-to-date
-	VERSION=`grep -P -o -e "([0-9\.]*)" debian/changelog | head -n 1`; \
-	echo "#define program_version \"$$VERSION\"" > shared/version.h
+	echo "#define program_version \"$(VERSION)\"" > shared/version.h
+	echo "$(VERSION)"
 
 manual:
 	# Git pull wiki & run pandoc to create manual pages
