@@ -1,3 +1,10 @@
+polonius (0.4.3) bullseye; urgency=medium
+
+  * Patched a bug which caused end positions
+  reported by --output-pos to be off by 1
+
+ -- rail5 <andrew@rail5.org>  Sat, 22 Apr 2023 21:16:15 -0400
+
 polonius (0.4.2) bullseye; urgency=medium
 
   * Changed delimiter in polonius-reader from commas to
