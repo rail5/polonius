@@ -83,7 +83,7 @@ void reader::file::do_job() {
 		Just output in the format startposition,endposition
 		*/
 		if (just_outputting_positions) {
-			cout << start_position << " " << end_position << endl;
+			cout << start_position << " " << end_position-1 << endl;
 			return;
 		}
 		
@@ -144,7 +144,7 @@ void reader::file::do_job() {
 				match_end = (match_start + search_query_length);
 				
 				if (just_outputting_positions) {
-					cout << match_start << " " << match_end << endl;
+					cout << match_start << " " << match_end-1 << endl;
 					return;
 				}
 				
