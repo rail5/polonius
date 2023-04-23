@@ -16,7 +16,65 @@ int main(int argc, char* argv[]) {
 
 	string program_name = "polonius-editor";
 	
-	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename -a \"{INSTRUCTION}\"\n\nOptions:\n  -i\n  --input\n    Specify input file to edit\n\n  -a\n  --add-instruction\n    Instruct the program on how to edit your file\n      Example instructions:\n      REPLACE 5 hello world\n        (Replaces text, starting from byte #5, with \"hello world\")\n      INSERT 7 salut a tous\n        (Inserts \"salut a tous\" at byte #7, shifting the rest of the file without replacing it)\n      REMOVE 9 15\n        (Removes bytes #9 to #15 from the file)\n\n  -s\n  --add-instruction-set\n    Provide a set of multiple instructions for editing the file\n      Each instruction in the set should be on its own line, as in the following example:\n        --add-instruction-set \"REPLACE 20 hello world\n        INSERT 50 hello again\n        REMOVE 70 75\"\n\n  -c\n  --special-chars\n    Interpret escaped character sequences (\\n, \\t and \\\\)\n\n  -b\n  --block-size\n    Specify the amount of data from the file we're willing to load into memory at any given time\n      Example:\n        -b 10M\n        -b 200K\n      (Default 10 kilobytes)\n\n  -v\n  --verbose\n    Verbose mode\n\n  -V\n  --version\n    Print version number\n\n  -h\n  --help\n    Display this message\n\nExamples:\n  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n\n  " + program_name + " -a \"insert 0 hello world\" ./file.txt\n";
+	string help_string =
+	program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\n"
+	"This is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\n"
+	""
+	"Usage: " + program_name + " -i filename -a \"{INSTRUCTION}\"\n\n"
+	""
+	"Options:\n"
+	" -i\n"
+	" --input\n"
+	"   Specify input file to edit\n\n"
+	""
+	"  -a\n"
+	" --add-instruction\n"
+	"   Instruct the program on how to edit your file\n"
+	"     Example instructions:\n"
+	"     REPLACE 5 hello world\n"
+	"       (Replaces text, starting from byte #5, with \"hello world\")\n"
+	"     INSERT 7 salut a tous\n"
+	"       (Inserts \"salut a tous\" at byte #7, shifting the rest of the file without replacing it)\n"
+	"     REMOVE 9 15\n"
+	"       (Removes bytes #9 to #15 from the file)\n\n"
+	""
+	"  -s\n"
+	" --add-instruction-set\n"
+	"   Provide a set of multiple instructions for editing the file\n"
+	"     Each instruction in the set should be on its own line, as in the following example:\n"
+	"       --add-instruction-set \"REPLACE 20 hello world\n"
+	"       INSERT 50 hello again\n"
+	"       REMOVE 70 75\"\n\n"
+	""
+	"  -c\n"
+	" --special-chars\n"
+	"   Interpret escaped character sequences (\\n, \\t and \\\\)\n\n"
+	""
+	"  -b\n"
+	" --block-size\n"
+	"   Specify the amount of data from the file we're willing to load into memory at any given time\n"
+	"     Example:\n"
+	"       -b 10M\n"
+	"       -b 200K\n"
+	"     (Default 10 kilobytes)\n\n"
+	""
+	"  -v\n"
+	" --verbose\n"
+	"   Verbose mode\n\n"
+	""
+	"  -V\n"
+	" --version\n"
+	"   Print version number\n\n"
+	""
+	"  -h\n"
+	" --help\n"
+	"   Display this message\n\n"
+	""
+	"Examples:\n"
+	"  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n"
+	"world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n\n"
+	""
+	"  " + program_name + " -a \"insert 0 hello world\" ./file.txt\n";
 	
 	
 	/*
@@ -108,7 +166,7 @@ int main(int argc, char* argv[]) {
 				break;
 			
 			case 'h':
-				cout << helpstring;
+				cout << help_string;
 				return EXIT_SUCCESS;
 				break;
 			

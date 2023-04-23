@@ -16,7 +16,63 @@ int main(int argc, char* argv[]) {
 
 	string program_name = "polonius-reader";
 
-	string helpstring = program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\nThis is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\nUsage: " + program_name + " -i filename\n\nOptions:\n  -i\n  --input\n    Specify input file to read\n\n  -s\n  --start\n    Specify byte number to start reading from\n\n  -l\n  --length\n    Specify how many bytes to read\n\n  -b\n  --block-size\n    Specify the amount of data from the file we're willing to load into memory at any given time\n      Example:\n        -b 10M\n        -b 200K\n      (Default 10 kilobytes)\n\n  -f\n  --find\n  --search\n    Search for a string in the file\n    If -s / --start is specified, the program will only search for matches after that start position\n    If -l / --length is specified, the program will only search for matches within that length from the start\n    Returns nothing (blank) if no matches were found\n\n  -p\n  --output-pos\n    Output the start and end position, rather than the text (in the format \"start,end\", for example 10,15)\n    If used with searches, this will output the start and end position of the search result\n    Outside of searches, it will return the values of -s / --start and the end position (start + length)\n\n  -V\n  --version\n    Print version number\n\n  -h\n  --help\n    Display this message\n\nExamples:\n  " + program_name + " --input ./file.txt --start 50 --length 10\n\n  " + program_name + " -s 50 -l 10 ./file.txt\n\n  " + program_name + " -i ./file.txt --start 75 --search \"hello world\" --length 10\n\n  " + program_name + " ./file.txt -f \"hello world\" --output-pos\n";
+	string help_string =
+	program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\n"
+	"This is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\n"
+	""
+	"Usage: " + program_name + " -i filename\n\n"
+	""
+	"Options:\n"
+	"  -i\n"
+	"  --input\n"
+	"    Specify input file to read\n\n"
+	""
+	"  -s\n"
+	"  --start\n"
+	"    Specify byte number to start reading from\n\n"
+	""
+	"  -l\n"
+	"  --length\n"
+	"   Specify how many bytes to read\n\n"
+	""
+	"  -b\n"
+	" --block-size\n"
+	"   Specify the amount of data from the file we're willing to load into memory at any given time\n"
+	"     Example:\n"
+	"       -b 10M\n"
+	"       -b 200K\n"
+	"     (Default 10 kilobytes)\n\n"
+	""
+	"  -f\n"
+	" --find\n"
+	" --search\n"
+	"   Search for a string in the file\n"
+	"   If -s / --start is specified, the program will only search for matches after that start position\n"
+	"   If -l / --length is specified, the program will only search for matches within that length from the start\n"
+	"   Returns nothing (blank) if no matches were found\n\n"
+	""
+	"  -p\n"
+	" --output-pos\n"
+	"   Output the start and end position, rather than the text (in the format \"start,end\", for example 10,15)\n"
+	"   If used with searches, this will output the start and end position of the search result\n"
+	"   Outside of searches, it will return the values of -s / --start and the end position (start + length)\n\n"
+	""
+	"  -V\n"
+	" --version\n"
+	"   Print version number\n\n"
+	""
+	"  -h\n"
+	" --help\n"
+	"   Display this message\n\n"
+	""
+	"Examples:\n"
+	"  " + program_name + " --input ./file.txt --start 50 --length 10\n\n"
+	""
+	"  " + program_name + " -s 50 -l 10 ./file.txt\n\n"
+	""
+	"  " + program_name + " -i ./file.txt --start 75 --search \"hello world\" --length 10\n\n"
+	""
+	"  " + program_name + " ./file.txt -f \"hello world\" --output-pos\n";
 	
 	/*
 	Necessary info for the program to do its job
@@ -108,7 +164,7 @@ int main(int argc, char* argv[]) {
 				break;
 				
 			case 'h':
-				cout << helpstring;
+				cout << help_string;
 				return EXIT_SUCCESS;
 				break;
 				
@@ -132,7 +188,7 @@ int main(int argc, char* argv[]) {
 	
 	// Make sure we got an input file
 	if (!received_filename) {
-		cerr << helpstring;
+		cerr << help_string;
 		return EXIT_BADFILE;
 	}
 	
