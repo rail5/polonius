@@ -220,7 +220,7 @@ editor::instruction parse_instruction_string(string instruction_string) {
 			1.
 				REPLACE 5 hello
 					(
-					This would replace bytes #5 - #9 with "hello"
+					This would replace characters #5 - #9 with "hello"
 						Example:
 							Original file:
 								01234567890123
@@ -230,7 +230,7 @@ editor::instruction parse_instruction_string(string instruction_string) {
 			2.
 				INSERT 6 ni hao
 					(
-					This would shift bytes #6 - EOF rightward and insert "ni hao" at position #6 without replacing
+					This would shift characters #6 - EOF rightward and insert "ni hao" at position #6 without replacing
 					(Or, if #6 is EOF, this would insert "ni hao" at the end of the file)
 						Example:
 							Original file:
@@ -241,7 +241,7 @@ editor::instruction parse_instruction_string(string instruction_string) {
 			3.
 				REMOVE 7 10
 					(
-					This would remove bytes #7 - #10 and shift the remaining bytes leftward
+					This would remove characters #7 - #10 and shift the remaining characters leftward
 						Example:
 							Original file:
 								01234567890123

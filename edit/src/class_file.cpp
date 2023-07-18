@@ -122,9 +122,9 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	bool add_instruction(instruction input_instruction):
 		Add an 'instruction' object to the instruction_set
 			An 'instruction' object tells us what kind of edit to make
-			For instance, "replace byte #5 with a 'c'"
+			For instance, "replace character #5 with a 'c'"
 			Or "insert a 'q' at position #56"
-			Or "remove byte #3"
+			Or "remove character #3"
 		
 		Returns true if the instruction was successfully added
 		Returns false if the file is uninitialized
