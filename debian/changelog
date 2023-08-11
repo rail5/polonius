@@ -1,3 +1,9 @@
+polonius (0.4.4) bullseye; urgency=medium
+
+  * Dummy update for testing
+
+ -- rail5 <andrew@rail5.org>  Fri, 11 Aug 2023 12:48:41 -0400
+
 polonius (0.4.3) bullseye; urgency=medium
 
   * Patched a bug which caused end positions
