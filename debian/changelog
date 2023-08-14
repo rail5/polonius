@@ -1,3 +1,10 @@
+polonius (0.4.5) bullseye; urgency=medium
+
+  * Updated the way in which the makefile
+  retrieves the current version number
+
+ -- rail5 <andrew@rail5.org>  Mon, 14 Aug 2023 17:17:04 -0400
+
 polonius (0.4.4) bullseye; urgency=medium
 
   * Dummy update for testing
