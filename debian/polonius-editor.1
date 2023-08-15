@@ -36,13 +36,13 @@ Instruct the program on how to edit your file
 Example instructions:
 
   REPLACE 5 hello world
-    (Replaces text, starting from byte #5, with \[dq]hello world\[dq])
+    (Replaces text, starting from character #5, with \[dq]hello world\[dq])
 
   INSERT 7 salut a tous
-    (Inserts \[dq]salut a tous\[dq] at byte #7, shifting the rest of the file without replacing it)
+    (Inserts \[dq]salut a tous\[dq] at character #7, shifting the rest of the file without replacing it)
 
   REMOVE 9 15
-    (Removes bytes #9 to #15 from the file)
+    (Removes characters #9 to #15 from the file)
 \f[R]
 .fi
 .PP
@@ -64,7 +64,7 @@ Each instruction in the set should be on its own line, as in the following examp
 .IP
 .nf
 \f[C]
-Interpret escaped character sequences (\[rs]n, \[rs]t, and \[rs]\[rs])
+Interpret escaped character sequences (\[rs]n, \[rs]t, \[rs]\[rs], and \[rs]x00 - \[rs]xFF)
 \f[R]
 .fi
 .PP
@@ -74,7 +74,7 @@ Interpret escaped character sequences (\[rs]n, \[rs]t, and \[rs]\[rs])
 \f[C]
 Specify the maximum amount of data we can load from the file into memory at any given time
 
-Defaults to 1 kilobyte if not specified
+Defaults to 10 kilobytes if not specified
 \f[R]
 .fi
 .PP
@@ -130,11 +130,8 @@ This option is common to both \f[B]polonius-reader\f[R] and
 .PP
 Setting the \[lq]special characters\[rq] flag tells Polonius to process
 \f[B]escaped character sequences\f[R].
-Polonius will process \f[C]\[rs]n\f[R], \f[C]\[rs]t\f[R], and
-\f[C]\[rs]\[rs]\f[R].
-.PP
-There is a plan to allow for insertion of any arbitrary byte in the
-format of \f[C]\[rs]x00\f[R], but this is not yet implemented.
+Polonius will process \f[C]\[rs]n\f[R], \f[C]\[rs]t\f[R],
+\f[C]\[rs]\[rs]\f[R], and \f[C]\[rs]x00\f[R] through \f[C]\[rs]xFF\f[R].
 .PP
 The special characters flag can be set with the \f[I]-c\f[R] option.
 .SS VERBOSE
