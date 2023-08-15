@@ -1,3 +1,11 @@
+polonius (0.4.6) bullseye; urgency=medium
+
+  * The -c option can now process any
+  arbitrary byte in the format \x00 to
+  \xFF
+
+ -- rail5 <andrew@rail5.org>  Tue, 15 Aug 2023 01:19:26 -0400
+
 polonius (0.4.5) bullseye; urgency=medium
 
   * Updated the way in which the makefile
