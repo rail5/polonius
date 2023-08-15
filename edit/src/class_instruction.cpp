@@ -21,6 +21,7 @@ void editor::instruction::process_special_chars() {
 	vector<string> list_special_chars = {"\\n", "\\t", "\\\\"};
 	vector<string> replacements_for_special_chars = {"\n", "\t", "\\"};
 	
+	/* Process \n, \t, and \\ */
 	for (int i = 0; i < list_special_chars.size(); i++) {
 		size_t current_position = 0;
 		while ((current_position = text_input.find(list_special_chars[i], current_position)) != std::string::npos) {
@@ -28,6 +29,9 @@ void editor::instruction::process_special_chars() {
 			current_position += replacements_for_special_chars[i].length();
 		}
 	}
+
+	/* Process \x00 through \xFF */
+	text_input = process_bytecodes(text_input);
 	
 	end_position = (start_position + text_input.length());
 

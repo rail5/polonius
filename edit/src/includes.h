@@ -8,7 +8,7 @@
 	#define GETOPT_H
 	#include <getopt.h>
 #endif
-/* Needed for explode() function */
+/* Needed for explode() and process_bytecodes() functions */
 #ifndef SSTREAM
 	#define SSTREAM
 	#include <sstream>
@@ -42,6 +42,11 @@
 #ifndef FSTREAM
 	#define FSTREAM
 	#include <fstream>
+#endif
+/* Needed for process_bytecodes() function */
+#ifndef REGEX
+	#define REGEX
+	#include <regex>
 #endif
 
 
@@ -84,6 +89,11 @@
 #ifndef FN_REMOVE_LEADING_WHITESPACE
 	#define FN_REMOVE_LEADING_WHITESPACE
 	#include "../../shared/remove_leading_whitespace.cpp"
+#endif
+/* string process_bytecodes(string input) processes strings containing escaped byte-codes (such as \x00 or \xFF), replacing all byte-codes with the actual bytes they represent */
+#ifndef FN_PROCESS_BYTECODES
+	#define FN_PROCESS_BYTECODES
+	#include "../../shared/process_bytecodes.cpp"
 #endif
 
 /* Shared definitions */
