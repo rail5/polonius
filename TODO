@@ -1,0 +1,20 @@
+TODO:
+	- Work on interactive UIs (GUI and ncurses-CLI) still needs to be started
+	
+	- "Instruction Optimization" for polonius-editor
+		REPLACE instructions are always preferred to INSERTs and REMOVEs, seeing as they're *much* faster
+		If a user types, for example:
+			-a "REMOVE 0 0"
+			-a "INSERT 0 a"
+		Polonius should be able to detect that this could be optimized into a single REPLACE instruction:
+			-a "REPLACE 0 a"
+		This would be major, especially for very large files
+		
+	- Regex searches in polonius-reader
+	
+	- General code clean-up for readability, consistency, and efficiency
+		For example, the process-special-chars check in polonius-editor happens within a member function of the instruction class, where in polonius-reader it happens in main(). There should be more consistency between the different pieces of polonius
+	
+	- Inserting '\x00', while it doesn't cause any major bugs, does not insert a NUL byte into the file.
+		For example, "INSERT 0 hello\x00world" results in a file with "helloworld" and no NUL byte in between.
+		Uncertain whether this should be considered a bug, or whether it should be possible for polonius to insert a NUL byte.
