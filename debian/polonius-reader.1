@@ -83,6 +83,14 @@ If used with searches, this will output the start and end position of the found 
 \f[R]
 .fi
 .PP
+-c / \[en]special-chars
+.IP
+.nf
+\f[C]
+Parse escaped character sequences in search queries (\[ga]\[rs]n\[ga], \[ga]\[rs]t\[ga], \[ga]\[rs]\[rs]\[ga], and \[ga]\[rs]x00\[ga] through \[ga]\[rs]xFF\[ga])
+\f[R]
+.fi
+.PP
 -V / \[en]version
 .IP
 .nf
@@ -242,3 +250,11 @@ This is mainly useful in two scenarios:
   In this case, if you set the *-p* flag, it will output something like \[ga]0 700\[ga], where *700* is the number of characters in the file
 \f[R]
 .fi
+.SS SPECIAL CHARACTERS
+.PP
+Setting the \[lq]special characters\[rq] flag tells Polonius to parse
+\f[B]escaped character sequences\f[R] in search queries.
+Polonius will parse \f[C]\[rs]n\f[R], \f[C]\[rs]t\f[R],
+\f[C]\[rs]\[rs]\f[R], and \f[C]\[rs]x00\f[R] through \f[C]\[rs]xFF\f[R].
+.PP
+The special characters flag can be set with the \f[I]-c\f[R] option.
