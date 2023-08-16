@@ -90,6 +90,11 @@
 	#define FN_REMOVE_LEADING_WHITESPACE
 	#include "../../shared/remove_leading_whitespace.cpp"
 #endif
+/* string process_escapedchars(string input) processes strings containing '\n', '\t', and '\\' (literal), replacing them with the actual characters they represent */
+#ifndef FN_PROCESS_ESCAPEDCHARS
+	#define FN_PROCESS_ESCAPEDCHARS
+	#include "../../shared/process_escapedchars.cpp"
+#endif
 /* string process_bytecodes(string input) processes strings containing escaped byte-codes (such as \x00 or \xFF), replacing all byte-codes with the actual bytes they represent */
 #ifndef FN_PROCESS_BYTECODES
 	#define FN_PROCESS_BYTECODES
