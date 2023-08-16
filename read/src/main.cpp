@@ -57,6 +57,10 @@ int main(int argc, char* argv[]) {
 	"   If used with searches, this will output the start and end position of the search result\n"
 	"   Outside of searches, it will return the values of -s / --start and the end position (start + length)\n\n"
 	""
+	"  -c\n"
+	"  --special-chars\n"
+	"    Parse escaped character sequences in search queries (\\n, \\t, \\\\, and \\x00 through \\xFF)\n\n"
+	""
 	"  -V\n"
 	" --version\n"
 	"   Print version number\n\n"
@@ -93,6 +97,8 @@ int main(int argc, char* argv[]) {
 	string searching_for = "";
 	
 	bool output_position = false;
+
+	bool special_chars = false;
 	
 	/*
 	GETOPT
@@ -110,11 +116,12 @@ int main(int argc, char* argv[]) {
 		{"find", required_argument, 0, 'f'},
 		{"search", required_argument, 0, 'f'},
 		{"output-pos", no_argument, 0, 'p'},
+		{"special-chars", no_argument, 0, 'c'},
 		{"version", no_argument, 0, 'V'},
 		{"help", no_argument, 0, 'h'}
 	};
 	
-	while ((c = getopt_long(argc, argv, "i:s:l:b:f:pVh", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "i:s:l:b:f:pcVh", long_options, &option_index)) != -1) {
 		switch(c) {
 			case 'i':
 				if (received_filename) {
@@ -156,6 +163,10 @@ int main(int argc, char* argv[]) {
 			
 			case 'p':
 				output_position = true;
+				break;
+			
+			case 'c':
+				special_chars = true;
 				break;
 				
 			case 'V':
@@ -210,6 +221,11 @@ int main(int argc, char* argv[]) {
 	the_file.set_just_outputting_positions(output_position);
 	
 	the_file.set_block_size(block_size);
+
+	if (special_chars) {
+		searching_for = process_escapedchars(searching_for);
+		searching_for = process_bytecodes(searching_for);
+	}
 	
 	the_file.set_search_query(searching_for);
 	
