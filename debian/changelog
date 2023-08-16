@@ -1,3 +1,12 @@
+polonius (0.4.7) bullseye; urgency=medium
+
+  * Polonius-reader can now parse
+  escaped character sequences in
+  search queries. This is done by
+  setting the '-c' flag.
+
+ -- rail5 <andrew@rail5.org>  Tue, 15 Aug 2023 23:19:51 -0400
+
 polonius (0.4.6) bullseye; urgency=medium
 
   * The -c option can now process any
