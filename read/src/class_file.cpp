@@ -80,7 +80,7 @@ void reader::file::do_job() {
 		/*
 		If just_outputting_positions == true,
 		Then we don't need to actually read the file,
-		Just output in the format startposition,endposition
+		Just output in the format "startposition endposition"
 		*/
 		if (just_outputting_positions) {
 			cout << start_position << " " << end_position-1 << endl;
