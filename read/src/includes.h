@@ -23,6 +23,11 @@
 	#define UNISTD_H
 	#include <unistd.h>
 #endif
+/* Needed for process_bytecodes() function */
+#ifndef REGEX
+	#define REGEX
+	#include <regex>
+#endif
 
 /* Shared definitions */
 #include "../../shared/definitions.h"
