@@ -13,7 +13,7 @@ polonius-editor - sequentially executes editing instructions on a file
 .PP
 \f[C]polonius-editor ./file -a \[dq]REPLACE 0 salut a tous\[rs]nAnd hello\[dq] --special-chars\f[R]
 .PP
-\f[C]polonius-editor ./file -a \[dq]INSERT 0 hello world\[dq] -a \[dq]REMOVE 0 5\[dq] -a \[dq]REPLACE 0 salut a tous\[dq]\f[R]
+\f[C]polonius-editor ./file -a \[dq]INSERT end hello world\[dq] -a \[dq]REMOVE 0 5\[dq] -a \[dq]REPLACE 0 salut a tous\[dq]\f[R]
 .SH OPTIONS
 .SS OVERVIEW
 .PP
@@ -43,6 +43,8 @@ Example instructions:
 
   REMOVE 9 15
     (Removes characters #9 to #15 from the file)
+  
+  The \[aq]end\[aq] keyword can also be used in place of absolute positions, and refers always to the end of the file.
 \f[R]
 .fi
 .PP
@@ -197,6 +199,9 @@ Then it will now contain:
 .PP
 Insert instructions will fail (and give an error) if the start position
 is \f[B]less than zero\f[R], or is \f[B]beyond the end of the file\f[R]
+.PP
+The `end' keyword can also be used in place of an absolute start
+position.
 .SS \[lq]REMOVE\[rq] INSTRUCTIONS
 .PP
 REMOVE instructions are used to delete text from the file.
@@ -233,6 +238,9 @@ The start position is \f[B]less than zero\f[R]
 The end position is \f[B]lower than the start position\f[R]
 .IP \[bu] 2
 Either position is \f[B]beyond the end of the file\f[R]
+.PP
+The `end' keyword can also be used in place of an absolute start or end
+position.
 .SS \[lq]REPLACE\[rq] INSTRUCTIONS
 .PP
 REPLACE instructions are used to replace existing text in the file
@@ -272,3 +280,6 @@ Instead, we should run two instructions:
 First, \f[C]REPLACE 0 goodbye123\f[R]
 .IP \[bu] 2
 Then, \f[C]INSERT 10 4\f[R]
+.PP
+The `end' keyword can also be used in place of an absolute start
+position.
