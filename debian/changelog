@@ -1,3 +1,13 @@
+polonius (0.4.8) bullseye; urgency=medium
+
+  * Added 'end' keyword. This
+  keyword can be used in instructions
+  in place of absolute positions
+  and always refers to the end of
+  the file. e.g.: 'INSERT end hello'
+
+ -- rail5 <andrew@rail5.org>  Thu, 17 Aug 2023 18:56:21 -0400
+
 polonius (0.4.7) bullseye; urgency=medium
 
   * Polonius-reader can now parse
