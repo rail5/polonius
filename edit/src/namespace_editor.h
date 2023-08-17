@@ -36,6 +36,9 @@ namespace editor {
 			void set_error_message(string message);
 			
 			string get_error_message();
+
+			void update_start_position(int64_t start);
+			void update_end_position(int64_t end);
 			
 			bool is_initialized();
 			int get_operation_type();

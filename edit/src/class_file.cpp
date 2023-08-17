@@ -147,6 +147,28 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	if (!input_instruction.is_initialized()) {
 		return false;
 	}
+
+	/*
+	Check for positions marked '-1.'
+	Position '-1' is reserved for the "end" keyword, and is used to refer dynamically to the end of the file
+	*/
+	if (input_instruction.get_start_position() == -1) {
+
+		int subtract_amount = 1;
+
+		if (input_instruction.get_operation_type() == replace_operation) {
+			// For INSERTs and REMOVEs, we subtract 1 from file_length
+			// For REPLACEs, we subtract 2
+			subtract_amount = 2;
+		}
+
+		input_instruction.update_start_position(file_length_after_last_instruction - subtract_amount);
+		input_instruction.update_end_position(input_instruction.get_start_position() + input_instruction.get_text().length());
+	}
+
+	if (input_instruction.get_end_position() == -1) {
+		input_instruction.update_end_position(file_length_after_last_instruction - 1);
+	}
 	
 	/*
 	Now, make sure that the start position isn't further than the end of the file

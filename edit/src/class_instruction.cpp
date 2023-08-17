@@ -40,10 +40,11 @@ bool editor::instruction::set_replace_instruction(int64_t start, string text) {
 	/*
 	Make sure the start position is valid.
 	Meaning:
-		- Not less than zero
+		- Not less than -1 (-1 is reserved for the 'end' keyword)
 		- Not beyond EOF
 	*/
-	if (start < 0) {
+
+	if (start < -1) {
 		error_message = "Invalid start position";
 		clear_instruction();
 		return false;
@@ -77,10 +78,10 @@ bool editor::instruction::set_insert_instruction(int64_t start, string text) {
 	/*
 	Make sure the start position is valid
 	Meaning:
-		- Not less than zero
+		- Not less than -1 (-1 is reserved for the 'end' keyword)
 		- Not beyond EOF
 	*/
-	if (start < 0) {
+	if (start < -1) {
 		error_message = "Invalid start position";
 		clear_instruction();
 		return false;
@@ -114,9 +115,9 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 	/*
 	Make sure the start position is valid
 	Meaning:
-		- Not less than zero
+		- Not less than -1 (-1 is reserved for the 'end' keyword)
 	*/
-	if (start < 0) {
+	if (start < -1) {
 		error_message = "Invalid start position";
 		clear_instruction();
 		return false;
@@ -125,9 +126,9 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 	/*
 	Make sure the end position is valid
 	Meaning:
-		- Not less than  the start position
+		- Not less than the start position
 	*/
-	if (end < start) {
+	if ( (end < start) && (end != -1) ) {
 		error_message = "Invalid end position";
 		clear_instruction();
 		return false;
@@ -159,6 +160,14 @@ void editor::instruction::set_error_message(string message) {
 
 string editor::instruction::get_error_message() {
 	return error_message;
+}
+
+void editor::instruction::update_start_position(int64_t start) {
+	start_position = start;
+}
+
+void editor::instruction::update_end_position(int64_t end) {
+	end_position = end;
 }
 
 bool editor::instruction::is_initialized() {
@@ -276,11 +285,18 @@ editor::instruction parse_instruction_string(string instruction_string) {
 		invalid_instruction.set_error_message("Invalid instruction: " + instruction_string);
 		return invalid_instruction;
 	}
+
+	string first_element = "";
+	string second_element = "";
+	string third_element = "";
+
+	bool second_element_is_end = false;
+	bool third_element_is_end = false;
 	
 	/*
 	Make sure the first element is either "replace," "insert," or "remove"
 	*/
-	string first_element = to_lower(instruction_vector[0]);
+	first_element = to_lower(instruction_vector[0]);
 	bool is_replace_instruction = (first_element == "replace");
 	bool is_insert_instruction = (first_element == "insert");
 	bool is_remove_instruction = (first_element == "remove");
@@ -293,19 +309,27 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	}
 	
 	/*
-	The second element should ALWAYS be an integer
+	The second element should ALWAYS be either an integer or the keyword "end"
 		See: shared_functions/is_number.cpp
 	*/
-	if (!is_number(instruction_vector[1])) {
+	second_element = to_lower(instruction_vector[1]);
+
+	second_element_is_end = (second_element == "end");
+
+	if ( ! (is_number(second_element) || (second_element_is_end)) ) {
 		invalid_instruction.set_error_message("Invalid instruction: '" + instruction_vector[1] + "' is not a positive integer");
 		return invalid_instruction;
 	}
 	
 	/*
-	If it's a remove instruction, the third element should also be an integer
+	If it's a remove instruction, the third element should also be either an integer or the keyword "end"
 	*/
 	if (is_remove_instruction) {
-		if (!is_number(instruction_vector[2])) {
+		third_element = to_lower(instruction_vector[2]);
+
+		third_element_is_end = (third_element == "end");
+
+		if ( ! (is_number(instruction_vector[2]) || (third_element_is_end) )) {
 			invalid_instruction.set_error_message("Invalid REMOVE instruction: '" + instruction_vector[2] + "' is not a positive integer");
 			return invalid_instruction;
 		}
@@ -314,22 +338,45 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	/*
 	Now, to actually create the 'instruction' object
 	*/
+
+	int64_t start_position;
+	int64_t end_position;
+
 	if (is_replace_instruction) {
-		int64_t start_position = (int64_t)stoll(instruction_vector[1]);
+
+		if (second_element_is_end) {
+			start_position = -1;
+		} else {
+			start_position = (int64_t)stoll(instruction_vector[1]);
+		}
 		
 		return create_replace_instruction(start_position, instruction_vector[2]);
 	}
 	
 	if (is_insert_instruction) {
-		int64_t start_position = (int64_t)stoll(instruction_vector[1]);
+
+		if (second_element_is_end) {
+			start_position = -1;
+		} else {
+			start_position = (int64_t)stoll(instruction_vector[1]);
+		}
 		
 		return create_insert_instruction(start_position, instruction_vector[2]);
 	}
 	
 	if (is_remove_instruction) {
-		int64_t start_position = (int64_t)stoll(instruction_vector[1]);
+
+		if (second_element_is_end) {
+			start_position = -1;
+		} else {
+			start_position = (int64_t)stoll(instruction_vector[1]);
+		}
 		
-		int64_t end_position = (int64_t)stoll(instruction_vector[2]);
+		if (third_element_is_end) {
+			end_position = -1;
+		} else {
+			end_position = (int64_t)stoll(instruction_vector[2]);
+		}
 		
 		return create_remove_instruction(start_position, end_position);
 	}
