@@ -1,0 +1,29 @@
+Polonius-Editor: Non-interactive (scriptable) editor
+Polonius-Reader: Non-interactive (scriptable) reader
+Polonius-CLI: Curses-based terminal interface
+Polonius-GUI: Graphical UI
+
+0.4.x:
+	Will have achieved:
+		Basic function of Polonius Editor & Reader
+	
+	Will be aiming to achieve:
+		Continuously improve efficiency, code quality/readability
+		FULLY complete Polonius Editor & Reader
+		Complete BASIC function of at least one interactive UI
+
+0.5.x:
+	Will have achieved:
+		Full completion of both Polonius Editor & Reader
+		Basic function of at least one interactive UI
+	
+	Will be aiming to achieve:
+		Fix UI bugs and achieve full function of both interactive UIs
+
+1.x:
+	Will have achieved:
+		Full completion of both interactive UIs
+	
+	Will be aiming to achieve:
+		Continuously improve efficiency, code quality/readability
+		Intensive tests, esp. regarding memory usage, to make Polonius more and more memory-efficient
