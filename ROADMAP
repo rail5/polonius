@@ -1,6 +1,6 @@
 Polonius-Editor: Non-interactive (scriptable) editor
 Polonius-Reader: Non-interactive (scriptable) reader
-Polonius-CLI: Curses-based terminal interface
+Polonius-CLI: Curses-based terminal UI
 Polonius-GUI: Graphical UI
 
 0.4.x:
