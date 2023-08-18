@@ -1,3 +1,11 @@
+polonius (0.4.10) bullseye; urgency=medium
+
+  * Patched a small bug in the 'end' keyword
+  which allowed for 'replace' instructions
+  with start positions lower than zero
+
+ -- rail5 <andrew@rail5.org>  Fri, 18 Aug 2023 12:21:03 -0400
+
 polonius (0.4.9) bullseye; urgency=medium
 
   * Multi-character 'replace'
