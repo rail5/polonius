@@ -154,18 +154,23 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	*/
 	bool start_position_is_eof = (input_instruction.get_start_position() == -1);
 	bool end_position_is_eof = (input_instruction.get_end_position() == -1);
-	
+
 	if (start_position_is_eof) {
 
-		int subtract_amount = 1;
-
 		if (input_instruction.get_operation_type() == replace_operation) {
-			// For INSERTs and REMOVEs, we subtract 1 from file_length
-			// For REPLACEs, we subtract 2
-			subtract_amount = 2;
+			/*
+			REPLACE instructions are a special case with the 'END' keyword
+				The user should be allowed to replace the last *few* characters of the file
+					e.g.: "REPLACE END abcd"
+			In which case we should calculate the start position as being, not EOF,
+				but EOF - (text_input.length())
+			*/
+			input_instruction.update_start_position(
+				file_length_after_last_instruction - input_instruction.get_text().length() - 1);
+		} else {
+			input_instruction.update_start_position(file_length_after_last_instruction - 1);
 		}
 
-		input_instruction.update_start_position(file_length_after_last_instruction - subtract_amount);
 		input_instruction.update_end_position(input_instruction.get_start_position() + input_instruction.get_text().length());
 	}
 
