@@ -4,26 +4,14 @@ Polonius-CLI: Curses-based terminal UI
 Polonius-GUI: Graphical UI
 
 0.4.x:
-	Will have achieved:
-		Basic function of Polonius Editor & Reader
-	
-	Will be aiming to achieve:
-		Continuously improve efficiency, code quality/readability
-		FULLY complete Polonius Editor & Reader
-		Complete BASIC function of at least one interactive UI
+	Basic function of Polonius Editor & Reader
 
 0.5.x:
-	Will have achieved:
-		Full completion of both Polonius Editor & Reader
-		Basic function of at least one interactive UI
-	
-	Will be aiming to achieve:
-		Fix UI bugs and achieve full function of both interactive UIs
+	Full completion of both Polonius Editor & Reader
+	Basic function of at least one interactive UI
 
 1.x:
-	Will have achieved:
-		Full completion of both interactive UIs
+	Full completion of both interactive UIs
 	
-	Will be aiming to achieve:
 		Continuously improve efficiency, code quality/readability
 		Intensive tests, esp. regarding memory usage, to make Polonius more and more memory-efficient
