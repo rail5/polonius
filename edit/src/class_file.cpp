@@ -152,7 +152,10 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	Check for positions marked '-1.'
 	Position '-1' is reserved for the "end" keyword, and is used to refer dynamically to the end of the file
 	*/
-	if (input_instruction.get_start_position() == -1) {
+	bool start_position_is_eof = (input_instruction.get_start_position() == -1);
+	bool end_position_is_eof = (input_instruction.get_end_position() == -1);
+	
+	if (start_position_is_eof) {
 
 		int subtract_amount = 1;
 
@@ -166,7 +169,7 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 		input_instruction.update_end_position(input_instruction.get_start_position() + input_instruction.get_text().length());
 	}
 
-	if (input_instruction.get_end_position() == -1) {
+	if (end_position_is_eof) {
 		input_instruction.update_end_position(file_length_after_last_instruction - 1);
 	}
 	
