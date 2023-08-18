@@ -1,3 +1,11 @@
+polonius (0.4.9) bullseye; urgency=medium
+
+  * Multi-character 'replace'
+  instructions using the 'end'
+  keyword are now possible
+
+ -- rail5 <andrew@rail5.org>  Thu, 17 Aug 2023 21:30:11 -0400
+
 polonius (0.4.8) bullseye; urgency=medium
 
   * Added 'end' keyword. This
