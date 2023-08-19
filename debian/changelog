@@ -1,3 +1,9 @@
+polonius (0.4.11) stable; urgency=medium
+
+  * Moving to Debian 12
+
+ -- rail5 <andrew@rail5.org>  Fri, 18 Aug 2023 23:07:08 -0400
+
 polonius (0.4.10) bullseye; urgency=medium
 
   * Patched a small bug in the 'end' keyword
