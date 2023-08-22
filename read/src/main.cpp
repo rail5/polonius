@@ -99,6 +99,8 @@ int main(int argc, char* argv[]) {
 	bool output_position = false;
 
 	bool special_chars = false;
+
+	reader::search_type query_type = reader::normal_search;
 	
 	/*
 	GETOPT
@@ -117,11 +119,12 @@ int main(int argc, char* argv[]) {
 		{"search", required_argument, 0, 'f'},
 		{"output-pos", no_argument, 0, 'p'},
 		{"special-chars", no_argument, 0, 'c'},
+		{"regex", no_argument, 0, 'e'},
 		{"version", no_argument, 0, 'V'},
 		{"help", no_argument, 0, 'h'}
 	};
 	
-	while ((c = getopt_long(argc, argv, "i:s:l:b:f:pcVh", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "i:s:l:b:f:pceVh", long_options, &option_index)) != -1) {
 		switch(c) {
 			case 'i':
 				if (received_filename) {
@@ -167,6 +170,10 @@ int main(int argc, char* argv[]) {
 			
 			case 'c':
 				special_chars = true;
+				break;
+			
+			case 'e':
+				query_type = reader::regex_search;
 				break;
 				
 			case 'V':
@@ -228,6 +235,8 @@ int main(int argc, char* argv[]) {
 	}
 	
 	the_file.set_search_query(searching_for);
+
+	the_file.set_search_type(query_type);
 	
 	the_file.set_job_type(job);
 
