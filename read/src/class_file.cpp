@@ -143,7 +143,7 @@ void reader::file::do_regex_search() {
 					And recombined into multiple expressions:
 						a. 'abc[a-z]+235'
 						b. 'abc[a-z]+23'
-						c. 'abc[a-z]}2'
+						c. 'abc[a-z]+2'
 						d. 'abc[a-z]+'
 						e. 'abc'
 						f. 'ab'
