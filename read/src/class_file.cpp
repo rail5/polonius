@@ -130,7 +130,36 @@ void reader::file::do_normal_search() {
 }
 
 void reader::file::do_regex_search() {
-	// Fill
+	/***
+	TODO:
+		A regex search in Polonius should happen this way:
+			1. Parse the regular expression into its component parts
+				e.g.:
+					Expression: 'abc[a-z]+235'
+					Should be split into:
+						a. 'abc'
+						b. '[a-z]+'
+						c. '235'
+					And recombined into 3 expressions:
+						a. 'abc[a-z]+235'
+						b. 'abc[a-z]+'
+						c. 'abc'
+			2. Search the loaded block (of size block_size) for a match for the full expression (a)
+				If found, skip to the final step
+				If not found:
+			3. Search: Does the loaded block END WITH a partial match? (Either expression b or c)
+				If no, load block #2 and go back to step #2
+				If yes:
+			4. Load a new block (of size block_size) STARTING FROM the start position of the aforementioned partial match, and
+				restart the process HERE from step #2
+			
+			Final:
+				Report the found match
+			
+		One important restriction is that we will be limited to finding regex matches no longer than the user-specified block size
+			(default 10KB)
+	***/
+	cout << "Regex searches not yet implemented" << endl;
 }
 
 void reader::file::do_search_job() {
