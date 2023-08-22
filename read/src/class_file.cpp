@@ -142,10 +142,12 @@ void reader::file::do_regex_search() {
 						'2' '3' '5'
 					And recombined into multiple expressions:
 						a. 'abc[a-z]+235'
-						b. 'abc[a-z]+'
-						c. 'abc'
-						d. 'ab'
-						e. 'a'
+						b. 'abc[a-z]+23'
+						c. 'abc[a-z]}2'
+						d. 'abc[a-z]+'
+						e. 'abc'
+						f. 'ab'
+						g. 'a'
 			2. Search the loaded block (of size block_size) for a match for the full expression (a)
 				If found, skip to the final step
 				If not found:
