@@ -137,17 +137,19 @@ void reader::file::do_regex_search() {
 				e.g.:
 					Expression: 'abc[a-z]+235'
 					Should be split into:
-						a. 'abc'
-						b. '[a-z]+'
-						c. '235'
-					And recombined into 3 expressions:
+						'a' 'b' 'c'
+						'[a-z]+'
+						'2' '3' '5'
+					And recombined into multiple expressions:
 						a. 'abc[a-z]+235'
 						b. 'abc[a-z]+'
 						c. 'abc'
+						d. 'ab'
+						e. 'a'
 			2. Search the loaded block (of size block_size) for a match for the full expression (a)
 				If found, skip to the final step
 				If not found:
-			3. Search: Does the loaded block END WITH a partial match? (Either expression b or c)
+			3. Search: Does the loaded block END WITH a partial match? (Any of the expressions listed above after expression a)
 				If no, load block #2 and go back to step #2
 				If yes:
 			4. Load a new block (of size block_size) STARTING FROM the start position of the aforementioned partial match, and
