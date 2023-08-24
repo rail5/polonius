@@ -360,8 +360,8 @@ std::vector<std::string> create_sub_expressions(std::string expression) {
 
 	std::vector<std::string> output;
 
-	for (int i=0; i<components.size(); i++) {
-		int upper_limit = components.size() - i;
+	for (int i=0; i<components.size()-1; i++) {
+		int upper_limit = components.size() - i - 1;
 
 		std::string sub_expression = "";
 
