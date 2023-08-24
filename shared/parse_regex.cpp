@@ -37,7 +37,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 	// A flag to set when we hit a caret (^)
 	bool caret = false;
 
-	// A flag to set when we hit backslash-b (\b), signifying "start of line"
+	// A flag to set when we hit backslash-b (\b), signifying "start of word"
 	bool backslash_b = false;
 
 	// A flag to set when we're entering multiple characters into one element of the vector
