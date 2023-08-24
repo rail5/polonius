@@ -34,12 +34,12 @@ Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD
 
 **polonius-reader**:
 
-  ![99%](https://progress-bar.dev/99)
+  ![100%](https://progress-bar.dev/100)
   
 
 **polonius-editor**:
 
-  ![99%](https://progress-bar.dev/99)
+  ![100%](https://progress-bar.dev/100)
   
 
 **CLI (polonius)**:
