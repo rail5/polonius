@@ -13,8 +13,6 @@
 	#include "is_number.cpp"
 #endif
 
-#include <iostream>
-
 #define FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS escaped = false; \
 	caret = false; \
 	backslash_b = false; \
