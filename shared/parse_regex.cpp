@@ -32,7 +32,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 			e.g.:
 
 			parse_regex("[A-Za-z]+abc[0-9]{3}")
-			returns: { "[A-Za-z]+", "a", "b", "c", "[0-9]{3}" }
+			returns: { "[A-Za-z]+", "a", "b", "c", "[0-9]", "{3}" }
 	***/
 
 	// The vector we will return
