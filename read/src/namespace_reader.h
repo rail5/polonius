@@ -8,8 +8,8 @@ namespace reader {
 	};
 
 	enum search_type {
-		normal_search,
-		regex_search
+		t_normal_search,
+		t_regex_search
 	};
 
 	class file {
@@ -29,7 +29,7 @@ namespace reader {
 			int block_size = 10240;
 			
 			string search_query = "";
-			search_type query_type = normal_search;
+			search_type query_type = t_normal_search;
 			
 			job_type job = read_job;
 

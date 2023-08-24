@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
 
 	bool special_chars = false;
 
-	reader::search_type query_type = reader::normal_search;
+	reader::search_type query_type = reader::t_normal_search;
 	
 	/*
 	GETOPT
@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
 				break;
 			
 			case 'e':
-				query_type = reader::regex_search;
+				query_type = reader::t_regex_search;
 				break;
 				
 			case 'V':

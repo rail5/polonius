@@ -168,9 +168,9 @@ void reader::file::do_regex_search() {
 }
 
 void reader::file::do_search_job() {
-	if (query_type == normal_search) {
+	if (query_type == t_normal_search) {
 		do_normal_search();
-	} else if (query_type == regex_search) {
+	} else if (query_type == t_regex_search) {
 		do_regex_search();
 	}
 }
