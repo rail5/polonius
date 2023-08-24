@@ -1,3 +1,11 @@
+polonius (0.5.1) stable; urgency=medium
+
+  * Polonius-reader now exits with
+  a non-zero exit code if a search
+  was unsuccessful
+
+ -- rail5 <andrew@rail5.org>  Thu, 24 Aug 2023 16:15:04 -0400
+
 polonius (0.5) stable; urgency=medium
 
   * Polonius-reader is now capable of
