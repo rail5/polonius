@@ -63,11 +63,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 		std::string part(1, c);
 		int current_index = parsed_expression.size()-1;
 
-		if (square_brackets_open || parentheses_level > 0 || escaped || caret || backslash_b || backslash_capital_b) {
-			multi_char_entry = true;
-		} else {
-			multi_char_entry = false;
-		}
+		multi_char_entry = (square_brackets_open || parentheses_level > 0 || escaped || caret || backslash_b || backslash_capital_b);
 
 		if (parentheses_level < 0) {
 			parentheses_level = 0;
