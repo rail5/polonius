@@ -275,6 +275,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				or_operator = false;
 				break;
 
