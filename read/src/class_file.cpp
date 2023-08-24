@@ -52,7 +52,7 @@ string reader::file::read(int64_t start_position, int64_t length) {
 	return buffer;
 }
 
-void reader::file::do_read_job() {
+bool reader::file::do_read_job() {
 	/*
 	If just_outputting_positions == true,
 	Then we don't need to actually read the file,
@@ -60,7 +60,7 @@ void reader::file::do_read_job() {
 	*/
 	if (just_outputting_positions) {
 		cout << start_position << " " << end_position-1 << endl;
-		return;
+		return true;
 	}
 	
 	for (int64_t i = start_position; i < end_position; (i = i + block_size)) {
@@ -72,10 +72,10 @@ void reader::file::do_read_job() {
 		
 		cout << read(i, block_size);
 	}
-	return;
+	return true;
 }
 
-void reader::file::do_normal_search() {
+bool reader::file::do_normal_search() {
 	int64_t match_start = 0;
 	int64_t match_end = 0;
 	
@@ -121,15 +121,17 @@ void reader::file::do_normal_search() {
 			
 			if (just_outputting_positions) {
 				cout << match_start << " " << match_end-1 << endl;
-				return;
+				return true;
 			}
 			
 			cout << block_data.substr(start_position, search_query_length) << endl;
-			return;
+			return true;
 	}
+
+	return false;
 }
 
-void reader::file::do_regex_search() {
+bool reader::file::do_regex_search() {
 	/***
 		A regex search in Polonius should happen this way:
 			0. Validate the regular expression (TODO: expression currently not validated before running)
@@ -226,26 +228,28 @@ void reader::file::do_regex_search() {
 			
 			if (just_outputting_positions) {
 				cout << match_start << " " << match_end-1 << endl;
-				return;
+				return true;
 			}
 			
 			cout << regex_search_result[0] << endl;
-			return;
+			return true;
 	}
+	return false;
 }
 
-void reader::file::do_search_job() {
+bool reader::file::do_search_job() {
 	if (query_type == t_normal_search) {
-		do_normal_search();
+		return do_normal_search();
 	} else if (query_type == t_regex_search) {
-		do_regex_search();
+		return do_regex_search();
 	}
+	return false;
 }
 
-void reader::file::do_job() {
+bool reader::file::do_job() {
 	if (!initialized) {
 		cout << "Error reading file" << endl;
-		return;
+		return false;
 	}
 	
 	// Make sure we're not trying to read outside the bounds of the file
@@ -267,14 +271,14 @@ void reader::file::do_job() {
 	}
 
 	if (job == read_job) {
-		do_read_job();
-		return;
+		return do_read_job();
 	}
 	
 	if (job == search_job) {
-		do_search_job();
-		return;
+		return do_search_job();
 	}
+
+	return false;
 }
 
 string reader::file::get_init_error_message() {

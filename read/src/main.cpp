@@ -244,7 +244,9 @@ int main(int argc, char* argv[]) {
 	
 	the_file.set_job_type(job);
 
-	the_file.do_job();
-
-	return EXIT_SUCCESS;
+	if (the_file.do_job()) {
+		return EXIT_SUCCESS;
+	} else {
+		return EXIT_OTHER;
+	}
 }

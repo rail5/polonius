@@ -33,22 +33,21 @@ namespace reader {
 			
 			job_type job = read_job;
 
-			void do_read_job();
-			void do_search_job();
+			bool do_read_job();
+			bool do_search_job();
 
-			void do_normal_search();
-			void do_regex_search();
+			bool do_normal_search();
+			bool do_regex_search();
 		
 		public:
 			bool init(string path);
 			
 			string read(int64_t start_position, int64_t length);
-			string search(string query);
 			
 			string get_init_error_message();
 			int64_t get_file_length();
 			
-			void do_job();
+			bool do_job();
 			
 			void set_start_position(int64_t position);
 			void set_amount_to_read(int64_t amount);
