@@ -37,6 +37,9 @@ std::vector<std::string> parse_regex(std::string expression) {
 	// A flag to set when we hit a caret (^)
 	bool caret = false;
 
+	// A flag to set when we hit backslash-b (\b), signifying "start of line"
+	bool backslash_b = false;
+
 	// A flag to set when we're entering multiple characters into one element of the vector
 	bool multi_char_entry = false;
 
@@ -57,7 +60,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 		std::string part(1, c);
 		int current_index = parsed_expression.size()-1;
 
-		if (square_brackets_open || parentheses_level > 0 || escaped || caret) {
+		if (square_brackets_open || parentheses_level > 0 || escaped || caret || backslash_b) {
 			multi_char_entry = true;
 		} else {
 			multi_char_entry = false;
@@ -79,6 +82,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				}
 
 				caret = false;
+				backslash_b = false;
 				break;
 			case '[':
 				if (multi_char_entry) {
@@ -93,6 +97,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 
 			case ']':
@@ -108,6 +113,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 			
 			case '(':
@@ -123,6 +129,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 			
 			case ')':
@@ -138,6 +145,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 			
 			case '{':
@@ -154,6 +162,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 			
 			case '}':
@@ -176,6 +185,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 
 			case '+':
@@ -183,6 +193,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 			
 			case '*':
@@ -190,6 +201,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 			
 			case '?':
@@ -197,6 +209,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 				break;
 			
 			case '^':
@@ -211,10 +224,29 @@ std::vector<std::string> parse_regex(std::string expression) {
 				}
 
 				escaped = false;
+				backslash_b = false;
 				break;
 			
 			case '$':
 				parsed_expression[current_index] += part;
+
+				escaped = false;
+				caret = false;
+				backslash_b = false;
+				break;
+			
+			case 'b':
+				if (escaped) {
+					backslash_b = true;
+				} else {
+					backslash_b = false;
+				}
+
+				if (multi_char_entry) {
+					parsed_expression[current_index] += part;
+				} else {
+					parsed_expression.push_back(part);
+				}
 
 				escaped = false;
 				caret = false;
@@ -273,6 +305,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				caret = false;
+				backslash_b = false;
 		}
 	}
 
