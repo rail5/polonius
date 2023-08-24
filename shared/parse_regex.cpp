@@ -15,7 +15,7 @@
 
 #include <iostream>
 
-#define CLEAR_ALL_MAIN_FLAGS escaped = false; \
+#define FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS escaped = false; \
 	caret = false; \
 	backslash_b = false; \
 	backslash_capital_b = false; \
@@ -108,7 +108,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 					square_brackets_open = true;
 				}
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 
 			case ']':
@@ -122,7 +122,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 					square_brackets_open = false;
 				}
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 			
 			case '(':
@@ -136,7 +136,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 					parsed_expression.push_back(part);
 				}
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 			
 			case ')':
@@ -150,7 +150,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 					parsed_expression.push_back(part);
 				}
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 			
 			case '{':
@@ -165,7 +165,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 					}
 				}
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 			
 			case '}':
@@ -186,25 +186,25 @@ std::vector<std::string> parse_regex(std::string expression) {
 					}
 				}
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 
 			case '+':
 				parsed_expression[current_index] += part;
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 			
 			case '*':
 				parsed_expression[current_index] += part;
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 			
 			case '?':
 				parsed_expression[current_index] += part;
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 			
 			case '^':
@@ -227,7 +227,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 			case '$':
 				parsed_expression[current_index] += part;
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 				break;
 			
 			case '|':
@@ -333,7 +333,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 					}
 				}
 
-				CLEAR_ALL_MAIN_FLAGS
+				FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS
 		}
 	}
 
