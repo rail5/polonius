@@ -1,3 +1,21 @@
+polonius (0.5) stable; urgency=medium
+
+  * Polonius-reader is now capable of
+  performing regex searches. The fact
+  that this is possible is a miracle as
+  far as I'm concerned.
+  The regex support isn't perfect, and
+  may fail from time to time while I'm
+  patching out any bugs.
+  A regex search can be performed by
+  passing the -e option when doing a
+  search.
+  With this addition, I believe that
+  polonius-reader and polonius-editor
+  are essentially feature-complete.
+
+ -- rail5 <andrew@rail5.org>  Thu, 24 Aug 2023 10:32:23 -0400
+
 polonius (0.4.11) stable; urgency=medium
 
   * Moving to Debian 12
