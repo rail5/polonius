@@ -23,7 +23,7 @@
 
 std::vector<std::string> parse_regex(std::string expression) {
 	/***
-	I hate this with every ounce of my being.
+	I hate this code with every ounce of my being.
 	I can only apologize.
 
 	vector<string> parse_regex(string expression):
@@ -31,7 +31,10 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 		Returns a vector<string> where each string is one component part of the expression, independently usable as its own expression
 
-		NOT FINISHED
+			e.g.:
+
+			parse_regex("[A-Za-z]+abc[0-9]{3}")
+			returns: { "[A-Za-z]+", "a", "b", "c", "[0-9]{3}" }
 	***/
 
 	// The vector we will return
@@ -335,4 +338,41 @@ std::vector<std::string> parse_regex(std::string expression) {
 	}
 
 	return parsed_expression;
+}
+
+std::vector<std::string> create_sub_expressions(std::string expression) {
+	/***
+	 vector<string> create_sub_expressions(string expression):
+	 	Returns a vector of "sub-" regular expressions from one original expression, excluding the original expression
+
+			e.g.:
+
+			create_sub_expressions("[a-z]+abc[0-9]")
+
+			returns: { "[a-z]+abc", "[a-z]+ab", "[a-z]+a", "[a-z]+" }
+
+			or,
+			create_sub_expressions("abcd")
+
+			returns: { "abc", "ab", "a" }
+			
+	***/
+
+	std::vector<std::string> components = parse_regex(expression);
+
+	std::vector<std::string> output;
+
+	for (int i=0; i<components.size(); i++) {
+		int upper_limit = components.size() - i;
+
+		std::string sub_expression = "";
+
+		for (int j=0; j<upper_limit; j++) {
+			sub_expression += components[j];
+		}
+
+		output.push_back(sub_expression);
+	}
+
+	return output;
 }
