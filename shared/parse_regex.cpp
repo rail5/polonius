@@ -173,7 +173,11 @@ std::vector<std::string> parse_regex(std::string expression) {
 					curly_braces_received_comma = false;
 					curly_braces_buffer += part;
 
-					parsed_expression[current_index] += curly_braces_buffer;
+					if (multi_char_entry) {
+						parsed_expression[current_index] += curly_braces_buffer;
+					} else {
+						parsed_expression.push_back(curly_braces_buffer);
+					}
 
 					curly_braces_buffer = "";
 				} else {

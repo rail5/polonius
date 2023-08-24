@@ -166,7 +166,7 @@ void reader::file::do_regex_search() {
 		TODO:
 			At the moment, it's also possible to construct situations in which there is a match present, but Polonius will not be able to find it.
 			Consider the expression:
-				[C-Z]{2}E
+				([C-Z]{2})E
 			Run on a file with the contents:
 				0ABCDEFGHIJKLMNOPQRSTUVWXYZ
 			With a block size of 4 bytes
