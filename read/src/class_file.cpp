@@ -133,6 +133,7 @@ void reader::file::do_regex_search() {
 	/***
 	TODO:
 		A regex search in Polonius should happen this way:
+			0. Validate the regular expression
 			1. Parse the regular expression into its component parts
 				e.g.:
 					Expression: 'abc[a-z]+235'

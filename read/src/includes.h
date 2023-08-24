@@ -62,6 +62,15 @@
 	#include "../../shared/process_bytecodes.cpp"
 #endif
 
+/* vector<string> parse_regex(string expression) splits a regular expression into its component parts */
+/* e.g.: parse_regex("[a-z]+123") returns { "[a-z]+", "1", "2", "3" } */
+/* vector<string> create_sub_expressions(string expression) [same file] runs parse_regex() and then recombines the parts into smaller expressions */
+/* e.g.: create_sub_expressions("[a-z]+123") returns { "[a-z]+12", "[a-z]+1", "[a-z]+" } */
+#ifndef FN_PARSE_REGEX
+	#define FN_PARSE_REGEX
+	#include "../../shared/parse_regex.cpp"
+#endif
+
 /* Contains the 'meat' of the program */
 #include "namespace_reader.h"
 #include "class_file.cpp"
