@@ -131,9 +131,8 @@ void reader::file::do_normal_search() {
 
 void reader::file::do_regex_search() {
 	/***
-	TODO:
 		A regex search in Polonius should happen this way:
-			0. Validate the regular expression
+			0. Validate the regular expression (TODO: expression currently not validated before running)
 			1. Parse the regular expression into its component parts
 				e.g.:
 					Expression: 'abc[a-z]+235'
@@ -163,8 +162,76 @@ void reader::file::do_regex_search() {
 			
 		One important restriction is that we will be limited to finding regex matches no longer than the user-specified block size
 			(default 10KB)
+		
+		TODO:
+			At the moment, it's also possible to construct situations in which there is a match present, but Polonius will not be able to find it.
+			Consider the expression:
+				[C-Z]{2}E
+			Run on a file with the contents:
+				0ABCDEFGHIJKLMNOPQRSTUVWXYZ
+			With a block size of 4 bytes
+
+			The proper match would be:
+				CDE
+				3 5
+
+			Polonius scans the first block for a match of the full expression:
+				0ABC
+			None found, it checks if it ends for a PARTIAL MATCH of the expression's first component ([C-Z]{2}), and finds that it does not
+			Polonius then moves on to the next block:
+				DEFG
+			It finds that this block ends with a partial match ([C-Z]{2})... etc
+			But, we've already missed our full match (CDE)
 	***/
-	cout << "Regex searches not yet implemented" << endl;
+	int64_t match_start = 0;
+	int64_t match_end = 0;
+
+	vector<string> sub_expressions = create_sub_expressions(search_query);
+
+	for (int64_t i = start_position; i < end_position; (i = i + block_size)) {
+		regex_scan:
+		int64_t amount_left_in_file = (end_position - i);
+		
+		if (block_size > amount_left_in_file) {
+			block_size = amount_left_in_file;
+		}
+		
+		string block_data = read(i, block_size);
+		smatch regex_search_result;
+		regex expression(search_query);
+
+		if (regex_search(block_data, regex_search_result, expression)) {
+				match_start = regex_search_result.prefix().length();
+				match_end = (block_size - regex_search_result.suffix().length());
+		} else {
+			for (int64_t j = 0; j < sub_expressions.size(); j++) {
+				smatch sub_expression_search_result;
+				regex sub_expression(sub_expressions[j]);
+
+				// Partial match found?
+				if (regex_search(block_data, sub_expression_search_result, sub_expression)) {
+					if (sub_expression_search_result.suffix().length() == 0 && sub_expression_search_result.prefix().length() > 0) {
+						i = i + sub_expression_search_result.prefix().length();
+						goto regex_scan;
+					}
+				}
+
+			}
+			continue;
+		}
+			// ABSOLUTE start & end position
+			// (that is, relative to the start of the file)
+			match_start = (i + match_start);
+			match_end = (i + match_end);
+			
+			if (just_outputting_positions) {
+				cout << match_start << " " << match_end-1 << endl;
+				return;
+			}
+			
+			cout << regex_search_result[0] << endl;
+			return;
+	}
 }
 
 void reader::file::do_search_job() {
