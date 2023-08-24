@@ -40,6 +40,9 @@ std::vector<std::string> parse_regex(std::string expression) {
 	// A flag to set when we hit backslash-b (\b), signifying "start of word"
 	bool backslash_b = false;
 
+	// A flag to set when we hit backslash-B (\B), signifying "NOT start of word"
+	bool backslash_capital_b = false;
+
 	// A flag to set when we're entering multiple characters into one element of the vector
 	bool multi_char_entry = false;
 
@@ -60,7 +63,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 		std::string part(1, c);
 		int current_index = parsed_expression.size()-1;
 
-		if (square_brackets_open || parentheses_level > 0 || escaped || caret || backslash_b) {
+		if (square_brackets_open || parentheses_level > 0 || escaped || caret || backslash_b || backslash_capital_b) {
 			multi_char_entry = true;
 		} else {
 			multi_char_entry = false;
@@ -83,6 +86,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			case '[':
 				if (multi_char_entry) {
@@ -98,6 +102,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 
 			case ']':
@@ -114,6 +119,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case '(':
@@ -130,6 +136,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case ')':
@@ -146,6 +153,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case '{':
@@ -163,6 +171,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case '}':
@@ -186,6 +195,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 
 			case '+':
@@ -194,6 +204,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case '*':
@@ -202,6 +213,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case '?':
@@ -210,6 +222,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case '^':
@@ -225,6 +238,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 				escaped = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case '$':
@@ -233,6 +247,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 				break;
 			
 			case 'b':
@@ -240,6 +255,24 @@ std::vector<std::string> parse_regex(std::string expression) {
 					backslash_b = true;
 				} else {
 					backslash_b = false;
+				}
+
+				if (multi_char_entry) {
+					parsed_expression[current_index] += part;
+				} else {
+					parsed_expression.push_back(part);
+				}
+
+				escaped = false;
+				caret = false;
+				backslash_capital_b = false;
+				break;
+			
+			case 'B':
+				if (escaped) {
+					backslash_capital_b = true;
+				} else {
+					backslash_capital_b = false;
 				}
 
 				if (multi_char_entry) {
@@ -306,6 +339,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 				escaped = false;
 				caret = false;
 				backslash_b = false;
+				backslash_capital_b = false;
 		}
 	}
 
