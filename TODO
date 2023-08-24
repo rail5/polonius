@@ -9,8 +9,6 @@ TODO:
 		Polonius should be able to detect that this could be optimized into a single REPLACE instruction:
 			-a "REPLACE 0 a"
 		This would be major, especially for very large files
-		
-	- Regex searches in polonius-reader
 	
 	- General code clean-up for readability, consistency, and efficiency
 		For example, the process-special-chars check in polonius-editor happens within a member function of the instruction class, where in polonius-reader it happens in main(). There should be more consistency between the different pieces of polonius
