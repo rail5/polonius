@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
 	""
 	"  -p\n"
 	" --output-pos\n"
-	"   Output the start and end position, rather than the text (in the format \"start,end\", for example 10,15)\n"
+	"   Output the start and end position, rather than the text (in the format \"start end\", for example 10 15)\n"
 	"   If used with searches, this will output the start and end position of the search result\n"
 	"   Outside of searches, it will return the values of -s / --start and the end position (start + length)\n\n"
 	""
