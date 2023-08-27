@@ -1,3 +1,10 @@
+polonius (0.5.2) stable; urgency=medium
+
+  * Updated help string -- corrected
+  a mistake
+
+ -- rail5 <andrew@rail5.org>  Sun, 27 Aug 2023 11:34:17 -0400
+
 polonius (0.5.1) stable; urgency=medium
 
   * Polonius-reader now exits with
