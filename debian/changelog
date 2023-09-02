@@ -1,3 +1,10 @@
+polonius (0.5.3) stable; urgency=medium
+
+  * Updated help strings for editor and
+  reader
+
+ -- rail5 <andrew@rail5.org>  Sat, 02 Sep 2023 16:03:42 +0800
+
 polonius (0.5.2) stable; urgency=medium
 
   * Updated help string -- corrected
