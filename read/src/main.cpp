@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\n"
 	"This is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\n"
 	""
-	"Usage: " + program_name + " -i filename\n\n"
+	"Usage: " + program_name + " filename\n\n"
 	""
 	"Options:\n"
 	"  -i\n"
