@@ -208,16 +208,16 @@ bool reader::file::do_regex_search() {
 		} else {
 			for (int64_t j = 0; j < sub_expressions.size(); j++) {
 				smatch sub_expression_search_result;
-				regex sub_expression(sub_expressions[j]);
+				regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the string must END with the match
 
 				// Partial match found?
-				if (regex_search(block_data, sub_expression_search_result, sub_expression)) {
-					if (sub_expression_search_result.suffix().length() == 0 && sub_expression_search_result.prefix().length() > 0) {
-						i = i + sub_expression_search_result.prefix().length();
-						goto regex_scan;
-					}
-				}
+				bool partial_match_found = regex_search(block_data, sub_expression_search_result, sub_expression);
+				int64_t partial_match_position = sub_expression_search_result.prefix().length();
 
+				if (partial_match_found && partial_match_position > 0) {
+					i = i + partial_match_position;
+					goto regex_scan;
+				}
 			}
 			continue;
 		}
