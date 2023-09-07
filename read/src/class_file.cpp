@@ -190,22 +190,21 @@ bool reader::file::do_regex_search() {
 
 	vector<string> sub_expressions = create_sub_expressions(search_query);
 
-	for (int64_t i = start_position; i < end_position; (i = i + block_size)) {
+	for (int64_t current_index = start_position; current_index < end_position; (current_index = current_index + block_size)) {
 		regex_scan:
-		int64_t amount_left_in_file = (end_position - i);
+		int64_t amount_left_in_file = (end_position - current_index);
 		
 		if (block_size > amount_left_in_file) {
 			block_size = amount_left_in_file;
 		}
 		
-		string block_data = read(i, block_size);
+		string block_data = read(current_index, block_size);
 		smatch regex_search_result;
 		regex expression(search_query);
 
-		if (regex_search(block_data, regex_search_result, expression)) {
-				match_start = regex_search_result.prefix().length();
-				match_end = (block_size - regex_search_result.suffix().length());
-		} else {
+		bool full_match_found = regex_search(block_data, regex_search_result, expression);
+
+		if (!full_match_found) {
 			for (int64_t j = 0; j < sub_expressions.size(); j++) {
 				smatch sub_expression_search_result;
 				regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the string must END with the match
@@ -215,24 +214,24 @@ bool reader::file::do_regex_search() {
 				int64_t partial_match_position = sub_expression_search_result.prefix().length();
 
 				if (partial_match_found && partial_match_position > 0) {
-					i = i + partial_match_position;
+					current_index = current_index + partial_match_position;
 					goto regex_scan;
 				}
 			}
 			continue;
 		}
-			// ABSOLUTE start & end position
-			// (that is, relative to the start of the file)
-			match_start = (i + match_start);
-			match_end = (i + match_end);
-			
-			if (just_outputting_positions) {
-				cout << match_start << " " << match_end-1 << endl;
-				return true;
-			}
-			
-			cout << regex_search_result[0] << endl;
+		// ABSOLUTE start & end position
+		// (that is, relative to the start of the file)
+		match_start = current_index + (regex_search_result.prefix().length());
+		match_end = current_index + (block_size - regex_search_result.suffix().length());
+		
+		if (just_outputting_positions) {
+			cout << match_start << " " << match_end-1 << endl;
 			return true;
+		}
+		
+		cout << regex_search_result[0] << endl;
+		return true;
 	}
 	return false;
 }
