@@ -1,3 +1,9 @@
+polonius (0.5.5) stable; urgency=medium
+
+  * Fixed #25 (Github issues)
+
+ -- rail5 <andrew@rail5.org>  Sat, 09 Sep 2023 09:58:29 +0800
+
 polonius (0.5.4) stable; urgency=medium
 
   * Patched a small bug in regex searches, and improved code
