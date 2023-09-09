@@ -38,6 +38,24 @@
 	#include "../../shared/is_number.cpp"
 #endif
 
+/* std::vector<std::string> explode(std::string const &input, char delimiter, int maximum_number_of_elements = 0) returns a vector<string> split based on the given delimiter. Similar to PHP's explode() */
+#ifndef FN_EXPLODE
+	#define FN_EXPLODE
+	#include "../../shared/explode.cpp"
+#endif
+
+/* inline bool string_starts_with(std::string const &haystack, std::string const &needle) returns true if 'haystack' starts with substring 'needle' */
+#ifndef FN_STRING_STARTS_WITH
+	#define FN_STRING_STARTS_WITH
+	#include "../../shared/string_starts_with.cpp"
+#endif
+
+/* inline bool string_ends_with(std::string const &haystack, std::string const &needle) returns true if 'haystack' ends with substring 'needle' */
+#ifndef FN_STRING_ENDS_WITH
+	#define FN_STRING_ENDS_WITH
+	#include "../../shared/string_ends_with.cpp"
+#endif
+
 /* inline int parse_block_units(const std::string &user_input) converts sizes such as '10K' or '16M' to equivalent in bytes */
 #ifndef FN_PARSE_BLOCK_UNITS
 	#define FN_PARSE_BLOCK_UNITS

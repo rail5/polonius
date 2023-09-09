@@ -13,6 +13,21 @@
 	#include "is_number.cpp"
 #endif
 
+#ifndef FN_EXPLODE
+	#define FN_EXPLODE
+	#include "explode.cpp"
+#endif
+
+#ifndef FN_STRING_STARTS_WITH
+	#define FN_STRING_STARTS_WITH
+	#include "string_starts_with.cpp"
+#endif
+
+#ifndef FN_STRING_ENDS_WITH
+	#define FN_STRING_ENDS_WITH
+	#include "string_ends_with.cpp"
+#endif
+
 #define FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS escaped = false; \
 	caret = false; \
 	backslash_b = false; \
@@ -365,15 +380,46 @@ std::vector<std::string> create_sub_expressions(std::string expression) {
 	std::vector<std::string> output;
 
 	for (int i=0; i<components.size()-1; i++) {
-		int upper_limit = components.size() - i - 1;
+		int upper_limit = components.size() - i;
 
 		std::string sub_expression = "";
 
 		for (int j=0; j<upper_limit; j++) {
-			sub_expression += components[j];
+			if (string_starts_with(components[j], "{") && string_ends_with(components[j], "}")) {
+				std::string curly_braces_term = components[j];
+
+				// Remove the surrounding curly braces
+				curly_braces_term = curly_braces_term.substr(1, curly_braces_term.size() - 2);
+
+				// Split it by comma
+				std::vector<std::string> exploded_term = explode(curly_braces_term, ',');
+
+				// We're assuming that by the time the term reaches this part,
+				// It's absolutely properly formatted
+				// ie, it can be in the formats: {3} | {3,} | {3,4}
+				// And no others
+
+				// Clear the "curly_braces_term" string, and replace the FIRST number with '1'
+				curly_braces_term = "1,";
+
+				if (exploded_term.size() > 1) {
+					// Format was "{3,4}"
+					// Re-add the second number (unchanged) if it was present
+					// Making it (in our example) "{1,4}"
+					curly_braces_term += exploded_term[1];
+				}
+
+				// Re-add the surrounding curly braces
+				sub_expression += "{";
+				sub_expression += curly_braces_term;
+				sub_expression += "}";
+			} else {
+				sub_expression += components[j];
+			}
 		}
 
 		output.push_back(sub_expression);
+
 	}
 
 	return output;
