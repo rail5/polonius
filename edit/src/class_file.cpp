@@ -8,11 +8,9 @@
 	#include <sys/file.h>
 #endif
 
-using namespace std;
-
-bool editor::file::set_file(string file_path) {
+bool editor::file::set_file(std::string file_path) {
 	/***
-	bool set_file(string file_path):
+	bool set_file(std::string file_path):
 		Initialize the file object
 		
 		Returns true if the file object is successfully initialized
@@ -22,7 +20,7 @@ bool editor::file::set_file(string file_path) {
 	/*
 	Verify that the directory that the file is supposed to be in actually exists
 	*/
-	string directory = isolate_path_from_filename(file_path);
+	std::string directory = isolate_path_from_filename(file_path);
 	
 	file_name = file_path;
 	file_directory = directory;
@@ -40,7 +38,7 @@ bool editor::file::set_file(string file_path) {
 	Create the file if it doesn't already exist
 	*/
 	if (!file_exists(file_name)) {
-		ofstream new_file(file_name);
+		std::ofstream new_file(file_name);
 		new_file.close();
 		
 		/*
@@ -67,12 +65,12 @@ bool editor::file::set_file(string file_path) {
 	Initialize the file stream, set a POSIX file lock, and set file_length
 	*/
 	
-	file_stream = fstream(file_name, ios::binary | ios::out | ios::in);
+	file_stream = std::fstream(file_name, std::ios::binary | std::ios::out | std::ios::in);
 	
 	/*
 	Obtain file_descriptor in order to lock the file
 	Unfortunately, the only portable way to do this is to open a SECOND file stream with the C-type FILE*
-		rather than continuing with our luxury C++ fstream
+		rather than continuing with our luxury C++ std::fstream
 	This FILE* will never be used, except to get the file descriptor so that we can lock the file during editing
 	*/
 	c_type_file = fopen64(file_name.c_str(), "a+");
@@ -84,7 +82,7 @@ bool editor::file::set_file(string file_path) {
 		return initialized;
 	}
 	
-	file_length = filesystem::file_size(file_path);
+	file_length = std::filesystem::file_size(file_path);
 	file_length_after_last_instruction = file_length;
 	
 	/*
@@ -98,7 +96,7 @@ bool editor::file::set_file(string file_path) {
 	error_message = "";
 	
 	if (verbose) {
-		cout << "Set file to " << file_path << endl;
+		std::cout << "Set file to " << file_path << std::endl;
 	}
 	
 	/*
@@ -217,11 +215,11 @@ bool editor::file::is_initialized() {
 	return initialized;
 }
 
-string editor::file::get_file_name() {
+std::string editor::file::get_file_name() {
 	return file_name;
 }
 
-string editor::file::get_file_directory() {
+std::string editor::file::get_file_directory() {
 	return file_directory;
 }
 
@@ -233,17 +231,17 @@ int64_t editor::file::get_file_length() {
 	return file_length;
 }
 
-vector<editor::instruction> editor::file::get_instruction_set() {
+std::vector<editor::instruction> editor::file::get_instruction_set() {
 	return instruction_set;
 }
 
-string editor::file::get_error_message() {
+std::string editor::file::get_error_message() {
 	return error_message;
 }
 
-void editor::file::replace(int64_t start_position, string replacement_text) {
+void editor::file::replace(int64_t start_position, std::string replacement_text) {
 	/***
-	void editor::file::replace(int64_t start_position, string replacement_text):
+	void editor::file::replace(int64_t start_position, std::string replacement_text):
 		Execute a "REPLACE" instruction
 		Opens a file stream & replaces text inside the file, starting from start_position, with replacement_text
 	***/
@@ -253,7 +251,7 @@ void editor::file::replace(int64_t start_position, string replacement_text) {
 	}
 	
 	// Seek to start_position
-	file_stream.seekp(start_position, ios::beg);
+	file_stream.seekp(start_position, std::ios::beg);
 	// Replace
 	file_stream.write(replacement_text.c_str(), replacement_text.length());
 	
@@ -262,13 +260,13 @@ void editor::file::replace(int64_t start_position, string replacement_text) {
 	fflush(c_type_file);
 	
 	if (verbose) {
-		cout << "Executed REPLACE instruction (" << start_position << ", " << replacement_text << ")" << endl;
+		std::cout << "Executed REPLACE instruction (" << start_position << ", " << replacement_text << ")" << std::endl;
 	}
 }
 
-void editor::file::insert(int64_t start_position, string text_to_insert) {
+void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 	/***
-	void editor::file::insert(int64_t start_position, string text_to_insert):
+	void editor::file::insert(int64_t start_position, std::string text_to_insert):
 		Execute an "INSERT" instruction
 		Opens a file stream & inserts text_to_insert into the file at position start_position, without replacing
 	***/
@@ -290,7 +288,7 @@ void editor::file::insert(int64_t start_position, string text_to_insert) {
 		// Writing TO EOF
 		
 		// Seek to EOF
-		file_stream.seekp(start_position, ios::beg);
+		file_stream.seekp(start_position, std::ios::beg);
 		
 		// Insert
 		file_stream.write(text_to_insert.c_str(), text_to_insert.length());
@@ -301,7 +299,7 @@ void editor::file::insert(int64_t start_position, string text_to_insert) {
 		}
 		
 		// Add a newline char
-		file_stream.seekp(new_file_length - 1, ios::beg);
+		file_stream.seekp(new_file_length - 1, std::ios::beg);
 		file_stream.write("\n", 1);
 		
 		// Flush changes
@@ -312,7 +310,7 @@ void editor::file::insert(int64_t start_position, string text_to_insert) {
 		file_length = new_file_length;
 		
 		if (verbose) {
-			cout << "Executed INSERT instruction (" << start_position << ", " << text_to_insert << ")" << endl;
+			std::cout << "Executed INSERT instruction (" << start_position << ", " << text_to_insert << ")" << std::endl;
 		}
 		
 		return;
@@ -326,11 +324,11 @@ void editor::file::insert(int64_t start_position, string text_to_insert) {
 	ftruncate(file_descriptor, new_file_length);
 	
 	if (verbose) {
-		cout << "Adjusted file length to " << new_file_length << endl;
+		std::cout << "Adjusted file length to " << new_file_length << std::endl;
 	}
 	
 	// Add a newline char
-	file_stream.seekp(new_file_length - 1, ios::beg);
+	file_stream.seekp(new_file_length - 1, std::ios::beg);
 	file_stream.write("\n", 1);
 	
 	for (int64_t i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
@@ -362,25 +360,25 @@ void editor::file::insert(int64_t start_position, string text_to_insert) {
 		char* temp_data_storage = new char[amount_to_store + 1]{0}; // Allocate memory
 		
 		// Store read portion into allocated memory
-		file_stream.seekg(copy_from_this_position, ios::beg);
+		file_stream.seekg(copy_from_this_position, std::ios::beg);
 		file_stream.read(temp_data_storage, amount_to_store);
 		
 		// Add a NUL char to the end to terminate the string
 		temp_data_storage[amount_to_store] = 0;
 		
 		// Copy it to its new proper place
-		file_stream.seekp(copy_to_this_position, ios::beg);
+		file_stream.seekp(copy_to_this_position, std::ios::beg);
 		file_stream.write(temp_data_storage, amount_to_store);
 		
 		delete[] temp_data_storage; // Free memory
 		
 		if (verbose) {
-			cout << "Moved " << amount_to_store << " bytes to position #" << copy_to_this_position << " for INSERT instruction" << endl;
+			std::cout << "Moved " << amount_to_store << " bytes to position #" << copy_to_this_position << " for INSERT instruction" << std::endl;
 		}
 	}
 	
 	// Now, finally, insert the damn data (user inputted data)
-	file_stream.seekp(start_position, ios::beg);
+	file_stream.seekp(start_position, std::ios::beg);
 	file_stream.write(text_to_insert.c_str(), text_to_insert.length());
 	
 	// Flush changes
@@ -391,7 +389,7 @@ void editor::file::insert(int64_t start_position, string text_to_insert) {
 	file_length = new_file_length;
 	
 	if (verbose) {
-		cout << "Executed INSERT instruction (" << start_position << ", " << text_to_insert << ")" << endl;
+		std::cout << "Executed INSERT instruction (" << start_position << ", " << text_to_insert << ")" << std::endl;
 	}
 }
 
@@ -421,7 +419,7 @@ void editor::file::remove(int64_t start_position, int64_t end_position) {
 		ftruncate(file_descriptor, new_file_length);
 		
 		// Add a newline char
-		file_stream.seekp(new_file_length - 1, ios::beg);
+		file_stream.seekp(new_file_length - 1, std::ios::beg);
 		file_stream.write("\n", 1);
 		
 		// Flush changes
@@ -432,7 +430,7 @@ void editor::file::remove(int64_t start_position, int64_t end_position) {
 		file_length = new_file_length;
 		
 		if (verbose) {
-			cout << "Executed REMOVE instruction (" << start_position << ", " << end_position << ")" << endl;
+			std::cout << "Executed REMOVE instruction (" << start_position << ", " << end_position << ")" << std::endl;
 		}
 		
 		return;
@@ -455,20 +453,20 @@ void editor::file::remove(int64_t start_position, int64_t end_position) {
 		char* temp_data_storage = new char[amount_to_store + 1]{0}; // Allocate memory
 		
 		// Store read portion into allocated memory
-		file_stream.seekg(copy_from_this_position, ios::beg);
+		file_stream.seekg(copy_from_this_position, std::ios::beg);
 		file_stream.read(temp_data_storage, amount_to_store);
 		
 		// Add a NUL char to the end to terminate the string
 		temp_data_storage[amount_to_store] = 0;
 		
 		// Copy it to its new proper place
-		file_stream.seekp(copy_to_this_position, ios::beg);
+		file_stream.seekp(copy_to_this_position, std::ios::beg);
 		file_stream.write(temp_data_storage, amount_to_store);
 		
 		delete[] temp_data_storage; // Free memory
 		
 		if (verbose) {
-			cout << "Moved " << amount_to_store << " bytes to position #" << copy_to_this_position << " for REMOVE instruction" << endl;
+			std::cout << "Moved " << amount_to_store << " bytes to position #" << copy_to_this_position << " for REMOVE instruction" << std::endl;
 		}
 	}
 	
@@ -476,7 +474,7 @@ void editor::file::remove(int64_t start_position, int64_t end_position) {
 	ftruncate(file_descriptor, new_file_length);
 	
 	// Add a newline char
-	file_stream.seekp(new_file_length - 1, ios::beg);
+	file_stream.seekp(new_file_length - 1, std::ios::beg);
 	file_stream.write("\n", 1);
 	
 	// Flush changes
@@ -487,7 +485,7 @@ void editor::file::remove(int64_t start_position, int64_t end_position) {
 	file_length = new_file_length;
 	
 	if (verbose) {
-		cout << "Executed REMOVE instruction (" << start_position << ", " << end_position << ")" << endl;
+		std::cout << "Executed REMOVE instruction (" << start_position << ", " << end_position << ")" << std::endl;
 	}
 }
 
@@ -512,7 +510,7 @@ bool editor::file::execute_single_instruction(instruction instruction_to_execute
 }
 
 void editor::file::close() {
-	/* Close the fstream */
+	/* Close the std::fstream */
 	file_stream.close();
 	/* Close the C-type FILE* */
 	fclose(c_type_file);
@@ -521,7 +519,7 @@ void editor::file::close() {
 }
 
 
-editor::file::file(string path, int blocksize, bool verbose_mode) {
+editor::file::file(std::string path, int blocksize, bool verbose_mode) {
 	block_size = blocksize;
 	verbose = verbose_mode;
 	set_file(path);

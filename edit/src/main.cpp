@@ -10,13 +10,11 @@
 	#include <getopt.h>
 #endif
 
-using namespace std;
-
 int main(int argc, char* argv[]) {
 
-	string program_name = "polonius-editor";
+	std::string program_name = "polonius-editor";
 	
-	string help_string =
+	std::string help_string =
 	program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\n"
 	"This is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\n"
 	""
@@ -80,20 +78,20 @@ int main(int argc, char* argv[]) {
 	/*
 	Necessary information for the program to do its job
 	*/
-	string file_to_edit = "";
+	std::string file_to_edit = "";
 	bool received_filename = false;
 	
-	vector<editor::instruction> instructions_to_add;
+	std::vector<editor::instruction> instructions_to_add;
 	int block_size = 10240;
 	bool interpret_special_chars = false;
 	
 	bool verbose = false;
 	
 	/*
-	temp_instruction_set vector
-	-s / --add-instruction-set option fills this vector, moves its elements to instructions_to_add, and then clears this vector
+	temp_instruction_set std::vector
+	-s / --add-instruction-set option fills this std::vector, moves its elements to instructions_to_add, and then clears this std::vector
 	*/
-	vector<editor::instruction> temp_instruction_set;
+	std::vector<editor::instruction> temp_instruction_set;
 	
 	
 	/*
@@ -128,7 +126,7 @@ int main(int argc, char* argv[]) {
 		switch(c) {
 			case 'i':
 				if (received_filename) {
-					cerr << "polonius-editor: Error: Multiple files specified" << endl;
+					std::cerr << "polonius-editor: Error: Multiple files specified" << std::endl;
 					return EXIT_BADFILE;
 				}
 				file_to_edit = optarg;
@@ -147,7 +145,7 @@ int main(int argc, char* argv[]) {
 			case 'b':
 				block_size = parse_block_units(optarg);
 				if (block_size == -1) {
-					cerr << program_name << ": Block size '" << optarg << "' is not understood" << endl << "Use -h for help" << endl;
+					std::cerr << program_name << ": Block size '" << optarg << "' is not understood" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADARG;
 				}
 				break;
@@ -161,18 +159,18 @@ int main(int argc, char* argv[]) {
 				break;
 			
 			case 'V':
-				cout << program_version << endl;
+				std::cout << program_version << std::endl;
 				return EXIT_SUCCESS;
 				break;
 			
 			case 'h':
-				cout << help_string;
+				std::cout << help_string;
 				return EXIT_SUCCESS;
 				break;
 			
 			case '?':
 				if (optopt == 'i' || optopt == 's' || optopt == 'a' || optopt == 'b') {
-					cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << endl << "Use -h for help" << endl;
+					std::cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADOPT;
 				}
 				break;
@@ -181,7 +179,7 @@ int main(int argc, char* argv[]) {
 	
 	for (option_index = optind; option_index < argc; option_index++) {
 		if (received_filename) {
-			cerr << "polonius-editor: Error: Multiple files specified" << endl;
+			std::cerr << "polonius-editor: Error: Multiple files specified" << std::endl;
 			return EXIT_BADFILE;
 		}
 		file_to_edit = argv[option_index];
@@ -189,14 +187,14 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if (!received_filename) {
-		cerr << program_name << ": No input file given. Use -h for help" << endl;
+		std::cerr << program_name << ": No input file given. Use -h for help" << std::endl;
 		return EXIT_BADFILE;
 	}
 
 	editor::file document(file_to_edit, block_size, verbose);
 	
 	if (!document.is_initialized()) {
-		cerr << program_name << ": " << document.get_error_message() << endl;
+		std::cerr << program_name << ": " << document.get_error_message() << std::endl;
 		return EXIT_OTHER;
 	}
 	
@@ -207,12 +205,12 @@ int main(int argc, char* argv[]) {
 		}
 		
 		if (!document.add_instruction(instructions_to_add[i])) {
-			cerr << program_name << ": " << instructions_to_add[i].get_error_message() << endl;
+			std::cerr << program_name << ": " << instructions_to_add[i].get_error_message() << std::endl;
 			return EXIT_BADARG;
 		}
 	}
 	
-	vector<editor::instruction> instruction_set = document.get_instruction_set();
+	std::vector<editor::instruction> instruction_set = document.get_instruction_set();
 	
 	for (int i = 0; i < instruction_set.size(); i++) {
 		document.execute_single_instruction(instruction_set[i]);

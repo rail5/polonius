@@ -1,5 +1,3 @@
-using namespace std;
-
 void editor::instruction::clear_instruction() {
 	/***
 	void clear_instruction():
@@ -28,7 +26,7 @@ void editor::instruction::process_special_chars() {
 
 }
 
-bool editor::instruction::set_replace_instruction(int64_t start, string text) {
+bool editor::instruction::set_replace_instruction(int64_t start, std::string text) {
 	/***
 	bool set_replace_instruction():
 		- Sets the current instruction to type "replace"
@@ -66,7 +64,7 @@ bool editor::instruction::set_replace_instruction(int64_t start, string text) {
 	return true;
 }
 
-bool editor::instruction::set_insert_instruction(int64_t start, string text) {
+bool editor::instruction::set_insert_instruction(int64_t start, std::string text) {
 	/***
 	bool set_insert_instruction():
 		- Sets the current instruction to type "insert"
@@ -149,16 +147,16 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 	return true;
 }
 
-void editor::instruction::set_error_message(string message) {
+void editor::instruction::set_error_message(std::string message) {
 	/***
-	void set_error_message(string message):
+	void set_error_message(std::string message):
 		Set the instruction's "error_message" to the inputted string
 	***/
 	
 	error_message = message;
 }
 
-string editor::instruction::get_error_message() {
+std::string editor::instruction::get_error_message() {
 	return error_message;
 }
 
@@ -186,11 +184,11 @@ int64_t editor::instruction::get_end_position() {
 	return end_position;
 }
 
-string editor::instruction::get_text() {
+std::string editor::instruction::get_text() {
 	return text_input;
 }
 
-editor::instruction create_replace_instruction(int64_t start_position, string text) {
+editor::instruction create_replace_instruction(int64_t start_position, std::string text) {
 	editor::instruction new_instruction;
 	
 	new_instruction.set_replace_instruction(start_position, text);
@@ -198,7 +196,7 @@ editor::instruction create_replace_instruction(int64_t start_position, string te
 	return new_instruction;
 }
 
-editor::instruction create_insert_instruction(int64_t start_position, string text) {
+editor::instruction create_insert_instruction(int64_t start_position, std::string text) {
 	editor::instruction new_instruction;
 	
 	new_instruction.set_insert_instruction(start_position, text);
@@ -215,12 +213,12 @@ editor::instruction create_remove_instruction(int64_t start_position, int end_po
 }
 
 
-editor::instruction parse_instruction_string(string instruction_string) {
+editor::instruction parse_instruction_string(std::string instruction_string) {
 	/*
-	instruction parse_instruction_string(string instruction_string):
+	instruction parse_instruction_string(std::string instruction_string):
 		Create an 'instruction' object from a properly-formatted string
 		
-		The string must be formatted in one of the following ways:
+		The std::string must be formatted in one of the following ways:
 			1.
 				REPLACE 5 hello
 					(
@@ -252,12 +250,12 @@ editor::instruction parse_instruction_string(string instruction_string) {
 							New file:
 								0123456123
 					)
-		That is, the string must be formatted with these rules:
+		That is, the std::string must be formatted with these rules:
 			- Space-delimited
 			- The first key is the instruction name (REPLACE, INSERT, or REMOVE)
 			- The second key is the start position
 			- The third key is either:
-				- A string (in the case of REPLACE or INSERT)
+				- A std::string (in the case of REPLACE or INSERT)
 				- The end position (in the case of REMOVE)
 	*/
 	
@@ -268,10 +266,10 @@ editor::instruction parse_instruction_string(string instruction_string) {
 	instruction_string = remove_leading_whitespace(instruction_string);
 	
 	/*
-	Split the string into a vector<string> delimited by spaces
+	Split the std::string into a std::vector<std::string> delimited by spaces
 		See: shared_functions/explode.cpp
 	*/
-	vector<string> instruction_vector = explode(instruction_string, ' ', 3);
+	std::vector<std::string> instruction_vector = explode(instruction_string, ' ', 3);
 	
 	/*
 	Set up an 'instruction' object marked invalid to return if there's a problem
@@ -286,9 +284,9 @@ editor::instruction parse_instruction_string(string instruction_string) {
 		return invalid_instruction;
 	}
 
-	string first_element = "";
-	string second_element = "";
-	string third_element = "";
+	std::string first_element = "";
+	std::string second_element = "";
+	std::string third_element = "";
 
 	bool second_element_is_end = false;
 	bool third_element_is_end = false;
@@ -387,10 +385,10 @@ editor::instruction parse_instruction_string(string instruction_string) {
 }
 
 
-vector<editor::instruction> parse_instruction_set_string(string instruction_set_string) {
+std::vector<editor::instruction> parse_instruction_set_string(std::string instruction_set_string) {
 	/***
-	vector<instruction> parse_instruction_set_string(string instruction_set_string):
-		Create a vector of 'instruction' objects from a newline-delimited string of properly-formatted instructions
+	std::vector<instruction> parse_instruction_set_string(std::string instruction_set_string):
+		Create a std::vector of 'instruction' objects from a newline-delimited std::string of properly-formatted instructions
 		
 		Example of ONE properly-formatted "instruction set" string:
 			REPLACE 5 hello
@@ -398,16 +396,16 @@ vector<editor::instruction> parse_instruction_set_string(string instruction_set_
 			REMOVE 7 10
 		
 		Each line must follow the normal rules for properly-formatted instructions
-			See: parse_instruction_string(string instruction_string)
+			See: parse_instruction_string(std::string instruction_string)
 		
 		The "instruction set" itself must be newline-delimited
 			That is, each individual instruction must be on its own line
 	***/
-	vector<editor::instruction> output_instruction_set;
+	std::vector<editor::instruction> output_instruction_set;
 	
-	vector<string> instruction_strings = explode(instruction_set_string, '\n');
+	std::vector<std::string> instruction_strings = explode(instruction_set_string, '\n');
 	
-	for (string i : instruction_strings) {
+	for (std::string i : instruction_strings) {
 		output_instruction_set.push_back( parse_instruction_string(i) );
 	}
 	
