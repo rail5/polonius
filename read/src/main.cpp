@@ -10,13 +10,11 @@
 	#include <getopt.h>
 #endif
 
-using namespace std;
-
 int main(int argc, char* argv[]) {
 
-	string program_name = "polonius-reader";
+	std::string program_name = "polonius-reader";
 
-	string help_string =
+	std::string help_string =
 	program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\n"
 	"This is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\n"
 	""
@@ -46,7 +44,7 @@ int main(int argc, char* argv[]) {
 	"  -f\n"
 	" --find\n"
 	" --search\n"
-	"   Search for a string in the file\n"
+	"   Search for a std::string in the file\n"
 	"   If -s / --start is specified, the program will only search for matches after that start position\n"
 	"   If -l / --length is specified, the program will only search for matches within that length from the start\n"
 	"   Returns nothing (blank) if no matches were found\n\n"
@@ -90,7 +88,7 @@ int main(int argc, char* argv[]) {
 		"amount_to_read" == -1 will result in reading from the start position to the end of the file
 	*/
 	bool received_filename = false;
-	string file_to_read = "";
+	std::string file_to_read = "";
 	
 	int64_t start_position = 0;
 	int64_t amount_to_read = -1;
@@ -98,7 +96,7 @@ int main(int argc, char* argv[]) {
 	int block_size = 10240;
 	
 	reader::job_type job = reader::read_job;
-	string searching_for = "";
+	std::string searching_for = "";
 	
 	bool output_position = false;
 
@@ -132,7 +130,7 @@ int main(int argc, char* argv[]) {
 		switch(c) {
 			case 'i':
 				if (received_filename) {
-					cerr << program_name << ": Error: Multiple files specified" << endl;
+					std::cerr << program_name << ": Error: Multiple files specified" << std::endl;
 					return EXIT_BADFILE;
 				}
 				file_to_read = optarg;
@@ -141,24 +139,24 @@ int main(int argc, char* argv[]) {
 				
 			case 's':
 				if (!is_number(optarg)) {
-					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
+					std::cerr << program_name << ": '" << optarg << "' is not an integer" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADARG;
 				}
-				start_position = (int64_t)stoll(optarg);
+				start_position = (int64_t)std::stoll(optarg);
 				break;
 				
 			case 'l':
 				if (!is_number(optarg)) {
-					cerr << program_name << ": '" << optarg << "' is not an integer" << endl << "Use -h for help" << endl;
+					std::cerr << program_name << ": '" << optarg << "' is not an integer" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADARG;
 				}
-				amount_to_read = (int64_t)stoll(optarg);
+				amount_to_read = (int64_t)std::stoll(optarg);
 				break;
 				
 			case 'b':
 				block_size = parse_block_units(optarg);
 				if (block_size == -1) {
-					cerr << program_name << ": Block size '" << optarg << "' is not understood" << endl << "Use -h for help" << endl;
+					std::cerr << program_name << ": Block size '" << optarg << "' is not understood" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADARG;
 				}
 				break;
@@ -181,18 +179,18 @@ int main(int argc, char* argv[]) {
 				break;
 				
 			case 'V':
-				cout << program_version << endl;
+				std::cout << program_version << std::endl;
 				return EXIT_SUCCESS;
 				break;
 				
 			case 'h':
-				cout << help_string;
+				std::cout << help_string;
 				return EXIT_SUCCESS;
 				break;
 				
 			case '?':
 				if (optopt == 'i' || optopt == 's' || optopt == 'l') {
-					cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << endl << "Use -h for help" << endl;
+					std::cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADOPT;
 				}
 				break;
@@ -201,7 +199,7 @@ int main(int argc, char* argv[]) {
 	
 	for (option_index = optind; option_index < argc; option_index++) {
 		if (received_filename) {
-			cerr << program_name << ": Error: Multiple files specified" << endl;
+			std::cerr << program_name << ": Error: Multiple files specified" << std::endl;
 			return EXIT_BADFILE;
 		}
 		file_to_read = argv[option_index];
@@ -210,14 +208,14 @@ int main(int argc, char* argv[]) {
 	
 	// Make sure we got an input file
 	if (!received_filename) {
-		cerr << help_string;
+		std::cerr << help_string;
 		return EXIT_BADFILE;
 	}
 	
 	reader::file the_file;
 	
 	if (!the_file.init(file_to_read)) {
-		cerr << program_name << ": " << the_file.get_init_error_message() << endl;
+		std::cerr << program_name << ": " << the_file.get_init_error_message() << std::endl;
 		return EXIT_BADFILE;
 	}
 	

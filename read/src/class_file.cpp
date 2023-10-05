@@ -8,9 +8,7 @@
 	#include <iostream>
 #endif
 
-using namespace std;
-
-bool reader::file::init(string path) {
+bool reader::file::init(std::string path) {
 	if (!file_exists(path)) {
 		init_error_message = "File '" + path + "' does not exist";
 		return false;
@@ -18,7 +16,7 @@ bool reader::file::init(string path) {
 	
 	file_name = path;
 	
-	ifstream file_stream(file_name, ifstream::binary);
+	std::ifstream file_stream(file_name, std::ifstream::binary);
 	
 	if (!file_stream) {
 		init_error_message = "Could not open file '" + file_name + "' for reading";
@@ -34,12 +32,12 @@ bool reader::file::init(string path) {
 	return true;
 }
 
-string reader::file::read(int64_t start_position, int64_t length) {
+std::string reader::file::read(int64_t start_position, int64_t length) {
 
-	ifstream file_stream(file_name, ifstream::binary);
+	std::ifstream file_stream(file_name, std::ifstream::binary);
 	
 	// allocate memory
-	string buffer(length, ' ');
+	std::string buffer(length, ' ');
 	
 	// set position
 	file_stream.seekg(start_position);
@@ -59,7 +57,7 @@ bool reader::file::do_read_job() {
 	Just output in the format "startposition endposition"
 	*/
 	if (just_outputting_positions) {
-		cout << start_position << " " << end_position-1 << endl;
+		std::cout << start_position << " " << end_position-1 << std::endl;
 		return true;
 	}
 	
@@ -70,7 +68,7 @@ bool reader::file::do_read_job() {
 			block_size = amount_left_in_file;
 		}
 		
-		cout << read(i, block_size);
+		std::cout << read(i, block_size);
 	}
 	return true;
 }
@@ -100,7 +98,7 @@ bool reader::file::do_normal_search() {
 			shift_by_this_much = amount_left_in_file;
 		}
 		
-		string block_data = read(i, block_size);
+		std::string block_data = read(i, block_size);
 		
 		// Check if the WHOLE search query is in the block
 		// And if so, just output it
@@ -120,11 +118,11 @@ bool reader::file::do_normal_search() {
 			match_end = (match_start + search_query_length);
 			
 			if (just_outputting_positions) {
-				cout << match_start << " " << match_end-1 << endl;
+				std::cout << match_start << " " << match_end-1 << std::endl;
 				return true;
 			}
 			
-			cout << block_data.substr(start_position, search_query_length) << endl;
+			std::cout << block_data.substr(start_position, search_query_length) << std::endl;
 			return true;
 	}
 
@@ -133,7 +131,7 @@ bool reader::file::do_normal_search() {
 
 bool reader::file::do_regex_search() {
 	/***
-		A regex search in Polonius should happen this way:
+		A std::regex search in Polonius should happen this way:
 			0. Validate the regular expression (TODO: expression currently not validated before running)
 			1. Parse the regular expression into its component parts
 				e.g.:
@@ -162,7 +160,7 @@ bool reader::file::do_regex_search() {
 			Final:
 				Report the found match
 			
-		One important restriction is that we will be limited to finding regex matches no longer than the user-specified block size
+		One important restriction is that we will be limited to finding std::regex matches no longer than the user-specified block size
 			(default 10KB)
 		
 		TODO:
@@ -188,7 +186,7 @@ bool reader::file::do_regex_search() {
 	int64_t match_start = 0;
 	int64_t match_end = 0;
 
-	vector<string> sub_expressions = create_sub_expressions(search_query);
+	std::vector<std::string> sub_expressions = create_sub_expressions(search_query);
 
 	for (int64_t current_index = start_position; current_index < end_position; (current_index = current_index + block_size)) {
 		regex_scan:
@@ -198,16 +196,16 @@ bool reader::file::do_regex_search() {
 			block_size = amount_left_in_file;
 		}
 		
-		string block_data = read(current_index, block_size);
-		smatch regex_search_result;
-		regex expression(search_query);
+		std::string block_data = read(current_index, block_size);
+		std::smatch regex_search_result;
+		std::regex expression(search_query);
 
 		bool full_match_found = regex_search(block_data, regex_search_result, expression);
 
 		if (!full_match_found) {
 			for (int64_t j = 0; j < sub_expressions.size(); j++) {
-				smatch sub_expression_search_result;
-				regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the string must END with the match
+				std::smatch sub_expression_search_result;
+				std::regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the std::string must END with the match
 
 				// Partial match found?
 				bool partial_match_found = regex_search(block_data, sub_expression_search_result, sub_expression);
@@ -226,11 +224,11 @@ bool reader::file::do_regex_search() {
 		match_end = current_index + (block_size - regex_search_result.suffix().length());
 		
 		if (just_outputting_positions) {
-			cout << match_start << " " << match_end-1 << endl;
+			std::cout << match_start << " " << match_end-1 << std::endl;
 			return true;
 		}
 		
-		cout << regex_search_result[0] << endl;
+		std::cout << regex_search_result[0] << std::endl;
 		return true;
 	}
 	return false;
@@ -247,7 +245,7 @@ bool reader::file::do_search_job() {
 
 bool reader::file::do_job() {
 	if (!initialized) {
-		cout << "Error reading file" << endl;
+		std::cout << "Error reading file" << std::endl;
 		return false;
 	}
 	
@@ -280,7 +278,7 @@ bool reader::file::do_job() {
 	return false;
 }
 
-string reader::file::get_init_error_message() {
+std::string reader::file::get_init_error_message() {
 	return init_error_message;
 }
 
@@ -304,7 +302,7 @@ void reader::file::set_block_size(int size) {
 	block_size = size;
 }
 
-void reader::file::set_search_query(string query) {
+void reader::file::set_search_query(std::string query) {
 	search_query = query;
 }
 
