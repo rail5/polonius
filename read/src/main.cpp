@@ -1,10 +1,5 @@
 #include "includes.h"
 
-#ifndef IOSTREAM
-	#define IOSTREAM
-	#include <iostream>
-#endif
-
 #ifndef GETOPT_H
 	#define GETOPT_H
 	#include <getopt.h>
@@ -12,9 +7,9 @@
 
 int main(int argc, char* argv[]) {
 
-	std::string program_name = "polonius-reader";
+	minified::string program_name = "polonius-reader";
 
-	std::string help_string =
+	minified::string help_string =
 	program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\n"
 	"This is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\n"
 	""
@@ -44,7 +39,7 @@ int main(int argc, char* argv[]) {
 	"  -f\n"
 	" --find\n"
 	" --search\n"
-	"   Search for a std::string in the file\n"
+	"   Search for a minified::string in the file\n"
 	"   If -s / --start is specified, the program will only search for matches after that start position\n"
 	"   If -l / --length is specified, the program will only search for matches within that length from the start\n"
 	"   Returns nothing (blank) if no matches were found\n\n"
@@ -88,7 +83,7 @@ int main(int argc, char* argv[]) {
 		"amount_to_read" == -1 will result in reading from the start position to the end of the file
 	*/
 	bool received_filename = false;
-	std::string file_to_read = "";
+	minified::string file_to_read = "";
 	
 	int64_t start_position = 0;
 	int64_t amount_to_read = -1;
@@ -96,7 +91,7 @@ int main(int argc, char* argv[]) {
 	int block_size = 10240;
 	
 	reader::job_type job = reader::read_job;
-	std::string searching_for = "";
+	minified::string searching_for = "";
 	
 	bool output_position = false;
 
@@ -130,7 +125,7 @@ int main(int argc, char* argv[]) {
 		switch(c) {
 			case 'i':
 				if (received_filename) {
-					std::cerr << program_name << ": Error: Multiple files specified" << std::endl;
+					minified::cerr << program_name << ": Error: Multiple files specified" << minified::endl;
 					return EXIT_BADFILE;
 				}
 				file_to_read = optarg;
@@ -139,7 +134,7 @@ int main(int argc, char* argv[]) {
 				
 			case 's':
 				if (!is_number(optarg)) {
-					std::cerr << program_name << ": '" << optarg << "' is not an integer" << std::endl << "Use -h for help" << std::endl;
+					minified::cerr << program_name << ": '" << optarg << "' is not an integer" << minified::endl << "Use -h for help" << minified::endl;
 					return EXIT_BADARG;
 				}
 				start_position = (int64_t)std::stoll(optarg);
@@ -147,7 +142,7 @@ int main(int argc, char* argv[]) {
 				
 			case 'l':
 				if (!is_number(optarg)) {
-					std::cerr << program_name << ": '" << optarg << "' is not an integer" << std::endl << "Use -h for help" << std::endl;
+					minified::cerr << program_name << ": '" << optarg << "' is not an integer" << minified::endl << "Use -h for help" << minified::endl;
 					return EXIT_BADARG;
 				}
 				amount_to_read = (int64_t)std::stoll(optarg);
@@ -156,7 +151,7 @@ int main(int argc, char* argv[]) {
 			case 'b':
 				block_size = parse_block_units(optarg);
 				if (block_size == -1) {
-					std::cerr << program_name << ": Block size '" << optarg << "' is not understood" << std::endl << "Use -h for help" << std::endl;
+					minified::cerr << program_name << ": Block size '" << optarg << "' is not understood" << minified::endl << "Use -h for help" << minified::endl;
 					return EXIT_BADARG;
 				}
 				break;
@@ -179,18 +174,18 @@ int main(int argc, char* argv[]) {
 				break;
 				
 			case 'V':
-				std::cout << program_version << std::endl;
+				minified::cout << program_version << minified::endl;
 				return EXIT_SUCCESS;
 				break;
 				
 			case 'h':
-				std::cout << help_string;
+				minified::cout << help_string;
 				return EXIT_SUCCESS;
 				break;
 				
 			case '?':
 				if (optopt == 'i' || optopt == 's' || optopt == 'l') {
-					std::cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << std::endl << "Use -h for help" << std::endl;
+					minified::cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << minified::endl << "Use -h for help" << minified::endl;
 					return EXIT_BADOPT;
 				}
 				break;
@@ -199,7 +194,7 @@ int main(int argc, char* argv[]) {
 	
 	for (option_index = optind; option_index < argc; option_index++) {
 		if (received_filename) {
-			std::cerr << program_name << ": Error: Multiple files specified" << std::endl;
+			minified::cerr << program_name << ": Error: Multiple files specified" << minified::endl;
 			return EXIT_BADFILE;
 		}
 		file_to_read = argv[option_index];
@@ -208,14 +203,14 @@ int main(int argc, char* argv[]) {
 	
 	// Make sure we got an input file
 	if (!received_filename) {
-		std::cerr << help_string;
+		minified::cerr << help_string;
 		return EXIT_BADFILE;
 	}
 	
 	reader::file the_file;
 	
 	if (!the_file.init(file_to_read)) {
-		std::cerr << program_name << ": " << the_file.get_init_error_message() << std::endl;
+		minified::cerr << program_name << ": " << the_file.get_init_error_message() << minified::endl;
 		return EXIT_BADFILE;
 	}
 	

@@ -3,6 +3,6 @@
 	#include <unistd.h>
 #endif
 
-inline bool file_exists(std::string name) {
+inline bool file_exists(minified::string name) {
 	return (access(name.c_str(), F_OK) != -1);
 }

@@ -14,8 +14,8 @@ namespace reader {
 	
 		private:
 			bool initialized = false;
-			std::string file_name;
-			std::string init_error_message = "unknown";
+			minified::string file_name;
+			minified::string init_error_message = "unknown";
 			int64_t file_length = 0;
 			
 			bool just_outputting_positions = false;
@@ -26,7 +26,7 @@ namespace reader {
 			
 			int block_size = 10240;
 			
-			std::string search_query = "";
+			minified::string search_query = "";
 			search_type query_type = t_normal_search;
 			
 			job_type job = read_job;
@@ -38,11 +38,11 @@ namespace reader {
 			bool do_regex_search();
 		
 		public:
-			bool init(std::string path);
+			bool init(minified::string path);
 			
-			std::string read(int64_t start_position, int64_t length);
+			minified::string read(int64_t start_position, int64_t length);
 			
-			std::string get_init_error_message();
+			minified::string get_init_error_message();
 			int64_t get_file_length();
 			
 			bool do_job();
@@ -51,7 +51,7 @@ namespace reader {
 			void set_amount_to_read(int64_t amount);
 			void set_just_outputting_positions(bool flag);
 			void set_block_size(int size);
-			void set_search_query(std::string query);
+			void set_search_query(minified::string query);
 			void set_search_type(search_type normal_or_regex);
 			void set_job_type(job_type input_job);
 	};

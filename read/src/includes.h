@@ -1,7 +1,7 @@
 /* Needed for I/O */
-#ifndef IOSTREAM
-	#define IOSTREAM
-	#include <iostream>
+#ifndef STDIOH
+	#define STDIOH
+	#include <stdio.h>
 #endif
 /* Needed for getopt / program arguments */
 #ifndef GETOPT_H
@@ -87,6 +87,12 @@
 #ifndef FN_PARSE_REGEX
 	#define FN_PARSE_REGEX
 	#include "../../shared/parse_regex.cpp"
+#endif
+
+/* Minified output streams stripped to only the functionality that we actually use, so that we can allocate less memory at runtime */
+#ifndef MINIFIED_OSTREAM
+	#define MINIFIED_OSTREAM
+	#include "../../shared/minified.cpp"
 #endif
 
 /* Contains the 'meat' of the program */

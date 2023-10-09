@@ -3,12 +3,7 @@
 	#include <fstream>
 #endif
 
-#ifndef IOSTREAM
-	#define IOSTREAM
-	#include <iostream>
-#endif
-
-bool reader::file::init(std::string path) {
+bool reader::file::init(minified::string path) {
 	if (!file_exists(path)) {
 		init_error_message = "File '" + path + "' does not exist";
 		return false;
@@ -32,12 +27,12 @@ bool reader::file::init(std::string path) {
 	return true;
 }
 
-std::string reader::file::read(int64_t start_position, int64_t length) {
+minified::string reader::file::read(int64_t start_position, int64_t length) {
 
 	std::ifstream file_stream(file_name, std::ifstream::binary);
 	
 	// allocate memory
-	std::string buffer(length, ' ');
+	minified::string buffer(length, ' ');
 	
 	// set position
 	file_stream.seekg(start_position);
@@ -57,7 +52,7 @@ bool reader::file::do_read_job() {
 	Just output in the format "startposition endposition"
 	*/
 	if (just_outputting_positions) {
-		std::cout << start_position << " " << end_position-1 << std::endl;
+		minified::cout << start_position << " " << end_position-1 << minified::endl;
 		return true;
 	}
 	
@@ -68,7 +63,7 @@ bool reader::file::do_read_job() {
 			block_size = amount_left_in_file;
 		}
 		
-		std::cout << read(i, block_size);
+		minified::cout << read(i, block_size);
 	}
 	return true;
 }
@@ -98,7 +93,7 @@ bool reader::file::do_normal_search() {
 			shift_by_this_much = amount_left_in_file;
 		}
 		
-		std::string block_data = read(i, block_size);
+		minified::string block_data = read(i, block_size);
 		
 		// Check if the WHOLE search query is in the block
 		// And if so, just output it
@@ -118,11 +113,11 @@ bool reader::file::do_normal_search() {
 			match_end = (match_start + search_query_length);
 			
 			if (just_outputting_positions) {
-				std::cout << match_start << " " << match_end-1 << std::endl;
+				minified::cout << match_start << " " << match_end-1 << minified::endl;
 				return true;
 			}
 			
-			std::cout << block_data.substr(start_position, search_query_length) << std::endl;
+			minified::cout << block_data.substr(start_position, search_query_length) << minified::endl;
 			return true;
 	}
 
@@ -186,7 +181,7 @@ bool reader::file::do_regex_search() {
 	int64_t match_start = 0;
 	int64_t match_end = 0;
 
-	std::vector<std::string> sub_expressions = create_sub_expressions(search_query);
+	std::vector<minified::string> sub_expressions = create_sub_expressions(search_query);
 
 	for (int64_t current_index = start_position; current_index < end_position; (current_index = current_index + block_size)) {
 		regex_scan:
@@ -196,7 +191,7 @@ bool reader::file::do_regex_search() {
 			block_size = amount_left_in_file;
 		}
 		
-		std::string block_data = read(current_index, block_size);
+		minified::string block_data = read(current_index, block_size);
 		std::smatch regex_search_result;
 		std::regex expression(search_query);
 
@@ -205,7 +200,7 @@ bool reader::file::do_regex_search() {
 		if (!full_match_found) {
 			for (int64_t j = 0; j < sub_expressions.size(); j++) {
 				std::smatch sub_expression_search_result;
-				std::regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the std::string must END with the match
+				std::regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the minified::string must END with the match
 
 				// Partial match found?
 				bool partial_match_found = regex_search(block_data, sub_expression_search_result, sub_expression);
@@ -224,11 +219,11 @@ bool reader::file::do_regex_search() {
 		match_end = current_index + (block_size - regex_search_result.suffix().length());
 		
 		if (just_outputting_positions) {
-			std::cout << match_start << " " << match_end-1 << std::endl;
+			minified::cout << match_start << " " << match_end-1 << minified::endl;
 			return true;
 		}
 		
-		std::cout << regex_search_result[0] << std::endl;
+		minified::cout << regex_search_result[0] << minified::endl;
 		return true;
 	}
 	return false;
@@ -245,7 +240,7 @@ bool reader::file::do_search_job() {
 
 bool reader::file::do_job() {
 	if (!initialized) {
-		std::cout << "Error reading file" << std::endl;
+		minified::cout << "Error reading file" << minified::endl;
 		return false;
 	}
 	
@@ -278,7 +273,7 @@ bool reader::file::do_job() {
 	return false;
 }
 
-std::string reader::file::get_init_error_message() {
+minified::string reader::file::get_init_error_message() {
 	return init_error_message;
 }
 
@@ -302,7 +297,7 @@ void reader::file::set_block_size(int size) {
 	block_size = size;
 }
 
-void reader::file::set_search_query(std::string query) {
+void reader::file::set_search_query(minified::string query) {
 	search_query = query;
 }
 
