@@ -1,0 +1,14 @@
+_deps/
+.cache/
+build/
+cargo/
+CMakeFiles/
+corrosion/
+lib/
+CMakeCache.txt
+Makefile
+*.CMakeFiles
+*.cmake
+*.ninja*
+*.d
+../.vscode
