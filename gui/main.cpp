@@ -1,4 +1,4 @@
-#include "polonius-gui.h" // generated header from memory.slint
+#include "polonius-gui.h"
 
 int main()
 {
