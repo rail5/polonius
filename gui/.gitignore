@@ -11,4 +11,3 @@ Makefile
 *.cmake
 *.ninja*
 *.d
-../.vscode

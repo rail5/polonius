@@ -16,6 +16,7 @@ FetchContent_MakeAvailable(Slint)
 add_executable(polonius-gui main.cpp)
 target_link_libraries(polonius-gui PRIVATE Slint::Slint)
 slint_target_sources(polonius-gui polonius-gui.slint)
+
 # On Windows, copy the Slint DLL next to the application binary so that it's found.
 if (WIN32)
     add_custom_command(TARGET polonius-gui POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:polonius-gui> $<TARGET_FILE_DIR:polonius-gui> COMMAND_EXPAND_LISTS)

@@ -12,6 +12,7 @@ to compile the code into and executable:
 
 ```bash
 cmake -GNinja .
+
 cmake --build .
 ```
 
