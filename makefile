@@ -9,8 +9,11 @@ update-version:
 	# And update shared/version.h with that number
 	# This ensures that the output of --version
 	# For each of the binaries is always up-to-date
-	echo "#define program_version \"$(VERSION)\"" > shared/version.h
-	echo "$(VERSION)"
+	@ \
+	if [ "$(VERSION)" != "" ]; then \
+		echo "#define program_version \"$(VERSION)\"" > shared/version.h; \
+		echo "$(VERSION)"; \
+	fi;
 
 manual:
 	# Git pull wiki & run pandoc to create manual pages
