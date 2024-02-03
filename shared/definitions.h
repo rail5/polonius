@@ -14,8 +14,8 @@
 #define EXIT_OTHER 4
 #define EXIT_INTERRUPT 5
 
-// Clang doesn't have fopen64
-#ifdef __clang__
+// Account for systems which have fopen64
+#if defined __clang__ || defined __HAIKU__
 	#define fopen64 fopen
 	// This might(?) mean that we can't open >2GB files on 32-bit systems which use clang/llvm
 	// Testing is needed
