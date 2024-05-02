@@ -1,3 +1,10 @@
+polonius (0.5.6) stable; urgency=medium
+
+  * Properly check whether given path is a directory
+    Added support for building outside of Debian
+
+ -- rail5 <andrew@rail5.org>  Thu, 02 May 2024 22:26:33 +0800
+
 polonius (0.5.5) stable; urgency=medium
 
   * Fixed #25 (Github issues)
