@@ -23,6 +23,11 @@
 	#define UNISTD_H
 	#include <unistd.h>
 #endif
+/* Needed for some file checks (namely is_directory() function) */
+#ifndef SYS_STAT
+	#define SYS_STAT
+	#include <sys/stat.h>
+#endif
 /* Needed for process_bytecodes() function */
 #ifndef REGEX
 	#define REGEX
@@ -66,6 +71,12 @@
 #ifndef FN_FILE_EXISTS
 	#define FN_FILE_EXISTS
 	#include "../../shared/file_exists.cpp"
+#endif
+
+/* inline bool is_directory(std::string path) return true if the given path points to a directory */
+#ifndef FN_IS_DIRECTORY
+	#define FN_IS_DIRECTORY
+	#include "../../shared/is_directory.cpp"
 #endif
 
 /* string process_escapedchars(string input) processes strings containing '\n', '\t', and '\\' (literal), replacing them with the actual characters they represent */

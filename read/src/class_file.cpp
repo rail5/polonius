@@ -15,6 +15,11 @@ bool reader::file::init(std::string path) {
 	}
 	
 	file_name = path;
+
+	if (is_directory(file_name)) {
+		init_error_message = file_name + " is a directory";
+		return false;
+	}
 	
 	std::ifstream file_stream(file_name, std::ifstream::binary);
 	

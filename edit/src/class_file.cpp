@@ -17,16 +17,22 @@ bool editor::file::set_file(std::string file_path) {
 		Only returns false if the directory that the file is meant to be in doesn't exist
 	***/
 	
-	/*
-	Verify that the directory that the file is supposed to be in actually exists
-	*/
 	std::string directory = isolate_path_from_filename(file_path);
 	
 	file_name = file_path;
 	file_directory = directory;
 	
 	/*
-	Return error if the directory doesn't exist
+	Verify that the path is not a directory
+	*/
+	if (is_directory(file_path)) {
+		error_message = file_name + " is a directory";
+		initialized = false;
+		return initialized;
+	}
+
+	/*
+	Return error if the directory that the file is supposed to be in doesn't exist
 	*/
 	if (!file_exists(directory)) {
 		error_message = "Path '" + directory + "' does not exist";
