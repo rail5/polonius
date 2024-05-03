@@ -1,3 +1,10 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
+#ifndef EDIT_SRC_INCLUDES_H_
+#define EDIT_SRC_INCLUDES_H_
+
 /* Needed for I/O */
 #ifndef IOSTREAM
 	#define IOSTREAM
@@ -128,3 +135,5 @@
 #include "namespace_editor.h"
 #include "class_instruction.cpp"
 #include "class_file.cpp"
+
+#endif // EDIT_SRC_INCLUDES_H_

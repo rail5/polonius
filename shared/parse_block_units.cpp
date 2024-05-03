@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #ifndef FN_IS_NUMBER
 	#define FN_IS_NUMBER
 	#include "is_number.cpp"
@@ -21,12 +25,12 @@ inline int parse_block_units(const std::string &user_input) {
 	}
 	
 	if (last_character == "K" || last_character == "k") {
-		int blocksize = (int)stoi(all_but_last_character);
+		int blocksize = stoi(all_but_last_character);
 		return (blocksize * 1024);
 	}
 	
 	if (last_character == "M" || last_character == "m") {
-		int blocksize = (int)stoi(all_but_last_character);
+		int blocksize = stoi(all_but_last_character);
 		return (blocksize * 1024 * 1024);
 	}
 	
@@ -38,5 +42,5 @@ inline int parse_block_units(const std::string &user_input) {
 	if (!is_number(user_input)) {
 		return -1;
 	}
-	return (int)stol(user_input);
+	return static_cast<int>(stol(user_input));
 }

@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #include "includes.h"
 
 #ifndef IOSTREAM
@@ -11,7 +15,6 @@
 #endif
 
 int main(int argc, char* argv[]) {
-
 	std::string program_name = "polonius-reader";
 
 	std::string help_string =
@@ -111,8 +114,7 @@ int main(int argc, char* argv[]) {
 	opterr = 0;
 	int option_index = 0;
 	
-	static struct option long_options[] =
-	{
+	static struct option long_options[] = {
 		{"input", required_argument, 0, 'i'},
 		{"start", required_argument, 0, 's'},
 		{"length", required_argument, 0, 'l'},
@@ -190,7 +192,7 @@ int main(int argc, char* argv[]) {
 				
 			case '?':
 				if (optopt == 'i' || optopt == 's' || optopt == 'l') {
-					std::cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << std::endl << "Use -h for help" << std::endl;
+					std::cerr << program_name << ": Option -" << static_cast<char>(optopt) << " requires an argument" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADOPT;
 				}
 				break;

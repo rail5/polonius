@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #ifndef FSTREAM
 	#define FSTREAM
 	#include <fstream>
@@ -38,7 +42,6 @@ bool reader::file::init(std::string path) {
 }
 
 std::string reader::file::read(int64_t start_position, int64_t length) {
-
 	std::ifstream file_stream(file_name, std::ifstream::binary);
 	
 	// allocate memory

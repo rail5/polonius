@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #ifndef SSTREAM
 	#define SSTREAM
 	#include <sstream>
@@ -40,7 +44,6 @@ std::vector<std::string> explode(std::string const &input, char delimiter, int m
 	
 	// If maximum_number_of_elements is set, we want to recombine any splits after the maximum
 	if (maximum_number_of_elements > 0) {
-	
 		// Set the highest index (counting from zero) we want the vector to have
 		int last_permissible_element = maximum_number_of_elements - 1;
 		

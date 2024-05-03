@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #ifndef FILESYSTEM
 	#define FILESYSTEM
 	#include <filesystem>
@@ -55,7 +59,6 @@ bool editor::file::set_file(std::string file_path) {
 			initialized = false;
 			return initialized;
 		}
-		
 	}
 	
 	/*
@@ -160,7 +163,6 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	bool end_position_is_eof = (input_instruction.get_end_position() == -1);
 
 	if (start_position_is_eof) {
-
 		if (input_instruction.get_operation_type() == replace_operation) {
 			/*
 			REPLACE instructions are a special case with the 'END' keyword
@@ -338,7 +340,6 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 	file_stream.write("\n", 1);
 	
 	for (int64_t i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
-	
 		int64_t copy_to_this_position = (i - (amount_to_store - 1)) - 1;
 		int64_t copy_from_this_position = (copy_to_this_position - insert_length);
 
@@ -351,7 +352,6 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 			// (In the above example, 512 rather than 1024)
 		// And set i = start_position to make sure the loop doesn't run again after this
 		if (copy_from_this_position < start_position) {
-		
 			int64_t difference = start_position - copy_from_this_position;
 			
 			copy_from_this_position = start_position;
@@ -444,7 +444,6 @@ void editor::file::remove(int64_t start_position, int64_t end_position) {
 	
 	// Before EOF
 	for (int64_t i = start_position; i < (new_file_length - 1); i = (i + amount_to_store)) {
-		
 		int64_t copy_to_this_position = i;
 		
 		int64_t copy_from_this_position = (i + remove_length);
@@ -496,7 +495,6 @@ void editor::file::remove(int64_t start_position, int64_t end_position) {
 }
 
 bool editor::file::execute_single_instruction(instruction instruction_to_execute) {
-
 	if (instruction_to_execute.get_operation_type() == replace_operation) {
 		replace(instruction_to_execute.get_start_position(), instruction_to_execute.get_text());
 		return true;

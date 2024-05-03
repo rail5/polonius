@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #ifndef REGEX
 	#define REGEX
 	#include <regex>
@@ -32,7 +36,7 @@
 	caret = false; \
 	backslash_b = false; \
 	backslash_capital_b = false; \
- 	or_operator = false;
+	or_operator = false;
 
 std::vector<std::string> parse_regex(std::string expression) {
 	/***
@@ -318,7 +322,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 						// Push each of the characters we had been saving for the buffer
 						// Back into the output vector one by one
-						for (int i=0; i<curly_braces_buffer.size(); i++) {
+						for (int i=0; i < curly_braces_buffer.size(); i++) {
 							std::string bufferpart(1, curly_braces_buffer[i]);
 
 							if (multi_char_entry) {
@@ -379,12 +383,12 @@ std::vector<std::string> create_sub_expressions(std::string expression) {
 
 	std::vector<std::string> output;
 
-	for (int i=0; i<components.size()-1; i++) {
+	for (int i = 0; i < components.size()-1; i++) {
 		int upper_limit = components.size() - i;
 
 		std::string sub_expression = "";
 
-		for (int j=0; j<upper_limit; j++) {
+		for (int j = 0; j < upper_limit; j++) {
 			if (string_starts_with(components[j], "{") && string_ends_with(components[j], "}")) {
 				std::string curly_braces_term = components[j];
 
@@ -419,7 +423,6 @@ std::vector<std::string> create_sub_expressions(std::string expression) {
 		}
 
 		output.push_back(sub_expression);
-
 	}
 
 	return output;

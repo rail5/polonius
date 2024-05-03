@@ -1,3 +1,10 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
+#ifndef SHARED_DEFINITIONS_H_
+#define SHARED_DEFINITIONS_H_
+
 // Basic info:
 #include "version.h"
 #define program_author "rail5"
@@ -20,3 +27,5 @@
 	// This might(?) mean that we can't open >2GB files on 32-bit systems which use clang/llvm
 	// Testing is needed
 #endif
+
+#endif // SHARED_DEFINITIONS_H_

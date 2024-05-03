@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #ifndef UNISTD_H
 	#define UNISTD_H
 	#include <unistd.h>

@@ -1,3 +1,10 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
+#ifndef READ_SRC_INCLUDES_H_
+#define READ_SRC_INCLUDES_H_
+
 /* Needed for I/O */
 #ifndef IOSTREAM
 	#define IOSTREAM
@@ -103,3 +110,5 @@
 /* Contains the 'meat' of the program */
 #include "namespace_reader.h"
 #include "class_file.cpp"
+
+#endif // READ_SRC_INCLUDES_H_

@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #ifndef SYS_STAT
 	#define SYS_STAT
 	#include <sys/stat.h>

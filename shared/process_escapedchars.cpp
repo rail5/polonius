@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #ifndef VECTOR
 	#define VECTOR
 	#include <vector>

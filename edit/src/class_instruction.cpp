@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 void editor::instruction::clear_instruction() {
 	/***
 	void clear_instruction():
@@ -23,7 +27,6 @@ void editor::instruction::process_special_chars() {
 	text_input = process_bytecodes(text_input);
 	
 	end_position = (start_position + text_input.length());
-
 }
 
 bool editor::instruction::set_replace_instruction(int64_t start, std::string text) {
@@ -314,7 +317,7 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 
 	second_element_is_end = (second_element == "end");
 
-	if ( ! (is_number(second_element) || (second_element_is_end)) ) {
+	if ( !(is_number(second_element) || (second_element_is_end)) ) {
 		invalid_instruction.set_error_message("Invalid instruction: '" + instruction_vector[1] + "' is not a positive integer");
 		return invalid_instruction;
 	}
@@ -327,7 +330,7 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 
 		third_element_is_end = (third_element == "end");
 
-		if ( ! (is_number(instruction_vector[2]) || (third_element_is_end) )) {
+		if ( !(is_number(instruction_vector[2]) || (third_element_is_end)) ) {
 			invalid_instruction.set_error_message("Invalid REMOVE instruction: '" + instruction_vector[2] + "' is not a positive integer");
 			return invalid_instruction;
 		}
@@ -341,7 +344,6 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 	int64_t end_position;
 
 	if (is_replace_instruction) {
-
 		if (second_element_is_end) {
 			start_position = -1;
 		} else {
@@ -352,7 +354,6 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 	}
 	
 	if (is_insert_instruction) {
-
 		if (second_element_is_end) {
 			start_position = -1;
 		} else {
@@ -363,7 +364,6 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 	}
 	
 	if (is_remove_instruction) {
-
 		if (second_element_is_end) {
 			start_position = -1;
 		} else {
@@ -406,7 +406,7 @@ std::vector<editor::instruction> parse_instruction_set_string(std::string instru
 	std::vector<std::string> instruction_strings = explode(instruction_set_string, '\n');
 	
 	for (std::string i : instruction_strings) {
-		output_instruction_set.push_back( parse_instruction_string(i) );
+		output_instruction_set.push_back(parse_instruction_string(i));
 	}
 	
 	return output_instruction_set;

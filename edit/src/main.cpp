@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 rail5
+*/
+
 #include "includes.h"
 
 #ifndef IOSTREAM
@@ -11,7 +15,6 @@
 #endif
 
 int main(int argc, char* argv[]) {
-
 	std::string program_name = "polonius-editor";
 	
 	std::string help_string =
@@ -101,8 +104,7 @@ int main(int argc, char* argv[]) {
 	opterr = 0;
 	int option_index = 0;
 	
-	static struct option long_options[] =
-	{
+	static struct option long_options[] = {
 		{"input", required_argument, 0, 'i'},
 		
 		{"add-instruction-set", required_argument, 0, 's'},
@@ -170,7 +172,7 @@ int main(int argc, char* argv[]) {
 			
 			case '?':
 				if (optopt == 'i' || optopt == 's' || optopt == 'a' || optopt == 'b') {
-					std::cerr << program_name << ": Option -" << (char)optopt << " requires an argument" << std::endl << "Use -h for help" << std::endl;
+					std::cerr << program_name << ": Option -" << static_cast<char>(optopt) << " requires an argument" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADOPT;
 				}
 				break;
@@ -199,7 +201,6 @@ int main(int argc, char* argv[]) {
 	}
 	
 	for (int i = 0; i < instructions_to_add.size(); i++) {
-	
 		if (interpret_special_chars) {
 			instructions_to_add[i].process_special_chars();
 		}
@@ -219,5 +220,4 @@ int main(int argc, char* argv[]) {
 	/* Close file */
 	document.close();
 	return EXIT_SUCCESS;
-
 }
