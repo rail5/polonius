@@ -206,10 +206,10 @@ bool reader::file::do_regex_search() {
 		
 		std::string block_data = read(current_index, block_size);
 		std::smatch regex_search_result;
-		std::regex expression(search_query);
+		std::regex expression(search_query, std::regex::optimize);
 
 		bool full_match_found = regex_search(block_data, regex_search_result, expression);
-
+		
 		if (!full_match_found) {
 			for (int64_t j = 0; j < sub_expressions.size(); j++) {
 				std::smatch sub_expression_search_result;
