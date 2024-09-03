@@ -1,3 +1,19 @@
+polonius (0.5.8) stable; urgency=medium
+
+  * More sanity checks on block size inputs
+    Block sizes are now stored as 64-bit integers, and there are more
+    checks in place to ensure valid input. This closes #30
+  * Fixed problem with stack overflows in regex searches
+    The standard library's regex search function is recursive and has
+    potential to overflow the stack, particularly when searching very
+    large documents (in fact the *point* of polonius) This was documented
+    before it was fully understood in Github issue #29
+    To fix it, polonius-reader is now compiled with -fsplit-stack.
+    This option allows a discontiguous stack which grows automatically
+    as needed
+
+ -- rail5 <andrew@rail5.org>  Tue, 03 Sep 2024 17:00:31 +0800
+
 polonius (0.5.7) stable; urgency=medium
 
   * Patched a bug with 'remove' instructions
