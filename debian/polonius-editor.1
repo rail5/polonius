@@ -191,7 +191,7 @@ The \f[I]\[en]add-instruction-set\f[R] / \f[I]-s\f[R] option
 .PP
 Valid instruction types are: \f[I]INSERT\f[R], \f[I]REMOVE\f[R], and
 \f[I]REPLACE\f[R].
-Instruction types are \f[B]not case-sensitive\f[R].
+Instruction types are not case-sensitive.
 .SS \[lq]INSERT\[rq] INSTRUCTIONS
 .PP
 INSERT instructions are used to insert text into the file without
@@ -216,11 +216,17 @@ is \f[B]less than zero\f[R], or is \f[B]beyond the end of the file\f[R]
 .PP
 The `end' keyword can also be used in place of an absolute start
 position.
+For example, \f[V]INSERT end goodbye world\f[R] will place \[lq]goodbye
+world\[rq] at the end of the file.
+If we were working on the same \f[V]ABC123\f[R] file as before, it would
+now contain:
+.PP
+\f[V]ABC123goodbye world\f[R]
 .SS \[lq]REMOVE\[rq] INSTRUCTIONS
 .PP
 REMOVE instructions are used to delete text from the file.
 .PP
-The format a remove instruction is:
+The format for a remove instruction is:
 .PP
 \f[V]REMOVE start-position end-position\f[R]
 .PP
@@ -238,12 +244,9 @@ To remove \f[I]only one character\f[R], make the
 \f[B]start-position\f[R] and \f[B]end-position\f[R] \f[I]exactly the
 same\f[R].
 .PP
-For instance, in the example of a file containing \f[V]worldABC123\f[R],
-the digit \f[I]`3'\f[R] is character \f[I]#10\f[R] \f[I](counting from
-zero)\f[R].
-Therefore, running \f[V]REMOVE 10 10\f[R] will change the file to:
-.PP
-\f[V]worldABC12\f[R]
+For instance, running \f[V]REMOVE 0 0\f[R] will delete the first
+character of the file.
+Running \f[V]REMOVE 1 1\f[R] will delete the second character, etc
 .PP
 Remove instructions will fail (and give an error) if:
 .IP \[bu] 2
@@ -255,6 +258,23 @@ Either position is \f[B]beyond the end of the file\f[R]
 .PP
 The `end' keyword can also be used in place of an absolute start or end
 position.
+For example, in the file containing:
+.PP
+\f[V]worldABC123\f[R]
+.PP
+If we ran \f[V]REMOVE end end\f[R], the file would now contain:
+.PP
+\f[V]worldABC12\f[R]
+.PP
+It would remove the last character of the file.
+On the other hand, if we ran \f[V]REMOVE 1 end\f[R], we would remove
+\f[I]everything\f[R] after the very first character, and the file would
+now contain only:
+.PP
+\f[V]w\f[R]
+.PP
+And of course running \f[V]REMOVE 0 end\f[R] would remove
+\f[I]everything\f[R].
 .SS \[lq]REPLACE\[rq] INSTRUCTIONS
 .PP
 REPLACE instructions are used to replace existing text in the file
@@ -270,9 +290,11 @@ The format for a replace instruction is:
 .PP
 \f[V]REPLACE start-position new text to go in its place\f[R]
 .PP
-For example, \f[V]REPLACE 0 hello\f[R] will replace characters \f[I]0,
-1, 2, 3,\f[R] and *4** with \f[I]\[lq]h\[rq], \[lq]e\[rq], \[lq]l\[rq],
-\[lq]l\[rq],\f[R] and \f[I]\[lq]o\[rq]\f[R].
+For example, \f[V]REPLACE 0 hello\f[R] will replace the first batch of
+characters with the world \[lq]hello\[rq].
+Specifically, it will replace characters \f[I]0, 1, 2, 3,\f[R] and *4**
+with \f[I]\[lq]h\[rq], \[lq]e\[rq], \[lq]l\[rq], \[lq]l\[rq],\f[R] and
+\f[I]\[lq]o\[rq]\f[R].
 If the file previously contained:
 .PP
 \f[V]worldABC12\f[R]
@@ -285,15 +307,33 @@ Replace instructions will fail (and give an error) if the \f[B]start or
 end\f[R] of the replacement text is \f[B]beyond the end of the
 file\f[R].
 .PP
-For example, if the instruction \f[V]REPLACE 0 goodbye1234\f[R] was run
+For example, if the instruction \f[V]REPLACE 0 goodbye12345\f[R] was run
 on our example file (which contains \f[V]helloABC12\f[R]), the
-instruction would fail, because our replacement text
-(\[lq]goodbye1234\[rq]) extends beyond the current bounds of the file.
+instruction would fail, because the replacement text is \f[I]longer\f[R]
+than the text actually in the file \[en] there\[cq]s not enough in the
+file to replace!
+Our replacement text (\[lq]goodbye12345\[rq]) extends \f[I]beyond the
+current bounds\f[R] of the file.
 Instead, we should run two instructions:
 .IP \[bu] 2
-First, \f[V]REPLACE 0 goodbye123\f[R]
+First, \f[V]REPLACE 0 goodbye123\f[R] (replacing what \f[I]can\f[R] be
+replaced)
 .IP \[bu] 2
-Then, \f[V]INSERT 10 4\f[R]
+Then, \f[V]INSERT 10 45\f[R]
 .PP
 The `end' keyword can also be used in place of an absolute start
 position.
+For example, if our file contained:
+.PP
+\f[V]goodbye12345\f[R]
+.PP
+And we ran the instruction \f[V]REPLACE end world\f[R], the file would
+now contain:
+.PP
+\f[V]goodbyeworld\f[R]
+.PP
+We would be replacing the last \f[I]n\f[R] characters of the file with
+\f[I]\[lq]w\[rq], \[lq]o\[rq], \[lq]r\[rq], \[lq]l\[rq],
+\[lq]d\[rq]\f[R] (in this case, 5 characters, replacing
+\f[I]\[lq]1\[rq], \[lq]2\[rq], \[lq]3\[rq], \[lq]4\[rq],
+\[lq]5\[rq]\f[R])
