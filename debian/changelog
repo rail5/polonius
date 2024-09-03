@@ -1,3 +1,11 @@
+polonius (0.5.7) stable; urgency=medium
+
+  * Patched a bug with 'remove' instructions
+    Previously, remove instructions didn't work properly with the 'end'
+    keyword. That has now been fixed in this change. This closes #26
+
+ -- rail5 <andrew@rail5.org>  Tue, 03 Sep 2024 13:43:26 +0800
+
 polonius (0.5.6) stable; urgency=medium
 
   * Properly check whether given path is a directory
