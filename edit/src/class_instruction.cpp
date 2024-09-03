@@ -129,7 +129,11 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 	Meaning:
 		- Not less than the start position
 	*/
-	if ( (end < start) && (end != -1) ) {
+	if ( 
+		((end < start) && (end != -1))
+		||
+		((start == -1) && (end != -1)) /* Disallow the start position being 'END' and the end position not being 'END' */
+	) {
 		error_message = "Invalid end position";
 		clear_instruction();
 		return false;
