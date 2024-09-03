@@ -141,7 +141,15 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 	*/
 	operation = remove_operation;
 	start_position = start;
-	end_position = end + 1;
+	if (end_position != -1) {
+		// '-1' is set if the user used the 'end' keyword
+		// Later parts of the program will check if start/end positions are set to -1,
+		// And if so, dynamically update them to point to the end of the file
+		// So, here we don't want to increment '-1' to '0'
+		// But, for all other points, remove instruction positions need to be updated INTERNALLY
+		// So that the end position is one beyond the point we want to remove
+		end_position = end + 1;
+	}
 	initialized = true;
 	
 	/* Clear any earlier error messages */
@@ -378,9 +386,8 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 		
 		return create_remove_instruction(start_position, end_position);
 	}
-	
-	// If we've made it this far, something terrible has happened
-	invalid_instruction.set_error_message("I must suck at programming");
+	// Control shouldn't ever reach this part
+	invalid_instruction.set_error_message("Control somehow reached the end of 'parse_instruction_string'. This shouldn't be possible. Please file a bug report");
 	return invalid_instruction;
 }
 

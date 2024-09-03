@@ -175,12 +175,19 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 				file_length_after_last_instruction - input_instruction.get_text().length() - 1);
 		} else {
 			input_instruction.update_start_position(file_length_after_last_instruction - 1);
+
+			if (input_instruction.get_operation_type() == remove_operation) {
+				// For REMOVE instructions, should be file_length - 2, not - 1
+				// Meaning: the "start position" pointer should point JUST BEFORE the character we want to act on
+				input_instruction.update_start_position(input_instruction.get_start_position() - 1);
+			}
 		}
 
 		input_instruction.update_end_position(input_instruction.get_start_position() + input_instruction.get_text().length());
 	}
 
 	if (end_position_is_eof) {
+		// end_position_is_eof can never be set high unless we're running a REMOVE instruction
 		input_instruction.update_end_position(file_length_after_last_instruction - 1);
 	}
 	
