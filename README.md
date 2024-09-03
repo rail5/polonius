@@ -34,19 +34,19 @@ Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD
 
 **polonius-reader**:
 
-  ![99%](https://progress-bar.dev/99)
+  ![99%](https://geps.dev/progress/99)
   
 
 **polonius-editor**:
 
-  ![99%](https://progress-bar.dev/99)
+  ![99%](https://geps.dev/progress/99)
   
 
 **CLI (polonius)**:
 
-  ![1%](https://progress-bar.dev/1)
+  ![1%](https://geps.dev/progress/1)
   
 
 **GUI (polonius-gui)**:
 
-  ![0%](https://progress-bar.dev/0)
+  ![0%](https://geps.dev/progress/0)
