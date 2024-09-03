@@ -199,6 +199,12 @@ bool reader::file::do_regex_search() {
 	int64_t match_start = 0;
 	int64_t match_end = 0;
 
+	#ifdef no_split_stack
+	std::cerr << "polonius-reader: Warning!" << std::endl;
+	std::cerr << "polonius-reader: Your system architecture has a known bug with regex searches" << std::endl;
+	std::cerr << "polonius-reader: If the search fails, try again with a smaller block size (-b)" << std::endl;
+	#endif
+
 	std::vector<std::string> sub_expressions = create_sub_expressions(search_query);
 
 	for (int64_t current_index = start_position; current_index < end_position; (current_index = current_index + block_size)) {
