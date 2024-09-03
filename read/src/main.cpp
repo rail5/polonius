@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 	int64_t start_position = 0;
 	int64_t amount_to_read = -1;
 	
-	int block_size = 10240;
+	int64_t block_size = 10240;
 	
 	reader::job_type job = reader::read_job;
 	std::string searching_for = "";
@@ -157,8 +157,8 @@ int main(int argc, char* argv[]) {
 				
 			case 'b':
 				block_size = parse_block_units(optarg);
-				if (block_size == -1) {
-					std::cerr << program_name << ": Block size '" << optarg << "' is not understood" << std::endl << "Use -h for help" << std::endl;
+				if (block_size < 0) {
+					std::cerr << program_name << ": Block size '" << optarg << "' is not understood or too large" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADARG;
 				}
 				break;

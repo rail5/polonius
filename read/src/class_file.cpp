@@ -42,20 +42,25 @@ bool reader::file::init(std::string path) {
 }
 
 std::string reader::file::read(int64_t start_position, int64_t length) {
-	std::ifstream file_stream(file_name, std::ifstream::binary);
-	
-	// allocate memory
-	std::string buffer(length, ' ');
-	
-	// set position
-	file_stream.seekg(start_position);
-	
-	// read data as a block
-	file_stream.read(&buffer[0], length);
-	
-	file_stream.close();
-	
-	return buffer;
+	try {
+		std::ifstream file_stream(file_name, std::ifstream::binary);
+		
+		// allocate memory
+		std::string buffer(length, ' ');
+		
+		// set position
+		file_stream.seekg(start_position);
+		
+		// read data as a block
+		file_stream.read(&buffer[0], length);
+		
+		file_stream.close();
+		
+		return buffer;
+	} catch (...) {
+		std::cerr << "polonius-reader: Error reading file" << std::endl;
+		return "";
+	}
 }
 
 bool reader::file::do_read_job() {
@@ -306,7 +311,7 @@ void reader::file::set_just_outputting_positions(bool flag) {
 	just_outputting_positions = flag;
 }
 
-void reader::file::set_block_size(int size) {
+void reader::file::set_block_size(int64_t size) {
 	block_size = size;
 }
 

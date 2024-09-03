@@ -114,9 +114,9 @@ bool editor::file::set_file(std::string file_path) {
 	return initialized;
 }
 
-void editor::file::set_block_size(int specified_blocksize) {
+void editor::file::set_block_size(int64_t specified_blocksize) {
 	/***
-	bool set_block_size(int specified_blocksize):
+	bool set_block_size(int64_t specified_blocksize):
 		Set the block size to inputted blocksize
 			The "block size" is how much of the file (in bytes) we're willing to load into memory at one time
 	***/
@@ -238,7 +238,7 @@ std::string editor::file::get_file_directory() {
 	return file_directory;
 }
 
-int editor::file::get_block_size() {
+int64_t editor::file::get_block_size() {
 	return block_size;
 }
 
@@ -333,7 +333,7 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 	
 	// Writing BEFORE EOF
 	
-	int amount_to_store = block_size;
+	int64_t amount_to_store = block_size;
 	
 	// Adjust the length of the file by adding 0s to the end
 	ftruncate(file_descriptor, new_file_length);
@@ -422,7 +422,7 @@ void editor::file::remove(int64_t start_position, int64_t end_position) {
 	
 	int64_t new_file_length = (file_length - remove_length);
 	
-	int amount_to_store = block_size;
+	int64_t amount_to_store = block_size;
 	
 	// Are we deleting the end of the file, or something before the end of the file?
 	if (end_position == (file_length - 1)) {
@@ -530,7 +530,7 @@ void editor::file::close() {
 }
 
 
-editor::file::file(std::string path, int blocksize, bool verbose_mode) {
+editor::file::file(std::string path, int64_t blocksize, bool verbose_mode) {
 	block_size = blocksize;
 	verbose = verbose_mode;
 	set_file(path);

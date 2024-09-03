@@ -74,7 +74,7 @@ class file {
 		FILE* c_type_file;
 		int file_descriptor;
 		
-		int block_size = 10240;
+		int64_t block_size = 10240;
 		
 		std::vector<instruction> instruction_set;
 		int64_t file_length_after_last_instruction = 0;
@@ -86,7 +86,7 @@ class file {
 	public:
 		bool set_file(std::string file_path);
 		
-		void set_block_size(int specified_blocksize);
+		void set_block_size(int64_t specified_blocksize);
 		
 		void replace(int64_t start_position, std::string replacement_text);
 		void insert(int64_t start_position, std::string text_to_insert);
@@ -103,7 +103,7 @@ class file {
 		std::string get_file_name();
 		std::string get_file_directory();
 		
-		int get_block_size();
+		int64_t get_block_size();
 		
 		int64_t get_file_length();
 		
@@ -116,7 +116,7 @@ class file {
 		/*
 		Constructor
 		*/
-		explicit file(std::string path, int blocksize = 10240, bool verbose_mode = false);
+		explicit file(std::string path, int64_t blocksize = 10240, bool verbose_mode = false);
 };
 } // namespace editor
 

@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 	bool received_filename = false;
 	
 	std::vector<editor::instruction> instructions_to_add;
-	int block_size = 10240;
+	int64_t block_size = 10240;
 	bool interpret_special_chars = false;
 	
 	bool verbose = false;
@@ -146,8 +146,8 @@ int main(int argc, char* argv[]) {
 			
 			case 'b':
 				block_size = parse_block_units(optarg);
-				if (block_size == -1) {
-					std::cerr << program_name << ": Block size '" << optarg << "' is not understood" << std::endl << "Use -h for help" << std::endl;
+				if (block_size < 0) {
+					std::cerr << program_name << ": Block size '" << optarg << "' is not understood or too large" << std::endl << "Use -h for help" << std::endl;
 					return EXIT_BADARG;
 				}
 				break;

@@ -219,7 +219,7 @@ editor::instruction create_insert_instruction(int64_t start_position, std::strin
 	return new_instruction;
 }
 
-editor::instruction create_remove_instruction(int64_t start_position, int end_position) {
+editor::instruction create_remove_instruction(int64_t start_position, int64_t end_position) {
 	editor::instruction new_instruction;
 	
 	new_instruction.set_remove_instruction(start_position, end_position);

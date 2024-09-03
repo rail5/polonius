@@ -30,7 +30,7 @@ class file {
 
 		int64_t end_position = -1;
 		
-		int block_size = 10240;
+		int64_t block_size = 10240;
 		
 		std::string search_query = "";
 		search_type query_type = t_normal_search;
@@ -56,7 +56,7 @@ class file {
 		void set_start_position(int64_t position);
 		void set_amount_to_read(int64_t amount);
 		void set_just_outputting_positions(bool flag);
-		void set_block_size(int size);
+		void set_block_size(int64_t size);
 		void set_search_query(std::string query);
 		void set_search_type(search_type normal_or_regex);
 		void set_job_type(job_type input_job);
