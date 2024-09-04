@@ -1,3 +1,12 @@
+polonius (0.5.10) unstable; urgency=medium
+
+  * Emergency patch
+    Patching a bug that I carelessly introduced earlier
+    There's a reason that the current version number < 1
+  * Added more helpful error messages to invalid instruction errors
+
+ -- rail5 <andrew@rail5.org>  Wed, 04 Sep 2024 22:25:40 +0800
+
 polonius (0.5.9) stable; urgency=medium
 
   * Moved from std::regex to boost::regex. This finally closes #29
