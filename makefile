@@ -2,7 +2,7 @@ WIKIDIRECTORY=polonius.wiki
 WIKIUPSTREAM=https://github.com/rail5/polonius.wiki.git
 VERSION=$$(dpkg-parsechangelog -l debian/changelog --show-field version)
 
-all: update-version reader editor curses
+all: update-version reader editor
 
 update-version:
 	# Read the latest version number from debian/changelog
