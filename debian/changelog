@@ -1,3 +1,10 @@
+polonius (0.5.9) stable; urgency=medium
+
+  * Moved from std::regex to boost::regex. This finally closes #29
+  * Removed unfinished cli build from make target 'all'
+
+ -- rail5 <andrew@rail5.org>  Wed, 04 Sep 2024 11:26:25 +0800
+
 polonius (0.5.8) stable; urgency=medium
 
   * More sanity checks on block size inputs
