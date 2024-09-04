@@ -144,7 +144,7 @@ bool reader::file::do_normal_search() {
 
 bool reader::file::do_regex_search() {
 	/***
-		A std::regex search in Polonius should happen this way:
+		A regex search in Polonius should happen this way:
 			0. Validate the regular expression (TODO: expression currently not validated before running)
 			1. Parse the regular expression into its component parts
 				e.g.:
@@ -173,7 +173,7 @@ bool reader::file::do_regex_search() {
 			Final:
 				Report the found match
 			
-		One important restriction is that we will be limited to finding std::regex matches no longer than the user-specified block size
+		One important restriction is that we will be limited to finding regex matches no longer than the user-specified block size
 			(default 10KB)
 		
 		TODO:
@@ -216,15 +216,15 @@ bool reader::file::do_regex_search() {
 		}
 		
 		std::string block_data = read(current_index, block_size);
-		std::smatch regex_search_result;
-		std::regex expression(search_query, std::regex::optimize);
+		boost::smatch regex_search_result;
+		boost::regex expression(search_query);
 
 		bool full_match_found = regex_search(block_data, regex_search_result, expression);
 		
 		if (!full_match_found) {
 			for (int64_t j = 0; j < sub_expressions.size(); j++) {
-				std::smatch sub_expression_search_result;
-				std::regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the std::string must END with the match
+				boost::smatch sub_expression_search_result;
+				boost::regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the std::string must END with the match
 
 				// Partial match found?
 				bool partial_match_found = regex_search(block_data, sub_expression_search_result, sub_expression);

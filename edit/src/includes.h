@@ -58,7 +58,7 @@
 /* Needed for process_bytecodes() function */
 #ifndef REGEX
 	#define REGEX
-	#include <regex>
+	#include <boost/regex.hpp>
 #endif
 
 

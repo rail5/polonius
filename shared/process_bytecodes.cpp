@@ -4,7 +4,7 @@
 
 #ifndef REGEX
 	#define REGEX
-	#include <regex>
+	#include <boost/regex.hpp>
 #endif
 #ifndef SSTREAM
 	#define SSTREAM
@@ -18,10 +18,10 @@ std::string process_bytecodes(std::string input) {
 		
 		Returns the string with all byte-codes converted to the actual bytes they represent
 	***/
-	std::regex expression("(\\\\x)([a-fA-F0-9]{2})"); // Matches \x00 through \xFF
+	boost::regex expression("(\\\\x)([a-fA-F0-9]{2})"); // Matches \x00 through \xFF
 
-	while (std::regex_search(input, expression)) {
-		std::istringstream isolated_hex_code(std::regex_replace(input, expression, "$2", std::regex_constants::format_no_copy | std::regex_constants::format_first_only)); // Isolate the first match and copy it into a stringstream
+	while (boost::regex_search(input, expression)) {
+		std::istringstream isolated_hex_code(boost::regex_replace(input, expression, "$2", boost::regex_constants::format_no_copy | boost::regex_constants::format_first_only)); // Isolate the first match and copy it into a stringstream
 
 		unsigned char real_byte;
 
@@ -33,7 +33,7 @@ std::string process_bytecodes(std::string input) {
 
 		std::string string_real_byte(1, static_cast<char>(real_byte)); // Move said byte into a 1-character string
 
-		input = std::regex_replace(input, expression, string_real_byte, std::regex_constants::format_first_only);
+		input = boost::regex_replace(input, expression, string_real_byte, boost::regex_constants::format_first_only);
 	}
 
 	return input;

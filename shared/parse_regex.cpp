@@ -4,7 +4,7 @@
 
 #ifndef REGEX
 	#define REGEX
-	#include <regex>
+	#include <boost/regex.hpp>
 #endif
 
 #ifndef VECTOR
