@@ -197,7 +197,7 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	if ( (input_instruction.get_start_position() >= file_length_after_last_instruction && file_length_after_last_instruction > 0) ||
 		(input_instruction.get_start_position() > 0 && file_length_after_last_instruction == 0) ||
 		(input_instruction.get_start_position() < 0) ) {
-		input_instruction.set_error_message("Invalid start position");
+		input_instruction.set_error_message("Invalid start position", input_instruction.get_operation_type(), input_instruction.get_start_position(), input_instruction.get_end_position(), input_instruction.get_text());
 		return false;
 	}
 
@@ -206,7 +206,7 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	*/
 	if (input_instruction.get_operation_type() != insert_operation) {
 		if (input_instruction.get_end_position() >= file_length_after_last_instruction) {
-			input_instruction.set_error_message("Invalid end position");
+			input_instruction.set_error_message("Invalid end position", input_instruction.get_operation_type(), input_instruction.get_start_position(), input_instruction.get_end_position(), input_instruction.get_text());
 			return false;
 		}
 	}

@@ -46,7 +46,7 @@ bool editor::instruction::set_replace_instruction(int64_t start, std::string tex
 	*/
 
 	if (start < -1) {
-		error_message = "Invalid start position";
+		set_error_message("Invalid start position", replace_operation, start, 0, text);
 		clear_instruction();
 		return false;
 	}
@@ -83,7 +83,7 @@ bool editor::instruction::set_insert_instruction(int64_t start, std::string text
 		- Not beyond EOF
 	*/
 	if (start < -1) {
-		error_message = "Invalid start position";
+		set_error_message("Invalid start position", insert_operation, start, 0, text);
 		clear_instruction();
 		return false;
 	}
@@ -119,7 +119,7 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 		- Not less than -1 (-1 is reserved for the 'end' keyword)
 	*/
 	if (start < -1) {
-		error_message = "Invalid start position";
+		set_error_message("Invalid start position", remove_operation, start, end, "");
 		clear_instruction();
 		return false;
 	}
@@ -134,7 +134,7 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 		||
 		((start == -1) && (end != -1)) /* Disallow the start position being 'END' and the end position not being 'END' */
 	) {
-		error_message = "Invalid end position";
+		set_error_message("Invalid end position", remove_operation, start, end, "");
 		clear_instruction();
 		return false;
 	}
@@ -162,13 +162,39 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 	return true;
 }
 
-void editor::instruction::set_error_message(std::string message) {
+bool editor::instruction::set_error_message(std::string message, operation_type instruction_type, int64_t start, int64_t end, std::string input) {
 	/***
-	void set_error_message(std::string message):
-		Set the instruction's "error_message" to the inputted string
+	void set_error_message(std::string message, operation_type instruction_type, int64_t start, int64_t end, std::string input):
+		Set the instruction's "error_message" to the inputted string, with the option to provide more information
 	***/
-	
-	error_message = message;
+
+	std::string extra_info = " ";
+
+	switch (instruction_type) {
+		case no_operation:
+			error_message = message; // Just provide 'message', no additional information
+			return true;
+			break;
+
+		case replace_operation:
+			extra_info += "(REPLACE " + std::to_string(start) + " " + input + ")";
+			break;
+
+		case insert_operation:
+			extra_info += "(INSERT " + std::to_string(start) + " " + input + ")";
+			break;
+
+		case remove_operation:
+			extra_info += "(REMOVE " + std::to_string(start) + " " + std::to_string(end) + ")";
+			break;
+
+		default:
+			return false; // Error!
+			break;
+	}
+
+	error_message = message + extra_info;
+	return true;
 }
 
 std::string editor::instruction::get_error_message() {
@@ -187,7 +213,7 @@ bool editor::instruction::is_initialized() {
 	return initialized;
 }
 
-int editor::instruction::get_operation_type() {
+editor::operation_type editor::instruction::get_operation_type() {
 	return operation;
 }
 

@@ -39,7 +39,7 @@ class instruction {
 		bool set_replace_instruction(int64_t start, std::string text);
 		bool set_insert_instruction(int64_t start, std::string text);
 		bool set_remove_instruction(int64_t start, int64_t end);
-		void set_error_message(std::string message);
+		bool set_error_message(std::string message, operation_type instruction_type = no_operation, int64_t start = 0, int64_t end = 0, std::string input = "");
 		
 		std::string get_error_message();
 
@@ -47,7 +47,7 @@ class instruction {
 		void update_end_position(int64_t end);
 		
 		bool is_initialized();
-		int get_operation_type();
+		operation_type get_operation_type();
 		int64_t get_start_position();
 		int64_t get_end_position();
 		std::string get_text();
