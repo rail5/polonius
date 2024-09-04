@@ -1,12 +1,12 @@
 Source: polonius
 Priority: optional
 Maintainer: rail5 <andrew@rail5.org>
-Build-Depends: debhelper (>= 8.0.0), libncurses-dev
+Build-Depends: debhelper (>= 8.0.0), libncurses-dev, libboost-regex1.81-dev
 Standards-Version: 3.9.3
 Section: utils
 
 Package: polonius
-Version: 0.3
+Version: 0.5
 License: GPL-3.0
 Vendor: rail5 <andrew@rail5.org>
 Priority: optional

@@ -144,7 +144,7 @@ bool reader::file::do_normal_search() {
 
 bool reader::file::do_regex_search() {
 	/***
-		A std::regex search in Polonius should happen this way:
+		A regex search in Polonius should happen this way:
 			0. Validate the regular expression (TODO: expression currently not validated before running)
 			1. Parse the regular expression into its component parts
 				e.g.:
@@ -173,7 +173,7 @@ bool reader::file::do_regex_search() {
 			Final:
 				Report the found match
 			
-		One important restriction is that we will be limited to finding std::regex matches no longer than the user-specified block size
+		One important restriction is that we will be limited to finding regex matches no longer than the user-specified block size
 			(default 10KB)
 		
 		TODO:
@@ -199,12 +199,6 @@ bool reader::file::do_regex_search() {
 	int64_t match_start = 0;
 	int64_t match_end = 0;
 
-	#ifdef no_split_stack
-	std::cerr << "polonius-reader: Warning!" << std::endl;
-	std::cerr << "polonius-reader: Your system architecture has a known bug with regex searches" << std::endl;
-	std::cerr << "polonius-reader: If the search fails, try again with a smaller block size (-b)" << std::endl;
-	#endif
-
 	std::vector<std::string> sub_expressions = create_sub_expressions(search_query);
 
 	for (int64_t current_index = start_position; current_index < end_position; (current_index = current_index + block_size)) {
@@ -215,20 +209,31 @@ bool reader::file::do_regex_search() {
 			block_size = amount_left_in_file;
 		}
 		
-		std::string block_data = read(current_index, block_size);
-		std::smatch regex_search_result;
-		std::regex expression(search_query, std::regex::optimize);
+		bool full_match_found = false;
 
-		bool full_match_found = regex_search(block_data, regex_search_result, expression);
-		
+		std::string block_data = read(current_index, block_size);
+		boost::smatch regex_search_result;
+
+		try {
+			boost::regex expression(search_query);
+			full_match_found = boost::regex_search(block_data, regex_search_result, expression);
+		} catch (boost::regex_error e) {
+			std::cout << "polonius-reader: " << e.what() << std::endl;
+			return false;
+		}
+
 		if (!full_match_found) {
 			for (int64_t j = 0; j < sub_expressions.size(); j++) {
-				std::smatch sub_expression_search_result;
-				std::regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the std::string must END with the match
+				boost::smatch sub_expression_search_result;
+				boost::regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the std::string must END with the match
 
 				// Partial match found?
-				bool partial_match_found = regex_search(block_data, sub_expression_search_result, sub_expression);
-				int64_t partial_match_position = sub_expression_search_result.prefix().length();
+				bool partial_match_found = boost::regex_search(block_data, sub_expression_search_result, sub_expression);
+				int64_t partial_match_position = 0;
+
+				if (partial_match_found) {
+					partial_match_position = sub_expression_search_result.prefix().length();
+				}
 
 				if (partial_match_found && partial_match_position > 0) {
 					current_index = current_index + partial_match_position;

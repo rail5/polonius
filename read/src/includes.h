@@ -35,10 +35,10 @@
 	#define SYS_STAT
 	#include <sys/stat.h>
 #endif
-/* Needed for process_bytecodes() function */
+/* Needed for process_bytecodes() function and for regex searches */
 #ifndef REGEX
 	#define REGEX
-	#include <regex>
+	#include <boost/regex.hpp>
 #endif
 
 /* Shared definitions */
