@@ -3,15 +3,28 @@ Polonius-Reader: Non-interactive (scriptable) reader
 Polonius-CLI: Curses-based terminal UI
 Polonius-GUI: Graphical UI
 
+Below is an overview of what we hope to achieve by the first release of each minor version up to 1.0
+
 0.4.x:
 	Basic function of Polonius Editor & Reader
 
 0.5.x:
 	Full completion of both Polonius Editor & Reader
+
+0.6.x:
 	Basic function of at least one interactive UI
 
-1.x:
+0.7.x:
+	Basic function of both interactive UIs
+
+0.8.x:
+	Full completion of at least one interactive UI
+
+0.9.x:
 	Full completion of both interactive UIs
+
+1.x:
+	Construction & deployment of standard multi-platform tests
 	
 		Continuously improve efficiency, code quality/readability
 		Intensive tests, esp. regarding memory usage, to make Polonius more and more memory-efficient
