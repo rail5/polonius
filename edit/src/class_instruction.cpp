@@ -145,7 +145,7 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 	*/
 	operation = remove_operation;
 	start_position = start;
-	if (end_position != -1) {
+	if (end != -1) {
 		// '-1' is set if the user used the 'end' keyword
 		// Later parts of the program will check if start/end positions are set to -1,
 		// And if so, dynamically update them to point to the end of the file
@@ -153,6 +153,8 @@ bool editor::instruction::set_remove_instruction(int64_t start, int64_t end) {
 		// But, for all other points, remove instruction positions need to be updated INTERNALLY
 		// So that the end position is one beyond the point we want to remove
 		end_position = end + 1;
+	} else {
+		end_position = end;
 	}
 	initialized = true;
 	
