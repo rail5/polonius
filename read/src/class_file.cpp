@@ -215,20 +215,31 @@ bool reader::file::do_regex_search() {
 			block_size = amount_left_in_file;
 		}
 		
+		bool full_match_found = false;
+
 		std::string block_data = read(current_index, block_size);
 		boost::smatch regex_search_result;
-		boost::regex expression(search_query);
 
-		bool full_match_found = regex_search(block_data, regex_search_result, expression);
-		
+		try {
+			boost::regex expression(search_query);
+			full_match_found = boost::regex_search(block_data, regex_search_result, expression);
+		} catch (boost::regex_error e) {
+			std::cout << "polonius-reader: " << e.what() << std::endl;
+			return false;
+		}
+
 		if (!full_match_found) {
 			for (int64_t j = 0; j < sub_expressions.size(); j++) {
 				boost::smatch sub_expression_search_result;
 				boost::regex sub_expression(sub_expressions[j] + R"($)"); // 'R"($)"' signifies that the std::string must END with the match
 
 				// Partial match found?
-				bool partial_match_found = regex_search(block_data, sub_expression_search_result, sub_expression);
-				int64_t partial_match_position = sub_expression_search_result.prefix().length();
+				bool partial_match_found = boost::regex_search(block_data, sub_expression_search_result, sub_expression);
+				int64_t partial_match_position = 0;
+
+				if (partial_match_found) {
+					partial_match_position = sub_expression_search_result.prefix().length();
+				}
 
 				if (partial_match_found && partial_match_position > 0) {
 					current_index = current_index + partial_match_position;
