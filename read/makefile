@@ -6,4 +6,3 @@ all:
 
 clean:
 	rm -f bin/polonius-reader
-	rm -rf checks
