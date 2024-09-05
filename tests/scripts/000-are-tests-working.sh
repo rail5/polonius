@@ -7,5 +7,9 @@ fi
 
 echo "1"
 # Output debug information to the relevant debug file if we failed
-echo "Path is set to:" > debug/are-tests-working
-echo "$PATH" >> debug/are-tests-working
+{
+	echo "Path is set to:" 
+	echo "$PATH"
+	echo "We are running $(which polonius-editor) instead of ../polonius-editor"
+	echo "we are running $(which polonius-reader) instead of ../polonius-reader"
+} > debug/are-tests-working
