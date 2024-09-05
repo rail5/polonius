@@ -18,8 +18,12 @@ function check_instruction() {
 
 	rm -f "tmp/$file_name"
 
-	if [[ $should_return_zero -ne $return_code ]]; then
+	if [[ $should_return_zero -eq 0 ]] && [[ $return_code -ne 0 ]]; then
 		returned_correctly=1
+	elif [[ $should_return_zero -eq 1 ]] && [[ $return_code -eq 0 ]]; then
+		returned_correctly=1
+	else
+		returned_correctly=0
 	fi
 
 	if [[ $returned_correctly -eq 1 ]] && [[ $file_exists -eq $file_should_exist ]]; then
