@@ -6,10 +6,13 @@ if [ -t 1 ]; then
 	GREEN='\033[0;32m'
 	NC='\033[0m' # No Color
 fi
+
 # Make sure all the test scripts are executable
 chmod +x scripts/*.sh
 # Clear the tmp directory
 rm -f tmp/*
+# Clear debug output from previous tests
+rm -f debug/*
 
 # This flag will be tripped if any tests fail
 all_tests_passed=true
