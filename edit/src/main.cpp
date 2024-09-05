@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
 		switch(c) {
 			case 'i':
 				if (received_filename) {
-					std::cerr << "polonius-editor: Error: Multiple files specified" << std::endl;
+					std::cerr << program_name << ": Error: Multiple files specified" << std::endl;
 					return EXIT_BADFILE;
 				}
 				file_to_edit = optarg;
@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
 	
 	for (option_index = optind; option_index < argc; option_index++) {
 		if (received_filename) {
-			std::cerr << "polonius-editor: Error: Multiple files specified" << std::endl;
+			std::cerr << program_name << ": Error: Multiple files specified" << std::endl;
 			return EXIT_BADFILE;
 		}
 		file_to_edit = argv[option_index];
