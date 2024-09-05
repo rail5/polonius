@@ -42,3 +42,15 @@ function check_instruction() {
 		}  >> "debug/${test_name:?}"
 	fi
 }
+
+function create_test_file() {
+	# Returns the new test file name
+	local contents="$1" name="$2"
+	
+	if [[ "$name" == "" ]]; then
+		name="$(basename "$(mktemp -u)")"
+	fi
+
+	echo "$contents" > "tmp/${name:?}"
+	echo "$name"
+}
