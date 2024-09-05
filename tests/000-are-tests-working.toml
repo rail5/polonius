@@ -1,6 +1,0 @@
-[meta]
-# Test script
-script = "000-are-tests-working.sh"
-
-# Expected return data
-correct_output = "0"

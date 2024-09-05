@@ -1,27 +1,24 @@
 #!/usr/bin/env bash
 
-# The following packages in Debian are required before we can run tests:
-## reserialize
-## jq
-
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-for test_file in *.toml; do
-	test_name=${test_file//.toml/}
+# Make sure all the test scripts are executable
+chmod +x scripts/*.sh
+# Clear the tmp directory
+rm -f tmp/*
+
+for test_script in scripts/*.sh; do
+	test_name=${test_script//.sh/}
+	test_name=${test_name//scripts\//}
 
 	echo -n "Running \"$test_name\"... "
-
-	test_json=$(toml2json "$test_file")
-
-	test_script=$(jq -r ".meta.script" <<<"$test_json")
-	expected_result=$(jq -r ".meta.correct_output" <<<"$test_json")
 	
 	PATH="$(realpath "$(pwd)/../"):$PATH"
 	export PATH
 
-	if [[ "$("./scripts/$test_script")" == "$expected_result" ]]; then
+	if [[ "$("$test_script")" == "0" ]]; then
 		echo "pass" > "results/$test_name"
 		echo -e "${GREEN}PASSED.${NC}"
 	else

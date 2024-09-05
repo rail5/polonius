@@ -46,12 +46,17 @@ install:
 	install -m 0755 polonius-reader /usr/bin
 	install -m 0755 polonius-editor /usr/bin
 
-clean:
+clean: clean-builds clean-tests
+
+clean-builds:
 	rm -f ./polonius-reader
 	cd read && $(MAKE) clean
 	rm -f ./polonius-editor
 	cd edit && $(MAKE) clean
 	rm -f ./polonius
 	cd cli && $(MAKE) clean
+
+clean-tests:
 	rm -f ./tests/results/*
 	rm -f ./tests/debug/*
+	rm -f ./tests/tmp/*
