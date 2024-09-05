@@ -49,6 +49,7 @@ bool editor::file::set_file(std::string file_path) {
 	*/
 	if (!file_exists(file_name)) {
 		std::ofstream new_file(file_name);
+		new_file.write("\n", 1);
 		new_file.close();
 		
 		/*
@@ -293,13 +294,11 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 	int64_t insert_length = text_to_insert.length();
 		
 	int64_t new_file_length = file_length + insert_length;
-	
-	bool creating_new_file = (start_position == 0 && file_length == 0);
-	
+		
 	bool writing_to_eof = (start_position == (file_length - 1));
 	
 	// Are we writing to EOF, or before EOF?
-	if (writing_to_eof || creating_new_file) {
+	if (writing_to_eof) {
 		// Writing TO EOF
 		
 		// Seek to EOF
@@ -307,11 +306,6 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 		
 		// Insert
 		file_stream.write(text_to_insert.c_str(), text_to_insert.length());
-		
-		if (creating_new_file) {
-			// Compensate for the fact that we have to add a newline char to the end
-			new_file_length = new_file_length + 1;
-		}
 		
 		// Add a newline char
 		file_stream.seekp(new_file_length - 1, std::ios::beg);
