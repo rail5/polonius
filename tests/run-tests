@@ -35,4 +35,5 @@ if [[ "$all_tests_passed" == "true" ]]; then
 	echo -e "${GREEN}All tests OK.${NC}"
 else
 	echo -e "${RED}There were failed tests.${NC}"
+	echo "Debug info is available in debug/"
 fi
