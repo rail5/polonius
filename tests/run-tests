@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ "$(basename "$(pwd)")" != "tests" ]] || [[ ! -f "$(pwd)/run-tests" ]]; then
+	echo "This script must be run from the 'tests' subdirectory"
+	exit
+fi
+
 if [ -t 1 ]; then
 	# Colorized output only if we're outputting to a tty
 	RED='\033[0;31m'
