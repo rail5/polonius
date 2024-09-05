@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#polonius-editor tmp/new-file -a "insert 0 hello world" >/dev/null 2>&1
-
 echo "hello world" > tmp/new-file
 
 polonius-reader tmp/new-file >/dev/null 2>&1 && can_continue=true
