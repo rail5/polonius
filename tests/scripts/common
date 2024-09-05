@@ -1,22 +1,74 @@
 #!/usr/bin/env bash
 
-function check_instruction() {
-	local instruction="$1" test_name="$2" should_return_zero="$3" file_should_exist="$4" new_file="$5" file_name="$6" return_code="" file_exists="" returned_correctly=0
+function execute_instruction() {
+	# Returns the return code from polonius-editor
+	local instruction="$1" file_name="$2" get_output="$3" return_code="" output=""
+
+	polonius-editor "tmp/$file_name" -a "$instruction" >/dev/null 2>&1
+	return_code=$?
+	output="$(cat "tmp/$file_name" 2>/dev/null)"
+
+	if [[ $get_output -eq 1 ]]; then
+		echo "$output"
+	else
+		echo "$return_code"
+	fi
+}
+
+function prepare_a_file_for_instruction() {
+	local new_file="$1" file_name="$2"
 
 	if [[ "$file_name" == "" ]]; then
-		file_name="new-file"
+		file_name="$(basename "$(mktemp -u)")"
 	fi
 
 	if [[ "$new_file" == "1" ]]; then
 		rm -f "tmp/${file_name:?}"
 	fi
+	
+	echo "$file_name"
+}
 
-	polonius-editor "tmp/$file_name" -a "$instruction" >/dev/null 2>&1
-	return_code=$?
+function get_output_of_instruction() {
+	local instruction="$1" test_name="$2" new_file="$3" file_name="$4"
+
+	file_name=$(prepare_a_file_for_instruction "$new_file" "$file_name")
+	output=$(execute_instruction "$instruction" "$file_name" 1)
+
+	rm -f "tmp/${file_name:?}"
+
+	echo "$output"
+}
+
+function check_output_of_instruction_is_correct() {
+	local expected_output="$1" instruction="$2" test_name="$3" new_file="$4" file_name="$5" actual_output=""
+
+	actual_output="$(get_output_of_instruction "$instruction" "$test_name" "$new_file" "$file_name")"
+
+	if [[ "$expected_output" == "$actual_output" ]]; then
+		# Everything OK
+		true
+	else
+		export all_ok=1 # Everything not OK
+		{
+			echo "--"
+			echo "INSTRUCTION: $instruction"
+			echo "Expected result: $expected_output"
+			echo "Actual result: $actual_output"
+			echo "File name: tmp/$file_name"
+		}  >> "debug/${test_name:?}"
+	fi
+}
+
+function check_instruction() {
+	local instruction="$1" test_name="$2" should_return_zero="$3" file_should_exist="$4" new_file="$5" file_name="$6" return_code="" file_exists="" returned_correctly=0
+
+	file_name=$(prepare_a_file_for_instruction "$new_file" "$file_name")
+	return_code=$(execute_instruction "$instruction" "$file_name")
 
 	file_exists=$([[ -f "tmp/$file_name" ]] && echo 1 || echo 0)
 
-	rm -f "tmp/$file_name"
+	rm -f "tmp/${file_name:?}"
 
 	if [[ $should_return_zero -eq 0 ]] && [[ $return_code -ne 0 ]]; then
 		returned_correctly=1
