@@ -9,6 +9,9 @@ chmod +x scripts/*.sh
 # Clear the tmp directory
 rm -f tmp/*
 
+# This flag will be tripped if any tests fail
+all_tests_passed=true
+
 for test_script in scripts/*.sh; do
 	test_name=${test_script//.sh/}
 	test_name=${test_name//scripts\//}
@@ -24,5 +27,12 @@ for test_script in scripts/*.sh; do
 	else
 		echo "fail" > "results/$test_name"
 		echo -e "${RED}FAILED.${NC}"
+		all_tests_passed=false
 	fi
 done
+
+if [[ "$all_tests_passed" == "true" ]]; then
+	echo -e "${GREEN}All tests OK.${NC}"
+else
+	echo -e "${RED}There were failed tests.${NC}"
+fi
