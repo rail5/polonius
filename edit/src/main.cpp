@@ -198,7 +198,10 @@ int main(int argc, char* argv[]) {
 		return EXIT_BADARG;
 	}
 
-	if (!file_exists(file_to_edit) && instructions_to_add[0].get_operation_type() != editor::insert_operation) {
+	if (!file_exists(file_to_edit)
+		&&
+		(instructions_to_add[0].get_operation_type() != editor::insert_operation || instructions_to_add[0].get_start_position() > 0)
+	) {
 		std::cerr << program_name << ": File '" << file_to_edit << "' does not exist." << std::endl
 			<< program_name << ": If you want to create a new file, you should use the INSERT instruction." << std::endl;
 		return EXIT_BADARG;
