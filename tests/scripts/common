@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+function check_instruction() {
+	local instruction="$1" test_name="$2" should_return_zero="$3" file_should_exist="$4" new_file="$5" file_name="$6" return_code="" file_exists="" returned_correctly=0
+
+	if [[ "$file_name" == "" ]]; then
+		file_name="new-file"
+	fi
+
+	if [[ "$new_file" == "1" ]]; then
+		rm -f "tmp/${file_name:?}"
+	fi
+
+	polonius-editor "tmp/$file_name" -a "$instruction" >/dev/null 2>&1
+	return_code=$?
+
+	file_exists=$([[ -f "tmp/$file_name" ]] && echo 1 || echo 0)
+
+	rm -f "tmp/$file_name"
+
+	if [[ $should_return_zero -ne $return_code ]]; then
+		returned_correctly=1
+	fi
+
+	if [[ $returned_correctly -eq 1 ]] && [[ $file_exists -eq $file_should_exist ]]; then
+		# Everything OK
+		true
+	else
+		export all_ok=1 # Everything not OK
+		{
+			echo "--"
+			echo "INSTRUCTION: $instruction"
+			echo "Return code: $return_code"
+			echo "Should return 0?: $should_return_zero"
+			echo "File exists?: $file_exists"
+			echo "File should exist?: $file_should_exist"
+			echo "File name: tmp/$file_name"
+		}  >> "debug/${test_name:?}"
+	fi
+}
