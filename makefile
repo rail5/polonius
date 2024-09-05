@@ -39,6 +39,9 @@ curses:
 	cd cli && $(MAKE)
 	mv cli/bin/polonius ./
 
+test: clean all
+	cd tests && ./run-tests
+
 install:
 	install -m 0755 polonius-reader /usr/bin
 	install -m 0755 polonius-editor /usr/bin
@@ -50,3 +53,4 @@ clean:
 	cd edit && $(MAKE) clean
 	rm -f ./polonius
 	cd cli && $(MAKE) clean
+	rm -f ./tests/results/*

@@ -1,0 +1,6 @@
+[meta]
+# Test script
+script = "000.sh"
+
+# Expected return data
+correct_output = "0"
