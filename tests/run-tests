@@ -18,6 +18,9 @@ for test_file in *.toml; do
 	test_script=$(jq -r ".meta.script" <<<"$test_json")
 	expected_result=$(jq -r ".meta.correct_output" <<<"$test_json")
 	
+	PATH="$(realpath "$(pwd)/../"):$PATH"
+	export PATH
+
 	if [[ "$("./scripts/$test_script")" == "$expected_result" ]]; then
 		echo "pass" > "results/$test_name"
 		echo -e "${GREEN}PASSED.${NC}"

@@ -54,3 +54,4 @@ clean:
 	rm -f ./polonius
 	cd cli && $(MAKE) clean
 	rm -f ./tests/results/*
+	rm -f ./tests/debug/*
