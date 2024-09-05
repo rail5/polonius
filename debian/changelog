@@ -1,3 +1,15 @@
+polonius (0.5.11) unstable; urgency=medium
+
+  * Use the program_name variable instead of hard-coding the name into
+    error messages
+  * Make sure that the user provides instructions to execute
+  * Refuse to create a new file if the instruction sequence is invalid.
+    If we're creating a new file, the first instruction should be an
+    INSERT
+  * Immediately write a newline char when creating a new file
+
+ -- rail5 <andrew@rail5.org>  Thu, 05 Sep 2024 12:58:55 +0800
+
 polonius (0.5.10) unstable; urgency=medium
 
   * Emergency patch
