@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
-
+if [ -t 1 ]; then
+	# Colorized output only if we're outputting to a tty
+	RED='\033[0;31m'
+	GREEN='\033[0;32m'
+	NC='\033[0m' # No Color
+fi
 # Make sure all the test scripts are executable
 chmod +x scripts/*.sh
 # Clear the tmp directory
