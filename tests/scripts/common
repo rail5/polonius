@@ -1,18 +1,43 @@
 #!/usr/bin/env bash
 
-function execute_instruction() {
-	# Returns the return code from polonius-editor
-	local instruction="$1" file_name="$2" get_output="$3" return_code="" output=""
-
-	polonius-editor "tmp/$file_name" -a "$instruction" >/dev/null 2>&1
-	return_code=$?
-	output="$(cat "tmp/$file_name" 2>/dev/null)"
-
-	if [[ $get_output -eq 1 ]]; then
-		echo "$output"
+function run_polonius_reader_or_editor() {
+	local reader="$1" file_name="$2"
+	local -n raw_parameters_array="$3"
+	local get_output="$4" return_code="" output="" result=""
+	if [[ $reader -eq 1 ]]; then
+		# Running polonius-reader
+		if [[ $get_output -eq 1 ]]; then
+			# Getting output, not return code
+			result="$(polonius-reader "tmp/$file_name" "${raw_parameters_array[@]}" 2>/dev/null)"
+		else
+			# Getting return code
+			polonius-reader "tmp/$file_name" "${raw_parameters_array[@]}" >/dev/null 2>&1
+			result=$?
+		fi
 	else
-		echo "$return_code"
+		# Running polonius-editor
+		polonius-editor "tmp/$file_name" "${raw_parameters_array[@]}" >/dev/null 2>&1
+		return_code=$?
+		output="$(cat "tmp/$file_name" 2>/dev/null)"
+
+		if [[ $get_output -eq 1 ]]; then
+			result="$output"
+		else
+			result="$return_code"
+		fi
 	fi
+	echo "$result"
+}
+
+function execute_instruction() {
+	# Returns the return code or resulting file contents from polonius-editor
+	local instruction="$1" file_name="$2" get_output="$3" return_code="" output="" passed_args=()
+
+	passed_args+=("-a")
+	passed_args+=("$instruction")
+
+	result="$(run_polonius_reader_or_editor 0 "$file_name" "passed_args" "$get_output")"
+	echo "$result"
 }
 
 function prepare_a_file_for_instruction() {
