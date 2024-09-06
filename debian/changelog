@@ -1,3 +1,13 @@
+polonius (0.5.12) unstable; urgency=medium
+
+  * Added infrastructure to run automated tests on changes to Polonius
+    These will help to make sure that functionality isn't broken by any
+    code changes.
+  * Patched a small bug in INSERT which was found by this new automated
+    testing infrastructure
+
+ -- rail5 <andrew@rail5.org>  Fri, 06 Sep 2024 12:30:19 +0800
+
 polonius (0.5.11) unstable; urgency=medium
 
   * Use the program_name variable instead of hard-coding the name into
