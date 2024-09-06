@@ -40,6 +40,98 @@ function execute_instruction() {
 	echo "$result"
 }
 
+function populate_reader_args_array() {
+	# Populates the inputted "passed_args" array based on the inputted flags
+	local -n array_to_modify="$1"
+	local is_search="$2" search_query="$3" search_is_regex="$4" parse_special_chars="$5" output_pos="$6" start_pos="$7" length="$8"
+
+	if [[ $is_search -eq 1 ]]; then
+		array_to_modify+=("-f")
+		array_to_modify+=("$search_query")
+	fi
+
+	if [[ $search_is_regex -eq 1 ]]; then
+		array_to_modify+=("-e")
+	fi
+
+	if [[ $parse_special_chars -eq 1 ]]; then
+		array_to_modify+=("-c")
+	fi
+
+	if [[ "$start_pos" != "" ]]; then
+		array_to_modify+=("-s")
+		array_to_modify+=("$start_pos")
+	fi
+
+	if [[ "$length" != "" ]]; then
+		array_to_modify+=("-l")
+		array_to_modify+=("$length")
+	fi
+
+	if [[ "$output_pos" -eq 1 ]]; then
+		array_to_modify+=("-p")
+	fi
+}
+
+function execute_reader_command() {
+	# Returns the return code or text response from polonius-reader
+	local file_name="$1" get_output="$2" is_search="$3" search_query="$4" search_is_regex="$5" parse_special_chars="$6" output_pos="$7" start_pos="$8" length="$9" passed_args=()
+
+	populate_reader_args_array "passed_args" "$is_search" "$search_query" "$search_is_regex" "$parse_special_chars" "$output_pos" "$start_pos" "$length"
+
+	result="$(run_polonius_reader_or_editor 1 "$file_name" "passed_args" "$get_output")"
+	echo "$result"
+
+	rm -f "tmp/${file_name:?}" # Clean up after yourself!
+}
+
+function check_reader_command() {
+	# Sets 'all_ok' to 1 if the return code is not what we expect it to be
+	local test_name="$1" file_name="$2" should_return_zero="$3" is_search="$4" search_query="$5" search_is_regex="$6" parse_special_chars="$7" output_pos="$8" start_pos="$9" length="${10}" passed_args=() return_code=""
+
+	return_code=$(execute_reader_command "$file_name" 0 "$is_search" "$search_query" "$search_is_regex" "$parse_special_chars" "$output_pos" "$start_pos" "$length")
+
+	if [[ $should_return_zero -eq 0 ]] && [[ $return_code -ne 0 ]]; then
+		true # Everything OK
+	elif [[ $should_return_zero -eq 1 ]] && [[ $return_code -eq 0 ]]; then
+		true # Everything OK
+	else
+		export all_ok=1 # Everything not OK
+		{
+			populate_reader_args_array "passed_args" "$is_search" "$search_query" "$search_is_regex" "$parse_special_chars" "$output_pos" "$start_pos" "$length"
+			echo "--"
+			# shellcheck disable=SC2145
+			echo "INSTRUCTION: polonius-reader \"tmp/$file_name\" ${passed_args[@]}"
+			echo "Return code: $return_code"
+			echo "Should return 0?: $should_return_zero"
+			echo "File name: tmp/$file_name"
+		}  >> "debug/${test_name:?}"
+	fi
+}
+
+function check_reader_output_is_correct() {
+	# Sets all_ok to 1 if the output is not what we expect it to be
+	local expected_output="$1" test_name="$2" file_name="$3" is_search="$4" search_query="$5" search_is_regex="$6" parse_special_chars="$7" output_pos="$8" start_pos="$9" length="${10}" passed_args=() actual_output=""
+
+	actual_output="$(execute_reader_command "$file_name" 1 "$is_search" "$search_query" "$search_is_regex" "$parse_special_chars" "$output_pos" "$start_pos" "$length")"
+
+	if [[ "$expected_output" == "$actual_output" ]]; then
+		# Everything OK
+		true
+	else
+		export all_ok=1 # Everything not OK
+		{
+			populate_reader_args_array "passed_args" "$is_search" "$search_query" "$search_is_regex" "$parse_special_chars" "$output_pos" "$start_pos" "$length"
+			echo "--"
+			# shellcheck disable=SC2145
+			echo "INSTRUCTION: polonius-reader \"tmp/$file_name\" ${passed_args[@]}"
+			echo "Expected result: $expected_output"
+			echo "Actual result: $actual_output"
+			echo "File name: tmp/$file_name"
+		}  >> "debug/${test_name:?}"
+	fi
+}
+
 function prepare_a_file_for_instruction() {
 	local new_file="$1" file_name="$2"
 
