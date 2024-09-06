@@ -21,4 +21,10 @@ check_output_of_instruction_is_correct "0123 456789" "insert 4 \x20" "basic-writ
 
 check_output_of_instruction_is_correct "a b c" "insert 0 a\x20b\x20c" "basic-write-file" 1
 
+new_file=$(create_test_file "0123456789")
+check_output_of_instruction_is_correct "0123ab456789" "insert 4 a; 5 b" "basic-write-file" 0 "$new_file"
+
+new_file=$(create_test_file "0123456789")
+check_output_of_instruction_is_correct "0123  456789" "insert 4 \x20; 5 \x20" "basic-write-file" 0 "$new_file"
+
 echo "$all_ok"
