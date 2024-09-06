@@ -136,7 +136,8 @@ int main(int argc, char* argv[]) {
 				break;
 			
 			case 'a':
-				instructions_to_add.push_back(parse_instruction_string(optarg));
+				temp_instruction_sequence = parse_instruction_line(optarg);
+				move(temp_instruction_sequence.begin(), temp_instruction_sequence.end(), inserter(instructions_to_add, instructions_to_add.end()));
 				break;
 			
 			case 's':

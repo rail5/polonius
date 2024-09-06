@@ -424,6 +424,64 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 }
 
 
+std::vector<editor::instruction> parse_instruction_line(std::string instruction_line) {
+	/***
+	 * std::vector<instruction> parse_instruction_line(std::string instruction_line):
+	 * 	Create a std::vector of 'instruction' objects from a semicolon-delimited std::string of instructions
+	 * 	Example:
+	 * 		INSERT 10 abc; 20 def; 30 ghi
+	 * 		REMOVE 0 2; 5 7; 9 10
+	 * 		REPLACE 0 x; 2 y; 4 b
+	 * 	Will be considered equivalent to:
+	 * 		INSERT 10 abc
+	 * 		INSERT 20 def
+	 * 		INSERT 30 ghi
+	 * 		REMOVE 0 2
+	 * 		REMOVE 5 7
+	 * 		REMOVE 9 10
+	 * 		REPLACE 0 x
+	 * 		REPLACE 2 y
+	 * 		REPLACE 4 b
+	 * 	This function handles it when multiple instructions of the same type are given in the same line, separated by semicolons
+	 * 
+	 * 	It's also possible to input a literal ';' by escaping it, as in:
+	 * 		INSERT 10 along the wall to keep\; and slept
+	 ***/
+	std::vector<editor::instruction> output_instruction_sequence;
+	std::vector<std::string> component_strings = explode(instruction_line, ';', true);
+
+	editor::instruction first_instruction = parse_instruction_string(component_strings[0]);
+	output_instruction_sequence.push_back(first_instruction);
+
+	std::string prefix = "";
+
+	switch (first_instruction.get_operation_type()) {
+		case editor::replace_operation:
+			prefix = "REPLACE";
+			break;
+		case editor::insert_operation:
+			prefix = "INSERT";
+			break;
+		case editor::remove_operation:
+			prefix = "REMOVE";
+			break;
+		default:
+			// Invalid instruction
+			prefix = "INVALID";
+			break;
+	}
+	
+	for (unsigned i = 1; i < component_strings.size(); i++) {
+		// Infer that the 'instruction type' is the same as it was in the very first in the line
+		std::string inferred_instruction = prefix + component_strings[i];
+		editor::instruction this_instruction = parse_instruction_string(inferred_instruction);
+		output_instruction_sequence.push_back(this_instruction);
+	}
+
+	return output_instruction_sequence;
+}
+
+
 std::vector<editor::instruction> parse_instruction_sequence_string(std::string instruction_sequence_string) {
 	/***
 	std::vector<instruction> parse_instruction_sequence_string(std::string instruction_sequence_string):
@@ -431,7 +489,7 @@ std::vector<editor::instruction> parse_instruction_sequence_string(std::string i
 		
 		Example of ONE properly-formatted "instruction sequence" string:
 			REPLACE 5 hello
-			INSERT 6 ni hao
+			INSERT 6 ni hao; 15 bonjour; 25 hola
 			REMOVE 7 10
 		
 		Each line must follow the normal rules for properly-formatted instructions
@@ -445,7 +503,10 @@ std::vector<editor::instruction> parse_instruction_sequence_string(std::string i
 	std::vector<std::string> instruction_strings = explode(instruction_sequence_string, '\n');
 	
 	for (std::string i : instruction_strings) {
-		output_instruction_sequence.push_back(parse_instruction_string(i));
+		std::vector<editor::instruction> parsed_line = parse_instruction_line(i);
+		for (editor::instruction parsed_instruction : parsed_line) {
+			output_instruction_sequence.push_back(parsed_instruction);
+		}
 	}
 	
 	return output_instruction_sequence;

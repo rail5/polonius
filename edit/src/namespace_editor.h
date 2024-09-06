@@ -59,6 +59,8 @@ instruction create_remove_instruction(int64_t start_position, int64_t end_positi
 
 std::vector<instruction> parse_instruction_sequence_string(std::string instruction_sequence);
 
+std::vector<instruction> parse_instruction_line(std::string instruction_line);
+
 instruction parse_instruction_string(std::string instruction_string);
 
 class file {
