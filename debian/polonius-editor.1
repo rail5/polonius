@@ -23,6 +23,8 @@ polonius-editor - sequentially executes editing instructions on a file
 .PP
 \f[V]polonius-editor ./file -a \[dq]INSERT 0 hello world\[dq]\f[R]
 .PP
+\f[V]polonius-editor ./file -a \[dq]INSERT 0 abc; 10 def; 20 ghi\[dq]\f[R]
+.PP
 \f[V]polonius-editor ./file -a \[dq]REMOVE 0 5\[dq]\f[R]
 .PP
 \f[V]polonius-editor ./file -a \[dq]REPLACE 0 salut a tous\[rs]nAnd hello\[dq] --special-chars\f[R]
@@ -57,8 +59,16 @@ Example instructions:
 
   REMOVE 9 15
     (Removes characters #9 to #15 from the file)
-  
+
   The \[aq]end\[aq] keyword can also be used in place of absolute positions, and refers always to the end of the file.
+
+Multiple instructions of the same *type* can be combined into a single line, by separating them with semicolons. As in:
+
+  REPLACE 0 abc; 10 def; 20 ghi
+
+If you want to input a literal semicolon, it must be escaped (so that it won\[aq]t be mistaken for the delimiter). As in:
+
+  INSERT 0 the \[rs]; symbol
 \f[R]
 .fi
 .PP
@@ -71,7 +81,7 @@ Provide a sequence of multiple instructions for editing the file
 Each instruction in the sequence should be on its own line, as in the following example:
 
   --add-instruction-sequence \[dq]REPLACE 20 hello world
-  INSERT 50 hello again
+  INSERT 50 hello again; 100 finally goodbye
   REMOVE 70 75\[dq]
 \f[R]
 .fi
