@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
 
-echo "hello world" > tmp/new-file
+export all_ok=0
 
-polonius-reader tmp/new-file >/dev/null 2>&1 && can_continue=true
+#shellcheck source=common
+. scripts/common
 
-if [[ "$can_continue" == "true" ]] && [[ "$(polonius-reader tmp/new-file)" == "hello world" ]]; then
-	echo "0"
-	rm -f tmp/new-file
-	exit
-fi
+new_file="$(create_test_file "0123456789")"
+check_reader_command "basic-read-file" "$new_file" 1
 
-rm -f tmp/new-file
+new_file="$(create_test_file "0123456789")"
+check_reader_output_is_correct "0123456789" "basic-read-file" "$new_file"
 
-echo "1"
+new_file="$(create_test_file "0123456789")"
+check_reader_output_is_correct "012" "basic-read-file" "$new_file" 0 0 0 0 0 0 3
+
+new_file="$(create_test_file "0123456789")"
+check_reader_output_is_correct "789" "basic-read-file" "$new_file" 0 0 0 0 0 7
+
+new_file="$(create_test_file "0123456789")"
+check_reader_output_is_correct "456" "basic-read-file" "$new_file" 0 0 0 0 0 4 3
+
+echo "$all_ok"
