@@ -312,7 +312,7 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 	Split the std::string into a std::vector<std::string> delimited by spaces
 		See: shared_functions/explode.cpp
 	*/
-	std::vector<std::string> instruction_vector = explode(instruction_string, ' ', 3);
+	std::vector<std::string> instruction_vector = explode(instruction_string, ' ', false, 3);
 	
 	/*
 	Set up an 'instruction' object marked invalid to return if there's a problem

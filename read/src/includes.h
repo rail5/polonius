@@ -50,7 +50,7 @@
 	#include "../../shared/is_number.cpp"
 #endif
 
-/* std::vector<std::string> explode(std::string const &input, char delimiter, int maximum_number_of_elements = 0) returns a vector<string> split based on the given delimiter. Similar to PHP's explode() */
+/* std::vector<std::string> explode(std::string const &input, char delimiter, bool can_escape, int maximum_number_of_elements = 0) returns a vector<string> split based on the given delimiter. Similar to PHP's explode() */
 #ifndef FN_EXPLODE
 	#define FN_EXPLODE
 	#include "../../shared/explode.cpp"
