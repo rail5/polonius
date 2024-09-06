@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-polonius-editor tmp/new-file -a "insert 0 hello world" >/dev/null 2>&1
+export all_ok=0
 
-if [[ $? -eq 0 ]] && [[ -f tmp/new-file ]] && [[ "$(cat tmp/new-file)" == "hello world" ]]; then
-	echo "0"
-	rm -f tmp/new-file
-	exit
-fi
+#shellcheck source=common
+. scripts/common
 
-rm -f tmp/new-file
+check_instruction "insert 0 hello world" "basic-create-file" 1 1 1
 
-echo "1"
+check_output_of_instruction_is_correct "hello world" "insert 0 hello world" "basic-create-file" 1
+
+echo "$all_ok"
