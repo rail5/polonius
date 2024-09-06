@@ -41,6 +41,18 @@ function execute_instruction() {
 	echo "$result"
 }
 
+function execute_instruction_set() {
+	# Returns the return code or resulting file contents from polonius-editor
+	local instruction_set="$1" file_name="$2" get_output="$3" return_code="" output="" passed_args=()
+
+	passed_args+=("-s")
+	passed_args+=("$instruction_set")
+	passed_args+=("-c") # Parse special chars
+
+	result="$(run_polonius_reader_or_editor 0 "$file_name" "passed_args" "$get_output")"
+	echo "$result"
+}
+
 function populate_reader_args_array() {
 	# Populates the inputted "passed_args" array based on the inputted flags
 	local -n array_to_modify="$1"
@@ -158,6 +170,17 @@ function get_output_of_instruction() {
 	echo "$output"
 }
 
+function get_output_of_instruction_set() {
+	local instruction_set="$1" test_name="$2" new_file="$3" file_name="$4"
+
+	file_name=$(prepare_a_file_for_instruction "$new_file" "$file_name")
+	output=$(execute_instruction_set "$instruction_set" "$file_name" 1)
+
+	rm -f "tmp/${file_name:?}"
+
+	echo "$output"
+}
+
 function check_output_of_instruction_is_correct() {
 	local expected_output="$1" instruction="$2" test_name="$3" new_file="$4" file_name="$5" actual_output=""
 
@@ -171,6 +194,26 @@ function check_output_of_instruction_is_correct() {
 		{
 			echo "--"
 			echo "INSTRUCTION: $instruction"
+			echo "Expected result: $expected_output"
+			echo "Actual result: $actual_output"
+			echo "File name: tmp/$file_name"
+		}  >> "debug/${test_name:?}"
+	fi
+}
+
+function check_output_of_instruction_set_is_correct() {
+	local expected_output="$1" instruction_set="$2" test_name="$3" new_file="$4" file_name="$5" actual_output=""
+
+	actual_output="$(get_output_of_instruction_set "$instruction_set" "$test_name" "$new_file" "$file_name")"
+
+	if [[ "$expected_output" == "$actual_output" ]]; then
+		# Everything OK
+		true
+	else
+		export all_ok=1 # Everything not OK
+		{
+			echo "--"
+			echo "INSTRUCTION SET: $instruction_set"
 			echo "Expected result: $expected_output"
 			echo "Actual result: $actual_output"
 			echo "File name: tmp/$file_name"
