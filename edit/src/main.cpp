@@ -199,15 +199,6 @@ int main(int argc, char* argv[]) {
 		return EXIT_BADARG;
 	}
 
-	if (!file_exists(file_to_edit)
-		&&
-		(instructions_to_add[0].get_operation_type() != editor::insert_operation || instructions_to_add[0].get_start_position() > 0)
-	) {
-		std::cerr << program_name << ": File '" << file_to_edit << "' does not exist." << std::endl
-			<< program_name << ": If you want to create a new file, you should use the INSERT instruction." << std::endl;
-		return EXIT_BADARG;
-	}
-
 	editor::file document(file_to_edit, block_size, verbose);
 	
 	if (!document.is_initialized()) {
@@ -222,6 +213,7 @@ int main(int argc, char* argv[]) {
 		
 		if (!document.add_instruction(instructions_to_add[i])) {
 			std::cerr << program_name << ": " << instructions_to_add[i].get_error_message() << std::endl;
+			document.clean_up();
 			return EXIT_BADARG;
 		}
 	}

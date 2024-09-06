@@ -66,6 +66,7 @@ instruction parse_instruction_string(std::string instruction_string);
 class file {
 	private:
 		bool initialized = false;
+		bool file_is_new = false;
 		
 		std::string file_name;
 		std::string file_directory;
@@ -114,6 +115,7 @@ class file {
 		std::string get_error_message();
 		
 		void close();
+		void clean_up();
 		
 		/*
 		Constructor

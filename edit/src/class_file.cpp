@@ -51,6 +51,8 @@ bool editor::file::set_file(std::string file_path) {
 		std::ofstream new_file(file_name);
 		new_file.write("\n", 1);
 		new_file.close();
+
+		file_is_new = true;
 		
 		/*
 		If the file still doesn't exist, we don't have write permissions to the directory
@@ -521,6 +523,18 @@ void editor::file::close() {
 	fclose(c_type_file);
 	/* Unlock the file */
 	flock(file_descriptor, LOCK_UN);
+}
+
+void editor::file::clean_up() {
+	/***
+	 * The point of this function is to _delete_ the file in the specific case that:
+	 * 	1. We created it (it was a new file, didn't exist before we started here)
+	 * 	2. We had to exit early due to some error
+	 ***/
+	
+	if (file_is_new) {
+		std::remove(file_name.c_str());
+	}
 }
 
 
