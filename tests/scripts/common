@@ -35,6 +35,7 @@ function execute_instruction() {
 
 	passed_args+=("-a")
 	passed_args+=("$instruction")
+	passed_args+=("-c") # Parse special chars
 
 	result="$(run_polonius_reader_or_editor 0 "$file_name" "passed_args" "$get_output")"
 	echo "$result"
