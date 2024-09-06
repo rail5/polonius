@@ -57,9 +57,9 @@ instruction create_replace_instruction(int64_t start_position, std::string text)
 instruction create_insert_instruction(int64_t start_position, std::string text);
 instruction create_remove_instruction(int64_t start_position, int64_t end_position);
 
-instruction parse_instruction_string(std::string instruction_string);
+std::vector<instruction> parse_instruction_sequence_string(std::string instruction_sequence);
 
-std::vector<instruction> parse_instruction_set_string(std::string instruction_set);
+instruction parse_instruction_string(std::string instruction_string);
 
 class file {
 	private:
@@ -76,7 +76,7 @@ class file {
 		
 		int64_t block_size = 10240;
 		
-		std::vector<instruction> instruction_set;
+		std::vector<instruction> instruction_sequence;
 		int64_t file_length_after_last_instruction = 0;
 		
 		std::string error_message = "";
@@ -107,7 +107,7 @@ class file {
 		
 		int64_t get_file_length();
 		
-		std::vector<instruction> get_instruction_set();
+		std::vector<instruction> get_instruction_sequence();
 		
 		std::string get_error_message();
 		

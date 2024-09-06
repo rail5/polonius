@@ -424,9 +424,9 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 }
 
 
-std::vector<editor::instruction> parse_instruction_set_string(std::string instruction_set_string) {
+std::vector<editor::instruction> parse_instruction_sequence_string(std::string instruction_set_string) {
 	/***
-	std::vector<instruction> parse_instruction_set_string(std::string instruction_set_string):
+	std::vector<instruction> parse_instruction_sequence_string(std::string instruction_set_string):
 		Create a std::vector of 'instruction' objects from a newline-delimited std::string of properly-formatted instructions
 		
 		Example of ONE properly-formatted "instruction set" string:

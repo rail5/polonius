@@ -128,7 +128,7 @@ void editor::file::set_block_size(int64_t specified_blocksize) {
 bool editor::file::add_instruction(instruction &input_instruction) {
 	/***
 	bool add_instruction(instruction input_instruction):
-		Add an 'instruction' object to the instruction_set
+		Add an 'instruction' object to the instruction_sequence
 			An 'instruction' object tells us what kind of edit to make
 			For instance, "replace character #5 with a 'c'"
 			Or "insert a 'q' at position #56"
@@ -215,7 +215,7 @@ bool editor::file::add_instruction(instruction &input_instruction) {
 	/*
 	Add the instruction to the set, update file_length_after_last_instruction, and return true
 	*/
-	instruction_set.push_back(input_instruction);
+	instruction_sequence.push_back(input_instruction);
 	
 	if (input_instruction.get_operation_type() == insert_operation) {
 		file_length_after_last_instruction = (file_length_after_last_instruction + input_instruction.get_text().length());
@@ -247,8 +247,8 @@ int64_t editor::file::get_file_length() {
 	return file_length;
 }
 
-std::vector<editor::instruction> editor::file::get_instruction_set() {
-	return instruction_set;
+std::vector<editor::instruction> editor::file::get_instruction_sequence() {
+	return instruction_sequence;
 }
 
 std::string editor::file::get_error_message() {

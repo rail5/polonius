@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 				break;
 			
 			case 's':
-				temp_instruction_set = parse_instruction_set_string(optarg);
+				temp_instruction_set = parse_instruction_sequence_string(optarg);
 				move(temp_instruction_set.begin(), temp_instruction_set.end(), inserter(instructions_to_add, instructions_to_add.end()));
 				break;
 			
@@ -225,10 +225,10 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	
-	std::vector<editor::instruction> instruction_set = document.get_instruction_set();
+	std::vector<editor::instruction> instruction_sequence = document.get_instruction_sequence();
 	
-	for (int i = 0; i < instruction_set.size(); i++) {
-		document.execute_single_instruction(instruction_set[i]);
+	for (int i = 0; i < instruction_sequence.size(); i++) {
+		document.execute_single_instruction(instruction_sequence[i]);
 	}
 	
 	/* Close file */
