@@ -1,3 +1,21 @@
+polonius (0.5.13) unstable; urgency=medium
+
+  * Polonius can now accept single-line 'delimited' instructions
+    Multiple instructions of the same type can now be given on a single
+    line in the format: INSERT 0 abc; 10 def; 20 ghi
+    Or: REPLACE 0 abc; 10 def; 20 ghi
+    Or: REMOVE 0 2; 10 12; 20 22
+    Literal semicolons can also be inserted by escaping the semicolon
+    with a backslash, as in:
+    INSERT 10 along the wall to keep\; and slept
+  * 'Instruction sets' have been renamed to the more appropriate
+    'Instruction sequences'
+    This gives a clearer idea of what they are
+  * Added loads more tests
+  * Patched another small bug found by the tests
+
+ -- rail5 <andrew@rail5.org>  Fri, 06 Sep 2024 19:08:22 +0800
+
 polonius (0.5.12) unstable; urgency=medium
 
   * Added infrastructure to run automated tests on changes to Polonius
