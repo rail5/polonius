@@ -424,12 +424,12 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 }
 
 
-std::vector<editor::instruction> parse_instruction_sequence_string(std::string instruction_set_string) {
+std::vector<editor::instruction> parse_instruction_sequence_string(std::string instruction_sequence_string) {
 	/***
-	std::vector<instruction> parse_instruction_sequence_string(std::string instruction_set_string):
+	std::vector<instruction> parse_instruction_sequence_string(std::string instruction_sequence_string):
 		Create a std::vector of 'instruction' objects from a newline-delimited std::string of properly-formatted instructions
 		
-		Example of ONE properly-formatted "instruction set" string:
+		Example of ONE properly-formatted "instruction sequence" string:
 			REPLACE 5 hello
 			INSERT 6 ni hao
 			REMOVE 7 10
@@ -437,16 +437,16 @@ std::vector<editor::instruction> parse_instruction_sequence_string(std::string i
 		Each line must follow the normal rules for properly-formatted instructions
 			See: parse_instruction_string(std::string instruction_string)
 		
-		The "instruction set" itself must be newline-delimited
+		The "instruction sequence" itself must be newline-delimited
 			That is, each individual instruction must be on its own line
 	***/
-	std::vector<editor::instruction> output_instruction_set;
+	std::vector<editor::instruction> output_instruction_sequence;
 	
-	std::vector<std::string> instruction_strings = explode(instruction_set_string, '\n');
+	std::vector<std::string> instruction_strings = explode(instruction_sequence_string, '\n');
 	
 	for (std::string i : instruction_strings) {
-		output_instruction_set.push_back(parse_instruction_string(i));
+		output_instruction_sequence.push_back(parse_instruction_string(i));
 	}
 	
-	return output_instruction_set;
+	return output_instruction_sequence;
 }

@@ -40,10 +40,10 @@ int main(int argc, char* argv[]) {
 	"       (Removes characters #9 to #15 from the file)\n\n"
 	""
 	"  -s\n"
-	" --add-instruction-set\n"
+	" --add-instruction-sequence\n"
 	"   Provide a set of multiple instructions for editing the file\n"
 	"     Each instruction in the set should be on its own line, as in the following example:\n"
-	"       --add-instruction-set \"REPLACE 20 hello world\n"
+	"       --add-instruction-sequence \"REPLACE 20 hello world\n"
 	"       INSERT 50 hello again\n"
 	"       REMOVE 70 75\"\n\n"
 	""
@@ -91,10 +91,10 @@ int main(int argc, char* argv[]) {
 	bool verbose = false;
 	
 	/*
-	temp_instruction_set std::vector
-	-s / --add-instruction-set option fills this std::vector, moves its elements to instructions_to_add, and then clears this std::vector
+	temp_instruction_sequence std::vector
+	-s / --add-instruction-sequence option fills this std::vector, moves its elements to instructions_to_add, and then clears this std::vector
 	*/
-	std::vector<editor::instruction> temp_instruction_set;
+	std::vector<editor::instruction> temp_instruction_sequence;
 	
 	
 	/*
@@ -107,8 +107,8 @@ int main(int argc, char* argv[]) {
 	static struct option long_options[] = {
 		{"input", required_argument, 0, 'i'},
 		
-		{"add-instruction-set", required_argument, 0, 's'},
-		{"instruction-set", required_argument, 0, 's'},
+		{"add-instruction-sequence", required_argument, 0, 's'},
+		{"instruction-sequence", required_argument, 0, 's'},
 		
 		{"add-instruction", required_argument, 0, 'a'},
 		{"instruction", required_argument, 0, 'a'},
@@ -140,8 +140,8 @@ int main(int argc, char* argv[]) {
 				break;
 			
 			case 's':
-				temp_instruction_set = parse_instruction_sequence_string(optarg);
-				move(temp_instruction_set.begin(), temp_instruction_set.end(), inserter(instructions_to_add, instructions_to_add.end()));
+				temp_instruction_sequence = parse_instruction_sequence_string(optarg);
+				move(temp_instruction_sequence.begin(), temp_instruction_sequence.end(), inserter(instructions_to_add, instructions_to_add.end()));
 				break;
 			
 			case 'b':
