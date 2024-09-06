@@ -527,8 +527,8 @@ void editor::file::close() {
 
 void editor::file::clean_up() {
 	/***
-	 * The point of this function is to _delete_ the file in the specific case that:
-	 * 	1. We created it (it was a new file, didn't exist before we started here)
+	 * The point of this function is to _delete_ the file in the specific case that BOTH of the following are true:
+	 * 	1. We created it (it is a new file, didn't exist before we started here)
 	 * 	2. We had to exit early due to some error
 	 ***/
 	
