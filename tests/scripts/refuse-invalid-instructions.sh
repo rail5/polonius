@@ -8,6 +8,7 @@ test_title="refuse-invalid-instructions"
 . scripts/common
 
 check_instruction "insert 1 invalid" "$test_title" 0 0 1
+check_instruction "insert 0 valid; 25 invalid" "$test_title" 0 0 1
 check_instruction "replace 0 invalid" "$test_title" 0 0 1
 check_instruction "remove 0 0" "$test_title" 0 0 1
 check_instruction "remove -1 -2" "$test_title" 0 0 1
@@ -15,6 +16,9 @@ check_instruction "not a valid instruction code" "$test_title" 0 0 1
 
 new_file=$(create_test_file "0123456789")
 check_instruction "insert 11 invalid" "$test_title" 0 1 0 "$new_file"
+
+new_file=$(create_test_file "0123456789")
+check_instruction "insert 0 valid; 100 invalid" "$test_title" 0 1 0 "$new_file"
 
 new_file=$(create_test_file "0123456789")
 check_instruction "replace 10 a" "$test_title" 0 1 0 "$new_file"
