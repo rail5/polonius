@@ -62,15 +62,15 @@ Example instructions:
 \f[R]
 .fi
 .PP
--s / \[en]add-instruction-set
+-s / \[en]add-instruction-sequence
 .IP
 .nf
 \f[C]
-Provide a set of multiple instructions for editing the file
+Provide a sequence of multiple instructions for editing the file
 
-Each instruction in the set should be on its own line, as in the following example:
+Each instruction in the sequence should be on its own line, as in the following example:
 
-  --add-instruction-set \[dq]REPLACE 20 hello world
+  --add-instruction-sequence \[dq]REPLACE 20 hello world
   INSERT 50 hello again
   REMOVE 70 75\[dq]
 \f[R]
@@ -161,7 +161,7 @@ Here is some example output from Polonius with the verbose flag set:
 .IP
 .nf
 \f[C]
-$ polonius-editor ./file --verbose --add-instruction-set \[rs]
+$ polonius-editor ./file --verbose --add-instruction-sequence \[rs]
 > \[dq]INSERT 0 hello world
 > REMOVE 0 5
 > REMOVE 10 10
@@ -187,7 +187,7 @@ Instructions are provided using either:
 .IP "1." 3
 The \f[I]\[en]add-instruction\f[R] / \f[I]-a\f[R] option
 .IP "2." 3
-The \f[I]\[en]add-instruction-set\f[R] / \f[I]-s\f[R] option
+The \f[I]\[en]add-instruction-sequence\f[R] / \f[I]-s\f[R] option
 .PP
 Valid instruction types are: \f[I]INSERT\f[R], \f[I]REMOVE\f[R], and
 \f[I]REPLACE\f[R].
