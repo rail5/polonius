@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 	"  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n"
 	"world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n\n"
 	""
-	"  " + program_name + " ./file.txt -f ./instructions.txt"
+	"  " + program_name + " ./file.txt -f ./instructions.txt\n\n"
 	""
 	"  " + program_name + " -a \"insert 0 hello world\" ./file.txt\n";
 	
