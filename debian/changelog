@@ -1,3 +1,15 @@
+polonius (0.5.14) unstable; urgency=medium
+
+  * Added -f option to polonius-editor
+    The -f option allows the user to specify a FILE which contains our
+    instruction sequences, rather than specifying those instructions
+    via the command line.
+    E.g.: polonius-editor ./text.txt -f ./instructions.txt
+  * Patched another bug found by the test suite in which Polonius
+    couldn't handle blank lines in instruction sequences
+
+ -- rail5 <andrew@rail5.org>  Sat, 07 Sep 2024 11:15:00 +0800
+
 polonius (0.5.13) unstable; urgency=medium
 
   * Polonius can now accept single-line 'delimited' instructions
