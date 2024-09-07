@@ -86,6 +86,18 @@ Each instruction in the sequence should be on its own line, as in the following 
 \f[R]
 .fi
 .PP
+-f / \[en]add-instruction-file
+.IP
+.nf
+\f[C]
+Have Polonius read its instructions from a file
+
+The file should be formatted just like an ordinary instruction sequence (see above). Usage example:
+
+  --add-instruction-file ./instructions.txt
+\f[R]
+.fi
+.PP
 -c / \[en]special-chars
 .IP
 .nf
