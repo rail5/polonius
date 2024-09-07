@@ -47,6 +47,11 @@ int main(int argc, char* argv[]) {
 	"       INSERT 50 hello again\n"
 	"       REMOVE 70 75\"\n\n"
 	""
+	"  -f\n"
+	" --add-instruction-file\n"
+	"   Read our editing instructions from a file\n"
+	"     Each instruction within the file should be on its own line, as with instruction sequences\n"
+	""
 	"  -c\n"
 	" --special-chars\n"
 	"   Interpret escaped character sequences (\\n, \\t and \\\\)\n\n"
@@ -74,6 +79,8 @@ int main(int argc, char* argv[]) {
 	"Examples:\n"
 	"  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n"
 	"world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n\n"
+	""
+	"  " + program_name + " ./file.txt -f ./instructions.txt"
 	""
 	"  " + program_name + " -a \"insert 0 hello world\" ./file.txt\n";
 	
@@ -112,6 +119,9 @@ int main(int argc, char* argv[]) {
 		
 		{"add-instruction", required_argument, 0, 'a'},
 		{"instruction", required_argument, 0, 'a'},
+
+		{"add-instruction-file", required_argument, 0, 'f'},
+		{"instruction-file", required_argument, 0, 'f'},
 		
 		{"block-size", required_argument, 0, 'b'},
 		
@@ -124,7 +134,7 @@ int main(int argc, char* argv[]) {
 		{"help", no_argument, 0, 'h'}
 	};
 	
-	while ((c = getopt_long(argc, argv, "i:s:a:b:cvVh", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "i:s:a:f:b:cvVh", long_options, &option_index)) != -1) {
 		switch(c) {
 			case 'i':
 				if (received_filename) {
@@ -142,6 +152,11 @@ int main(int argc, char* argv[]) {
 			
 			case 's':
 				temp_instruction_sequence = parse_instruction_sequence_string(optarg);
+				move(temp_instruction_sequence.begin(), temp_instruction_sequence.end(), inserter(instructions_to_add, instructions_to_add.end()));
+				break;
+			
+			case 'f':
+				temp_instruction_sequence = parse_instruction_file(optarg);
 				move(temp_instruction_sequence.begin(), temp_instruction_sequence.end(), inserter(instructions_to_add, instructions_to_add.end()));
 				break;
 			

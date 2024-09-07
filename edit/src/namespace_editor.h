@@ -57,6 +57,8 @@ instruction create_replace_instruction(int64_t start_position, std::string text)
 instruction create_insert_instruction(int64_t start_position, std::string text);
 instruction create_remove_instruction(int64_t start_position, int64_t end_position);
 
+std::vector<instruction> parse_instruction_file(std::string file_path);
+
 std::vector<instruction> parse_instruction_sequence_string(std::string instruction_sequence);
 
 std::vector<instruction> parse_instruction_line(std::string instruction_line);

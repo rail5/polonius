@@ -482,6 +482,25 @@ std::vector<editor::instruction> parse_instruction_line(std::string instruction_
 }
 
 
+std::vector<editor::instruction> parse_instruction_file(std::string file_path) {
+	std::ifstream instruction_file(file_path);
+	std::string instruction_line = "";
+
+	std::vector<editor::instruction> output_instruction_sequence;
+
+	while (std::getline(instruction_file, instruction_line)) {
+		std::vector<editor::instruction> parsed_line = parse_instruction_line(instruction_line);
+		for (editor::instruction parsed_instruction : parsed_line) {
+			output_instruction_sequence.push_back(parsed_instruction);
+		}
+	}
+	
+	instruction_file.close();
+
+	return output_instruction_sequence;
+}
+
+
 std::vector<editor::instruction> parse_instruction_sequence_string(std::string instruction_sequence_string) {
 	/***
 	std::vector<instruction> parse_instruction_sequence_string(std::string instruction_sequence_string):
