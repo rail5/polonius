@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 	"  -f\n"
 	" --add-instruction-file\n"
 	"   Read our editing instructions from a file\n"
-	"     Each instruction within the file should be on its own line, as with instruction sequences\n"
+	"     Each instruction within the file should be on its own line, as with instruction sequences\n\n"
 	""
 	"  -c\n"
 	" --special-chars\n"
