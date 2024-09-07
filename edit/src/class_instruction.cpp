@@ -447,8 +447,13 @@ std::vector<editor::instruction> parse_instruction_line(std::string instruction_
 	 * 	It's also possible to input a literal ';' by escaping it, as in:
 	 * 		INSERT 10 along the wall to keep\; and slept
 	 ***/
-	std::vector<editor::instruction> output_instruction_sequence;
+	std::vector<editor::instruction> output_instruction_sequence = {};
 	std::vector<std::string> component_strings = explode(instruction_line, ';', true);
+
+	// Check if we're trying to parse a blank line
+	if (component_strings.empty()) {
+		return output_instruction_sequence; // Just return an empty vector
+	}
 
 	editor::instruction first_instruction = parse_instruction_string(component_strings[0]);
 	output_instruction_sequence.push_back(first_instruction);
