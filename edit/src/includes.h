@@ -128,6 +128,11 @@
 	#include "../../shared/process_bytecodes.cpp"
 #endif
 
+#ifndef FN_STRING_REPLACE_ALL
+	#define FN_STRING_REPLACE_ALL
+	#include "../../shared/string_replace_all.cpp"
+#endif
+
 /* Shared definitions */
 #include "../../shared/definitions.h"
 

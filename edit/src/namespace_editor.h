@@ -46,11 +46,52 @@ class instruction {
 		void update_start_position(int64_t start);
 		void update_end_position(int64_t end);
 		
-		bool is_initialized();
-		operation_type get_operation_type();
-		int64_t get_start_position();
-		int64_t get_end_position();
-		std::string get_text();
+		bool is_initialized() const;
+		operation_type get_operation_type() const;
+		int64_t get_start_position() const;
+		int64_t get_end_position() const;
+		std::string get_text() const;
+		std::string get_formatted_text() const;
+
+		friend std::ostream& operator<<(std::ostream& output_stream, const instruction& input) {
+			std::string output_string = "";
+			std::string second_part = "";
+			std::string third_part = "";
+			switch (input.operation) {
+				case replace_operation:
+					output_string += "REPLACE";
+					break;
+				case insert_operation:
+					output_string += "INSERT";
+					break;
+				case remove_operation:
+					output_string += "REMOVE";
+					if (input.end_position == -1) {
+						third_part = "end";
+					} else {
+						third_part = std::to_string(input.end_position);
+					}
+					break;
+				default:
+					return output_stream << "INVALID INSTRUCTION";
+			}
+
+			if (input.start_position == -1) {
+				second_part = "end";
+			} else {
+				second_part = std::to_string(input.start_position);
+			}
+
+			if (third_part == "") {
+				// REPLACE or INSERT operation
+				// Get and format the insertion/replacement text
+				third_part = input.get_formatted_text();
+			}
+
+			output_string += " " + second_part + " " + third_part;
+
+			return output_stream << output_string;
+		}
 };
 
 instruction create_replace_instruction(int64_t start_position, std::string text);

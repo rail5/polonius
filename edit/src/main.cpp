@@ -96,6 +96,8 @@ int main(int argc, char* argv[]) {
 	bool interpret_special_chars = false;
 	
 	bool verbose = false;
+
+	bool just_get_optimized_instructions = false;
 	
 	/*
 	temp_instruction_sequence std::vector
@@ -122,6 +124,8 @@ int main(int argc, char* argv[]) {
 
 		{"add-instruction-file", required_argument, 0, 'f'},
 		{"instruction-file", required_argument, 0, 'f'},
+
+		{"get-optimized-instructions", no_argument, 0, 'g'},
 		
 		{"block-size", required_argument, 0, 'b'},
 		
@@ -134,7 +138,7 @@ int main(int argc, char* argv[]) {
 		{"help", no_argument, 0, 'h'}
 	};
 	
-	while ((c = getopt_long(argc, argv, "i:s:a:f:b:cvVh", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "i:s:a:f:b:cgvVh", long_options, &option_index)) != -1) {
 		switch(c) {
 			case 'i':
 				if (received_filename) {
@@ -172,6 +176,10 @@ int main(int argc, char* argv[]) {
 				interpret_special_chars = true;
 				break;
 			
+			case 'g':
+				just_get_optimized_instructions = true;
+				break;
+			
 			case 'v':
 				verbose = true;
 				break;
@@ -194,6 +202,24 @@ int main(int argc, char* argv[]) {
 				break;
 		}
 	}
+
+	if (instructions_to_add.empty()) {
+		std::cerr << program_name << ": No instructions given. Use -h for help" << std::endl;
+		return EXIT_BADARG;
+	}
+
+	if (just_get_optimized_instructions) {
+		if (interpret_special_chars) {
+			for (editor::instruction& original_instruction : instructions_to_add) {
+				original_instruction.process_special_chars();
+			}
+		}
+		std::vector<editor::instruction> optimized = optimize_instruction_sequence(instructions_to_add);
+		for (editor::instruction optimized_instruction : optimized) {
+			std::cout << optimized_instruction << std::endl;
+		}
+		return 0;
+	}
 	
 	for (option_index = optind; option_index < argc; option_index++) {
 		if (received_filename) {
@@ -207,11 +233,6 @@ int main(int argc, char* argv[]) {
 	if (!received_filename) {
 		std::cerr << program_name << ": No input file given. Use -h for help" << std::endl;
 		return EXIT_BADFILE;
-	}
-
-	if (instructions_to_add.empty()) {
-		std::cerr << program_name << ": No instructions given. Use -h for help" << std::endl;
-		return EXIT_BADARG;
 	}
 
 	editor::file document(file_to_edit, block_size, verbose);

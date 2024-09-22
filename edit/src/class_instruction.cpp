@@ -211,24 +211,36 @@ void editor::instruction::update_end_position(int64_t end) {
 	end_position = end;
 }
 
-bool editor::instruction::is_initialized() {
+bool editor::instruction::is_initialized() const {
 	return initialized;
 }
 
-editor::operation_type editor::instruction::get_operation_type() {
+editor::operation_type editor::instruction::get_operation_type()  const {
 	return operation;
 }
 
-int64_t editor::instruction::get_start_position() {
+int64_t editor::instruction::get_start_position() const {
 	return start_position;
 }
 
-int64_t editor::instruction::get_end_position() {
+int64_t editor::instruction::get_end_position() const {
 	return end_position;
 }
 
-std::string editor::instruction::get_text() {
+std::string editor::instruction::get_text() const {
 	return text_input;
+}
+
+std::string editor::instruction::get_formatted_text() const {
+	std::string formatted_text = text_input;
+	string_replace_all(formatted_text, "\\", "\\\\");
+	string_replace_all(formatted_text, ";", "\\;");
+	string_replace_all(formatted_text, "\n", "\\n");
+	string_replace_all(formatted_text, "\t", "\\t");
+
+	formatted_text = return_to_bytecodes(formatted_text);
+
+	return formatted_text;
 }
 
 editor::instruction create_replace_instruction(int64_t start_position, std::string text) {
@@ -534,4 +546,23 @@ std::vector<editor::instruction> parse_instruction_sequence_string(std::string i
 	}
 	
 	return output_instruction_sequence;
+}
+
+std::vector<editor::instruction> optimize_instruction_sequence(const std::vector<editor::instruction>& instruction_sequence) {
+	/***
+	 * std::vector<instruction> optimize_instruction_sequence(std::vector<instruction> instruction_sequence):
+	 * 	Returns a simplified/optimized version of the inputted instruction sequence
+	 * 	This is done by applying the theorems listed at https://github.com/rail5/polonius/wiki/Instruction-Optimization
+	 * 	In particular, we're concerned with theorems 0, 1, 3, and 4.
+	 * 	Theorems 2, 5, and 6 are not applied because they reduce the number 'REPLACE' instructions,
+	 * 	Which are already fast, and don't need to be optimized away.
+	 */
+
+	std::vector<editor::instruction> result = instruction_sequence;
+
+	//for (int i = 0; i < instruction_sequence.size(); i++) {
+
+	//}
+
+	return result;
 }

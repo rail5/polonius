@@ -38,3 +38,28 @@ std::string process_bytecodes(std::string input) {
 
 	return input;
 }
+
+std::string return_to_bytecodes(std::string input) {
+	/***
+	 * string return_to_bytecodes(std::string input):
+	 * 	Undoes the processing done by process_bytecodes()
+	 * 	Replaces any characters outside of our printable range with bytecode equivalents
+	 */
+
+	boost::regex expression("([^\x20-\x7E]{1})");
+
+	while (boost::regex_search(input, expression)) {
+		std::istringstream isolated_byte(boost::regex_replace(input, expression, "$1", boost::regex_constants::format_no_copy | boost::regex_constants::format_first_only));
+
+		std::stringstream bytecode;
+		bytecode << std::hex << static_cast<unsigned int>(isolated_byte.str()[0]);
+
+		std::string bytecode_string = "0" + bytecode.str(); // Prepend a zero in case it's < x10
+		bytecode_string = bytecode_string.substr(bytecode_string.length() - 2); // Strip it to its last two characters in case we received something longer
+		bytecode_string = "\\\\x" + bytecode_string; // Prepend the \x escape sequence for bytecodes
+
+		input = boost::regex_replace(input, expression, bytecode_string, boost::regex_constants::format_first_only);
+	}
+
+	return input;
+}
