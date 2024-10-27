@@ -35,6 +35,9 @@ editor:
 	cd edit && $(MAKE)
 	mv edit/bin/polonius-editor ./
 
+gui:
+	cd gui && make
+
 curses:
 	cd cli && $(MAKE)
 	mv cli/bin/polonius ./

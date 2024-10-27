@@ -2,15 +2,37 @@
 // Created by NAT on 10/27/2024.
 //
 
-#ifndef MAIN_H
-#define MAIN_H
+// main.h
 
+#ifndef TEXTEDITOR_H
+#define TEXTEDITOR_H
 
+#include <QMainWindow>
+#include <QString>
+#include <QTextEdit>
 
-class main {
+class TextEditor : public QMainWindow
+{
+    Q_OBJECT
 
+public:
+    TextEditor();
+
+private slots:
+    void newFile();
+    void openFile();
+    bool saveFile();
+    bool saveFileAs();
+    void about();
+
+private:
+    void createActions();
+    bool maybeSave();
+    void setCurrentFile(const QString &fileName);
+
+    QTextEdit *textEdit;
+    QString currentFile;
+    bool isUntitled;
 };
 
-
-
-#endif //MAIN_H
+#endif // TEXTEDITOR_H
