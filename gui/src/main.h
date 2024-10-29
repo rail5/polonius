@@ -13,7 +13,6 @@
 
 class TextEditor : public QMainWindow
 {
-    Q_OBJECT
 
 public:
     TextEditor();
