@@ -35,8 +35,9 @@ editor:
 	cd edit && $(MAKE)
 	mv edit/bin/polonius-editor ./
 
-gui:
-	cd gui && make
+qt:
+	cd gui && $(MAKE)
+	mv gui/bin/polonius-gui ./
 
 curses:
 	cd cli && $(MAKE)
@@ -58,6 +59,8 @@ clean-builds:
 	cd edit && $(MAKE) clean
 	rm -f ./polonius
 	cd cli && $(MAKE) clean
+	rm -f ./polonius-gui
+	cd gui && $(MAKE) clean
 
 clean-tests:
 	rm -f ./tests/results/*
