@@ -10,5 +10,5 @@ all:
 	$(CXX) $(CXXFLAGS) $(QT_INCLUDES) -o bin/polonius-gui src/main.cpp $(QT_LIBS)
 
 clean:
-	rm -f $(TARGET)
+	rm -f bin/polonius-gui
 
