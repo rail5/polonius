@@ -4,8 +4,8 @@
 
 // main.h
 
-#ifndef TEXTEDITOR_H
-#define TEXTEDITOR_H
+#ifndef GUI_SRC_MAIN_H_
+#define GUI_SRC_MAIN_H_
 
 #include <QMainWindow>
 #include <QString>
@@ -35,4 +35,4 @@ private:
     bool isUntitled;
 };
 
-#endif // TEXTEDITOR_H
+#endif // GUI_SRC_MAIN_H_
