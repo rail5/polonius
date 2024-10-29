@@ -30,6 +30,11 @@ TextEditor::TextEditor()
     resize(800, 600);
 }
 
+TextEditor::~TextEditor()
+{
+    delete textEdit;
+}
+
 void TextEditor::createActions()
 {
     // File menu actions

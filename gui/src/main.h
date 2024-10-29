@@ -16,6 +16,7 @@ class TextEditor : public QMainWindow
 
 public:
     TextEditor();
+    ~TextEditor();
 
 private slots:
     void newFile();
