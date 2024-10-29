@@ -1,3 +1,7 @@
+/***
+ * Copyright (C) 2024 Natnael Taddese
+*/
+
 #include "class_TextEditor.cpp"
 
 int main(int argc, char *argv[]) {

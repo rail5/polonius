@@ -1,11 +1,9 @@
-//
-// Created by NAT on 10/27/2024.
-//
+/***
+ * Copyright (C) 2024 Natnael Taddese
+*/
 
-// main.h
-
-#ifndef GUI_SRC_MAIN_H_
-#define GUI_SRC_MAIN_H_
+#ifndef GUI_SRC_CLASS_TEXTEDITOR_H_
+#define GUI_SRC_CLASS_TEXTEDITOR_H_
 
 #include <QMainWindow>
 #include <QString>
@@ -35,4 +33,4 @@ private:
 	bool isUntitled;
 };
 
-#endif // GUI_SRC_MAIN_H_
+#endif // GUI_SRC_CLASS_TEXTEDITOR_H_

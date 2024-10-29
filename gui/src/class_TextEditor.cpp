@@ -1,8 +1,6 @@
-//
-// Created by NAT on 10/27/2024.
-//
-
-// main.cpp
+/***
+ * Copyright (C) 2024 Natnael Taddese
+*/
 
 #include <QApplication>
 #include <QMainWindow>
