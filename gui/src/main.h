@@ -15,24 +15,24 @@ class TextEditor : public QMainWindow
 {
 
 public:
-    TextEditor();
-    ~TextEditor();
+	TextEditor();
+	~TextEditor();
 
 private slots:
-    void newFile();
-    void openFile();
-    bool saveFile();
-    bool saveFileAs();
-    void about();
+	void newFile();
+	void openFile();
+	bool saveFile();
+	bool saveFileAs();
+	void about();
 
 private:
-    void createActions();
-    bool maybeSave();
-    void setCurrentFile(const QString &fileName);
+	void createActions();
+	bool maybeSave();
+	void setCurrentFile(const QString &fileName);
 
-    QTextEdit *textEdit;
-    QString currentFile;
-    bool isUntitled;
+	QTextEdit *textEdit;
+	QString currentFile;
+	bool isUntitled;
 };
 
 #endif // GUI_SRC_MAIN_H_
