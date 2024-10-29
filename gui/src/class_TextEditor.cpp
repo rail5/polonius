@@ -17,6 +17,7 @@
 #include <QKeySequence>
 
 #include "class_TextEditor.h"
+#include "polonius_hook.cpp"
 
 TextEditor::TextEditor() {
 	textEdit = new QTextEdit;
@@ -88,12 +89,10 @@ void TextEditor::openFile() {
 	if (maybeSave()) {
 		QString fileName = QFileDialog::getOpenFileName(this);
 		if (!fileName.isEmpty()) {
-			QFile file(fileName);
-			if (file.open(QFile::ReadOnly | QFile::Text)) {
-				QTextStream in(&file);
-				textEdit->setPlainText(in.readAll());
-				setCurrentFile(fileName);
-			}
+			PoloniusHook hook(fileName.toStdString());
+			std::string file_content = hook.read_file();
+			textEdit->setPlainText(QString::fromStdString(file_content));
+			setCurrentFile(fileName);
 		}
 	}
 }
