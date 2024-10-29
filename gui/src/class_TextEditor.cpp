@@ -1,5 +1,7 @@
 /***
  * Copyright (C) 2024 Natnael Taddese
+ * This is free software (GNU GPL v3)
+ * Please refer to the LICENSE file for more information
 */
 
 #include <QApplication>
