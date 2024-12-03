@@ -587,6 +587,13 @@ std::list<editor::instruction> editor::optimize_instruction_sequence(const std::
 	}
 
 	return result;
+
+	// Note to self:
+	// To do later
+	// The optimization should happen as instructions are *added* to the sequence.
+	// Since we can prove that the optimized sequence will always be exactly equivalent to the unoptimized sequence,
+	// There's no need to make optimization optional
+	// So, the optimization should not be done *here*.
 }
 
 void editor::combine_inserts(std::shared_ptr<std::list<editor::instruction>> instruction_sequence, std::list<editor::instruction>::iterator input_iterator) {
