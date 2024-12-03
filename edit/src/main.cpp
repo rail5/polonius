@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
 	std::string file_to_edit = "";
 	bool received_filename = false;
 	
-	std::vector<editor::instruction> instructions_to_add;
+	std::list<editor::instruction> instructions_to_add;
 	int64_t block_size = 10240;
 	bool interpret_special_chars = false;
 	
@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
 	temp_instruction_sequence std::vector
 	-s / --add-instruction-sequence option fills this std::vector, moves its elements to instructions_to_add, and then clears this std::vector
 	*/
-	std::vector<editor::instruction> temp_instruction_sequence;
+	std::list<editor::instruction> temp_instruction_sequence;
 	
 	
 	/*
@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
 				original_instruction.process_special_chars();
 			}
 		}
-		std::vector<editor::instruction> optimized = optimize_instruction_sequence(instructions_to_add);
+		std::list<editor::instruction> optimized = optimize_instruction_sequence(instructions_to_add);
 		for (editor::instruction optimized_instruction : optimized) {
 			std::cout << optimized_instruction << std::endl;
 		}
@@ -241,23 +241,23 @@ int main(int argc, char* argv[]) {
 		std::cerr << program_name << ": " << document.get_error_message() << std::endl;
 		return EXIT_OTHER;
 	}
-	
-	for (int i = 0; i < instructions_to_add.size(); i++) {
+
+	for (std::list<editor::instruction>::iterator it = instructions_to_add.begin(); it != instructions_to_add.end(); it++) {
 		if (interpret_special_chars) {
-			instructions_to_add[i].process_special_chars();
+			it->process_special_chars();
 		}
-		
-		if (!document.add_instruction(instructions_to_add[i])) {
-			std::cerr << program_name << ": " << instructions_to_add[i].get_error_message() << std::endl;
+
+		if (!document.add_instruction(*it)) {
+			std::cerr << program_name << ": " << it->get_error_message() << std::endl;
 			document.clean_up();
 			return EXIT_BADARG;
 		}
 	}
 	
-	std::vector<editor::instruction> instruction_sequence = document.get_instruction_sequence();
-	
-	for (int i = 0; i < instruction_sequence.size(); i++) {
-		document.execute_single_instruction(instruction_sequence[i]);
+	std::list<editor::instruction> instruction_sequence = document.get_instruction_sequence();
+
+	for (std::list<editor::instruction>::iterator it = instruction_sequence.begin(); it != instruction_sequence.end(); it++) {
+		document.execute_single_instruction(*it);
 	}
 	
 	/* Close file */

@@ -249,7 +249,7 @@ int64_t editor::file::get_file_length() {
 	return file_length;
 }
 
-std::vector<editor::instruction> editor::file::get_instruction_sequence() {
+std::list<editor::instruction> editor::file::get_instruction_sequence() {
 	return instruction_sequence;
 }
 

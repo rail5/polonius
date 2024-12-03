@@ -436,7 +436,7 @@ editor::instruction parse_instruction_string(std::string instruction_string) {
 }
 
 
-std::vector<editor::instruction> parse_instruction_line(std::string instruction_line) {
+std::list<editor::instruction> parse_instruction_line(std::string instruction_line) {
 	/***
 	 * std::vector<instruction> parse_instruction_line(std::string instruction_line):
 	 * 	Create a std::vector of 'instruction' objects from a semicolon-delimited std::string of instructions
@@ -459,7 +459,7 @@ std::vector<editor::instruction> parse_instruction_line(std::string instruction_
 	 * 	It's also possible to input a literal ';' by escaping it, as in:
 	 * 		INSERT 10 along the wall to keep\; and slept
 	 ***/
-	std::vector<editor::instruction> output_instruction_sequence = {};
+	std::list<editor::instruction> output_instruction_sequence = {};
 	std::vector<std::string> component_strings = explode(instruction_line, ';', true);
 
 	// Check if we're trying to parse a blank line
@@ -499,14 +499,14 @@ std::vector<editor::instruction> parse_instruction_line(std::string instruction_
 }
 
 
-std::vector<editor::instruction> parse_instruction_file(std::string file_path) {
+std::list<editor::instruction> parse_instruction_file(std::string file_path) {
 	std::ifstream instruction_file(file_path);
 	std::string instruction_line = "";
 
-	std::vector<editor::instruction> output_instruction_sequence;
+	std::list<editor::instruction> output_instruction_sequence;
 
 	while (std::getline(instruction_file, instruction_line)) {
-		std::vector<editor::instruction> parsed_line = parse_instruction_line(instruction_line);
+		std::list<editor::instruction> parsed_line = parse_instruction_line(instruction_line);
 		for (editor::instruction parsed_instruction : parsed_line) {
 			output_instruction_sequence.push_back(parsed_instruction);
 		}
@@ -518,7 +518,7 @@ std::vector<editor::instruction> parse_instruction_file(std::string file_path) {
 }
 
 
-std::vector<editor::instruction> parse_instruction_sequence_string(std::string instruction_sequence_string) {
+std::list<editor::instruction> parse_instruction_sequence_string(std::string instruction_sequence_string) {
 	/***
 	std::vector<instruction> parse_instruction_sequence_string(std::string instruction_sequence_string):
 		Create a std::vector of 'instruction' objects from a newline-delimited std::string of properly-formatted instructions
@@ -534,12 +534,12 @@ std::vector<editor::instruction> parse_instruction_sequence_string(std::string i
 		The "instruction sequence" itself must be newline-delimited
 			That is, each individual instruction must be on its own line
 	***/
-	std::vector<editor::instruction> output_instruction_sequence;
+	std::list<editor::instruction> output_instruction_sequence;
 	
 	std::vector<std::string> instruction_strings = explode(instruction_sequence_string, '\n');
 	
 	for (std::string i : instruction_strings) {
-		std::vector<editor::instruction> parsed_line = parse_instruction_line(i);
+		std::list<editor::instruction> parsed_line = parse_instruction_line(i);
 		for (editor::instruction parsed_instruction : parsed_line) {
 			output_instruction_sequence.push_back(parsed_instruction);
 		}
@@ -548,7 +548,7 @@ std::vector<editor::instruction> parse_instruction_sequence_string(std::string i
 	return output_instruction_sequence;
 }
 
-std::vector<editor::instruction> optimize_instruction_sequence(const std::vector<editor::instruction>& instruction_sequence) {
+std::list<editor::instruction> editor::optimize_instruction_sequence(const std::list<editor::instruction>& instruction_sequence) {
 	/***
 	 * std::vector<instruction> optimize_instruction_sequence(std::vector<instruction> instruction_sequence):
 	 * 	Returns a simplified/optimized version of the inputted instruction sequence
@@ -558,11 +558,40 @@ std::vector<editor::instruction> optimize_instruction_sequence(const std::vector
 	 * 	Which are already fast, and don't need to be optimized away.
 	 */
 
-	std::vector<editor::instruction> result = instruction_sequence;
+	std::list<editor::instruction> result = instruction_sequence;
 
-	//for (int i = 0; i < instruction_sequence.size(); i++) {
+	for (std::list<editor::instruction>::iterator it = result.begin(); it != result.end(); it++) {
+		std::cout << "Discovered a " << it->get_operation_type() << " instruction" << std::endl;
+		std::cout << "    Start position: " << it->get_start_position() << std::endl;
+		std::cout << "    End position: " << it->get_end_position() << std::endl;
+		std::cout << "    Text: " << (it->get_formatted_text()) << std::endl;
+		std::cout << "    Total length: " << it->get_end_position() - it->get_start_position() << std::endl;
+		std::cout << *it << std::endl;
 
-	//}
+		std::shared_ptr<std::list<editor::instruction>> sequence_pointer = std::make_shared<std::list<editor::instruction>>(result);
+
+		switch(it->get_operation_type()) {
+			case editor::insert_operation:
+				combine_inserts(sequence_pointer, it);
+				break;
+			case editor::remove_operation:
+
+				break;
+			case editor::replace_operation:
+				// The cost of optimizing replace instructions outweighs the benefit of having optimized replace instructions
+				// So skip these
+				continue;
+			default:
+				throw std::invalid_argument("Invalid instruction sequence");
+		}
+	}
 
 	return result;
+}
+
+void editor::combine_inserts(std::shared_ptr<std::list<editor::instruction>> instruction_sequence, std::list<editor::instruction>::iterator input_iterator) {
+	// Application of Theorem 0 in https://github.com/rail5/polonius/wiki/Instruction-Optimization
+	for (std::list<editor::instruction>::iterator it = input_iterator; it != instruction_sequence->end(); it++) {
+		//TODO(@rail5)
+	}
 }

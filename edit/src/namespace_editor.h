@@ -69,7 +69,7 @@ class instruction {
 					if (input.end_position == -1) {
 						third_part = "end";
 					} else {
-						third_part = std::to_string(input.end_position);
+						third_part = std::to_string(input.end_position - 1);
 					}
 					break;
 				default:
@@ -98,13 +98,14 @@ instruction create_replace_instruction(int64_t start_position, std::string text)
 instruction create_insert_instruction(int64_t start_position, std::string text);
 instruction create_remove_instruction(int64_t start_position, int64_t end_position);
 
-std::vector<instruction> parse_instruction_file(std::string file_path);
-
-std::vector<instruction> parse_instruction_sequence_string(std::string instruction_sequence);
-
-std::vector<instruction> parse_instruction_line(std::string instruction_line);
-
+std::list<instruction> parse_instruction_file(std::string file_path);
+std::list<instruction> parse_instruction_sequence_string(std::string instruction_sequence);
+std::list<instruction> parse_instruction_line(std::string instruction_line);
 instruction parse_instruction_string(std::string instruction_string);
+
+/* Instruction optimization */
+std::list<instruction> optimize_instruction_sequence(const std::list<instruction>& instruction_sequence);
+void combine_inserts(std::shared_ptr<std::list<instruction>> instruction_sequence, std::list<editor::instruction>::iterator input_iterator);
 
 class file {
 	private:
@@ -122,7 +123,7 @@ class file {
 		
 		int64_t block_size = 10240;
 		
-		std::vector<instruction> instruction_sequence;
+		std::list<instruction> instruction_sequence;
 		int64_t file_length_after_last_instruction = 0;
 		
 		std::string error_message = "";
@@ -153,7 +154,7 @@ class file {
 		
 		int64_t get_file_length();
 		
-		std::vector<instruction> get_instruction_sequence();
+		std::list<instruction> get_instruction_sequence();
 		
 		std::string get_error_message();
 		
