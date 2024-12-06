@@ -2,6 +2,8 @@
  * Copyright (C) 2024 rail5
 */
 
+#include "instruction.h"
+
 void editor::instruction::clear_instruction() {
 	/***
 	void clear_instruction():

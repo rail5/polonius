@@ -137,8 +137,7 @@
 #include "../../shared/definitions.h"
 
 /* Contains the 'meat' of the program */
-#include "namespace_editor.h"
-#include "class_instruction.cpp"
-#include "class_file.cpp"
+#include "instruction.cpp"
+#include "file.cpp"
 
 #endif // EDIT_SRC_INCLUDES_H_

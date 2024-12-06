@@ -12,6 +12,8 @@
 	#include <sys/file.h>
 #endif
 
+#include "file.h"
+
 bool editor::file::set_file(std::string file_path) {
 	/***
 	bool set_file(std::string file_path):
