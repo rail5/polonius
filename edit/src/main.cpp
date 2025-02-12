@@ -15,75 +15,47 @@
 #endif
 
 int main(int argc, char* argv[]) {
-	std::string program_name = "polonius-editor";
+	const std::string program_name = "polonius-editor";
 	
-	std::string help_string =
-	program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\n"
-	"This is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\n"
-	""
-	"Usage: " + program_name + " filename -a \"{INSTRUCTION}\"\n\n"
+	const std::string help_string =
+	program_name + " " + program_version + "\n"
+	"Usage: " + program_name + " [file] [options]\n"
 	""
 	"Options:\n"
-	" -i\n"
-	" --input\n"
-	"   Specify input file to edit\n\n"
-	""
-	"  -a\n"
-	" --add-instruction\n"
-	"   Instruct the program on how to edit your file\n"
-	"     Example instructions:\n"
-	"     REPLACE 5 hello world\n"
-	"       (Replaces text, starting from character #5, with \"hello world\")\n"
-	"     INSERT 7 salut a tous\n"
-	"       (Inserts \"salut a tous\" at character #7, shifting the rest of the file without replacing it)\n"
-	"     REMOVE 9 15\n"
-	"       (Removes characters #9 to #15 from the file)\n\n"
-	""
-	"  -s\n"
-	" --add-instruction-sequence\n"
-	"   Provide a sequence of multiple instructions for editing the file\n"
-	"     Each instruction in the sequence should be on its own line, as in the following example:\n"
-	"       --add-instruction-sequence \"REPLACE 20 hello world\n"
-	"       INSERT 50 hello again\n"
-	"       REMOVE 70 75\"\n\n"
-	""
-	"  -f\n"
-	" --add-instruction-file\n"
-	"   Read our editing instructions from a file\n"
-	"     Each instruction within the file should be on its own line, as with instruction sequences\n\n"
-	""
-	"  -c\n"
-	" --special-chars\n"
-	"   Interpret escaped character sequences (\\n, \\t and \\\\)\n\n"
-	""
-	"  -b\n"
-	" --block-size\n"
-	"   Specify the amount of data from the file we're willing to load into memory at any given time\n"
-	"     Example:\n"
-	"       -b 10M\n"
-	"       -b 200K\n"
-	"     (Default 10 kilobytes)\n\n"
-	""
-	"  -v\n"
-	" --verbose\n"
-	"   Verbose mode\n\n"
-	""
-	"  -V\n"
-	" --version\n"
-	"   Print version number\n\n"
-	""
-	"  -h\n"
-	" --help\n"
-	"   Display this message\n\n"
+	"  -i, --input [file]                    File to edit\n"
+	"  -a, --add-instruction [instruction]   Add an instruction\n"
+	"                                         (format: [REPLACE|INSERT|REMOVE] [start] [text|end])\n"
+	"                                         See the manual for more information\n"
+	"  -s, --add-instruction-sequence [seq]  Add an instruction sequence\n"
+	"                                         (one instruction per line)\n"
+	"  -f, --add-instruction-file [file]     Add instructions from a file\n"
+	"                                         (one instruction per line)\n"
+	"  -c, --special-chars                   Process escaped chars in instructions\n"
+	"                                         (\\n, \\t, \\\\, \\x00 through \\xFF)\n"
+	"  -b, --block-size [size]               Block size (default: 10K)\n"
+	"  -v, --verbose                         Output verbose information\n"
+	"  -V, --version                         Display version information\n"
+	"  -h, --help                            Display this help message\n"
 	""
 	"Examples:\n"
-	"  " + program_name + " --input ./file.txt --add-instruction \"REPLACE 20 hello \\n"
-	"world\" --add-instruction \"REMOVE 10 12\" --block-size 10K --special-chars\n\n"
-	""
-	"  " + program_name + " ./file.txt -f ./instructions.txt\n\n"
-	""
-	"  " + program_name + " -a \"insert 0 hello world\" ./file.txt\n";
+	"  " + program_name + " -i file.txt -a REPLACE 5 hello\n"
+	"  " + program_name + " ./file.txt -a \"INSERT 0 new text for start of file\"";
 	
+	const std::string version_string =
+	program_name + " " + program_version + "\n"
+	"Copyright (C) 2023-2025 rail5\n"
+	"\n"
+	"This program is free software; you can redistribute it and/or modify\n"
+	"it under the terms of the GNU General Public License as published by\n"
+	"the Free Software Foundation; either version 3 of the License, or\n"
+	"(at your option) any later version.\n"
+	"\n"
+	"This program is distributed in the hope that it will be useful,\n"
+	"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+	"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+	"\n"
+	"You should have received a copy of the GNU General Public License\n"
+	"along with this program. If not, see http://www.gnu.org/licenses/.";
 	
 	/*
 	Necessary information for the program to do its job
@@ -185,12 +157,12 @@ int main(int argc, char* argv[]) {
 				break;
 			
 			case 'V':
-				std::cout << program_version << std::endl;
+				std::cout << version_string << std::endl;
 				return EXIT_SUCCESS;
 				break;
 			
 			case 'h':
-				std::cout << help_string;
+				std::cout << help_string << std::endl;
 				return EXIT_SUCCESS;
 				break;
 			

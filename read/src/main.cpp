@@ -15,73 +15,48 @@
 #endif
 
 int main(int argc, char* argv[]) {
-	std::string program_name = "polonius-reader";
+	const std::string program_name = "polonius-reader";
 
-	std::string help_string =
-	program_name + " " + program_version + "\nCopyright (C) 2023 " + program_author + "\n\n"
-	"This is free software (GNU GPL 3), and you are welcome to redistribute it under certain conditions.\n\n"
-	""
-	"Usage: " + program_name + " filename\n\n"
+	const std::string help_string =
+	program_name + " " + program_version
+	"\n"
+	"Usage: " + program_name + " [file] [options]\n"
 	""
 	"Options:\n"
-	"  -i\n"
-	"  --input\n"
-	"    Specify input file to read\n\n"
-	""
-	"  -s\n"
-	"  --start\n"
-	"    Specify byte number to start reading from\n\n"
-	""
-	"  -l\n"
-	"  --length\n"
-	"   Specify how many bytes to read\n\n"
-	""
-	"  -b\n"
-	" --block-size\n"
-	"   Specify the amount of data from the file we're willing to load into memory at any given time\n"
-	"     Example:\n"
-	"       -b 10M\n"
-	"       -b 200K\n"
-	"     (Default 10 kilobytes)\n\n"
-	""
-	"  -f\n"
-	" --find\n"
-	" --search\n"
-	"   Search for a std::string in the file\n"
-	"   If -s / --start is specified, the program will only search for matches after that start position\n"
-	"   If -l / --length is specified, the program will only search for matches within that length from the start\n"
-	"   Returns nothing (blank) if no matches were found\n\n"
-	""
-	"  -p\n"
-	" --output-pos\n"
-	"   Output the start and end position, rather than the text (in the format \"start end\", for example 10 15)\n"
-	"   If used with searches, this will output the start and end position of the search result\n"
-	"   Outside of searches, it will return the values of -s / --start and the end position (start + length)\n\n"
-	""
-	"  -c\n"
-	"  --special-chars\n"
-	"    Parse escaped character sequences in search queries (\\n, \\t, \\\\, and \\x00 through \\xFF)\n\n"
-	""
-	"  -e\n"
-	"  --regex\n"
-	"    Interpret search query as a regular expression\n\n"
-	""
-	"  -V\n"
-	" --version\n"
-	"   Print version number\n\n"
-	""
-	"  -h\n"
-	" --help\n"
-	"   Display this message\n\n"
+	"  -i, --input [file]       File to read\n"
+	"  -s, --start [byte]       Byte to start from (default: 0)\n"
+	"  -l, --length [bytes]     Number of bytes to read (default: until EOF)\n"
+	"  -b, --block-size [size]  Block size (default: 10K)\n"
+	"  -f, --find [string]      Search for a string\n"
+	"                             If -s is set, only search from that position\n"
+	"                             If -l is set, only search that many bytes\n"
+	"  -p, --output-pos         Output start and end position rather than text\n"
+	"                             If -f is set, output position of the match\n"
+	"  -c, --special-chars      Process escaped characters in the search string\n"
+	"                             (\\n, \\t, \\\\, \\x00 through \\xFF)\n"
+	"  -e, --regex              Treat the search string as a regular expression\n"
+	"  -V, --version            Display version information\n"
+	"  -h, --help               Display this help message\n"
 	""
 	"Examples:\n"
-	"  " + program_name + " --input ./file.txt --start 50 --length 10\n\n"
-	""
-	"  " + program_name + " -s 50 -l 10 ./file.txt\n\n"
-	""
-	"  " + program_name + " -i ./file.txt --start 75 --search \"hello world\" --length 10\n\n"
-	""
-	"  " + program_name + " ./file.txt -f \"hello world\" --output-pos\n";
+	"  " + program_name + " -i file.txt -s 10 -l 100\n"
+	"  " + program_name + " -s 50 -f \"[a-zA-Z]{3}\" -e -p ./file.txt";
+
+	const std::string version_string = 
+	program_name + " " + program_version + "\n"
+	"Copyright (C) 2023-2025 rail5\n"
+	"\n"
+	"This program is free software; you can redistribute it and/or modify\n"
+	"it under the terms of the GNU General Public License as published by\n"
+	"the Free Software Foundation; either version 3 of the License, or\n"
+	"(at your option) any later version.\n"
+	"\n"
+	"This program is distributed in the hope that it will be useful,\n"
+	"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+	"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+	"\n"
+	"You should have received a copy of the GNU General Public License\n"
+	"along with this program. If not, see http://www.gnu.org/licenses/.";
 	
 	/*
 	Necessary info for the program to do its job
@@ -181,12 +156,12 @@ int main(int argc, char* argv[]) {
 				break;
 				
 			case 'V':
-				std::cout << program_version << std::endl;
+				std::cout << version_string << std::endl;
 				return EXIT_SUCCESS;
 				break;
 				
 			case 'h':
-				std::cout << help_string;
+				std::cout << help_string << std::endl;
 				return EXIT_SUCCESS;
 				break;
 				
@@ -210,7 +185,7 @@ int main(int argc, char* argv[]) {
 	
 	// Make sure we got an input file
 	if (!received_filename) {
-		std::cerr << help_string;
+		std::cerr << help_string << std::endl;
 		return EXIT_BADFILE;
 	}
 	
