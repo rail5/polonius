@@ -1,3 +1,10 @@
+polonius (0.5.15) unstable; urgency=medium
+
+  * Improved help messages Much better formatting
+  * Patched a bug in compilation on Ubuntu
+
+ -- rail5 <andrew@rail5.org>  Wed, 12 Feb 2025 11:08:04 +0800
+
 polonius (0.5.14) unstable; urgency=medium
 
   * Added -f option to polonius-editor
