@@ -341,9 +341,10 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 	// Add a newline char
 	file_stream.seekp(new_file_length - 1, std::ios::beg);
 	file_stream.write("\n", 1);
+	bool force_add_newline = false;
 	
 	for (int64_t i = (new_file_length - 1); i > start_position; i = (i - amount_to_store)) {
-		int64_t copy_to_this_position = (i - (amount_to_store - 1)) - 1;
+		int64_t copy_to_this_position = i - amount_to_store;
 		int64_t copy_from_this_position = (copy_to_this_position - insert_length);
 
 		// Final iteration:
@@ -360,10 +361,17 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 			copy_from_this_position = start_position;
 			
 			copy_to_this_position = copy_to_this_position + difference;
-			
+
 			amount_to_store = amount_to_store - difference;
 			
 			i = start_position; // Terminate loop
+		}
+
+		// HACKY fix for a bug inserting to files of 0 size
+		// Total rewrite of both editor & reader incoming very very soon
+		if (amount_to_store < 0) {
+			amount_to_store = 0;
+			force_add_newline = true;
 		}
 		
 		char* temp_data_storage = new char[amount_to_store + 1]{0}; // Allocate memory
@@ -380,7 +388,7 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 		file_stream.write(temp_data_storage, amount_to_store);
 		
 		delete[] temp_data_storage; // Free memory
-		
+
 		if (verbose) {
 			std::cout << "Moved " << amount_to_store << " bytes to position #" << copy_to_this_position << " for INSERT instruction" << std::endl;
 		}
@@ -389,6 +397,14 @@ void editor::file::insert(int64_t start_position, std::string text_to_insert) {
 	// Now, finally, insert the damn data (user inputted data)
 	file_stream.seekp(start_position, std::ios::beg);
 	file_stream.write(text_to_insert.c_str(), text_to_insert.length());
+
+	// If we have to force add a newline, do it now
+	if (force_add_newline) {
+		file_stream.seekp(new_file_length, std::ios::beg);
+		file_stream.write("\n", 1);
+		force_add_newline = false; // Reset
+	}
+		
 	
 	// Flush changes
 	file_stream.flush();
