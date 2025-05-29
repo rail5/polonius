@@ -1,3 +1,11 @@
+polonius (0.5.16) unstable; urgency=medium
+
+  * Super hacky fix for a bug inserting to files of 0 size
+    A TOTAL rewrite of both the editor and the reader is coming
+    very, very, very, very soon
+
+ -- rail5 <andrew@rail5.org>  Thu, 29 May 2025 16:44:06 +0800
+
 polonius (0.5.15) unstable; urgency=medium
 
   * Improved help messages Much better formatting
