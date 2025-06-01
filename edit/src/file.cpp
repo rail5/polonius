@@ -99,6 +99,35 @@ Polonius::Editor::File& Polonius::Editor::File::operator=(File&& other) noexcept
 	return *this;
 }
 
+void Polonius::Editor::File::validateInstructions() const {
+	// Keep a running tally of the size of the file
+	uint64_t size_after_last_instruction = size;
+	for (const auto& instruction : instructions) {
+		switch (instruction.type()) {
+			case INSERT:
+				if (instruction.start() > size_after_last_instruction) {
+					throw std::out_of_range("Insert position is out of bounds: " + std::to_string(instruction.start()));
+				}
+				size_after_last_instruction += instruction.size();
+				break;
+			case REMOVE:
+				if (instruction.end() > size_after_last_instruction) {
+					throw std::out_of_range("Remove position is out of bounds: " + std::to_string(instruction.start()) + " - " + std::to_string(instruction.end()));
+				}
+				if (instruction.start() > instruction.end()) {
+					throw std::invalid_argument("Remove start position is greater than end position: " + std::to_string(instruction.start()) + " - " + std::to_string(instruction.end()));
+				}
+				size_after_last_instruction -= instruction.size();
+				break;
+			case REPLACE:
+				if (instruction.start() > size_after_last_instruction || instruction.start() + instruction.size() > size_after_last_instruction) {
+					throw std::out_of_range("Replace position is out of bounds: " + std::to_string(instruction.start()));
+				}
+				break; // REPLACE instructions do not change the size of the file
+		}
+	}
+}
+
 void Polonius::Editor::File::parseInstructions(const std::string& instructions) {
 	// First, split the instructions string by newlines
 	std::vector<std::string> lines = explode(instructions, '\n');
@@ -296,6 +325,7 @@ void Polonius::Editor::File::replace(uint64_t position, const std::string& text)
 }
 
 void Polonius::Editor::File::executeInstructions() {
+	validateInstructions();
 	for (const auto& instruction : instructions) {
 		switch (instruction.type()) {
 			case INSERT:

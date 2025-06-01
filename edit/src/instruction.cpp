@@ -33,6 +33,10 @@ uint64_t Polonius::Editor::Instruction::end() const {
 	return end_position;
 }
 
+uint64_t Polonius::Editor::Instruction::size() const {
+	return end_position - start_position + 1;
+}
+
 const std::string& Polonius::Editor::Instruction::get_text() const {
 	return text;
 }

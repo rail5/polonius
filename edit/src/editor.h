@@ -34,6 +34,8 @@ class File {
 		void replace(uint64_t position, const std::string& text);
 		void remove(uint64_t start, uint64_t end);
 
+		void validateInstructions() const;
+
 	public:
 		File() = default;
 		explicit File(const std::filesystem::path& filePath);
@@ -70,6 +72,7 @@ class Instruction {
 		InstructionType type() const;
 		uint64_t start() const;
 		uint64_t end() const;
+		uint64_t size() const;
 		const std::string& get_text() const;
 
 		void set_type(InstructionType type);
