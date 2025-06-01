@@ -2,6 +2,7 @@
  * Copyright (C) 2024 rail5
 */
 
+#include "parse_block_units.h"
 #include "is_number.h"
 #include "to_lower.h"
 #include <stdexcept>

@@ -11,6 +11,8 @@
 #include <fstream>
 #include <unistd.h>
 
+uint64_t Polonius::Editor::block_size = 10240; // Default block size is 10K
+
 Polonius::Editor::File::File(const std::filesystem::path& filePath) {
 	path = filePath;
 	if (std::filesystem::exists(path)) {

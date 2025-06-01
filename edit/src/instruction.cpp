@@ -4,11 +4,14 @@
 
 #include "editor.h"
 
+#include "../../shared/process_special_chars.h"
+
+bool Polonius::Editor::special_chars = false; // Default is to not process special characters
+
 Polonius::Editor::Instruction::Instruction(InstructionType type, uint64_t start, const std::string& text) {
 	op = type;
 	start_position = start;
-	end_position = start + text.size();
-	this->text = text;
+	set_text(text);
 }
 
 Polonius::Editor::Instruction::Instruction(InstructionType type, uint64_t start, uint64_t end) {
@@ -54,6 +57,10 @@ void Polonius::Editor::Instruction::set_end(uint64_t end) {
 }
 
 void Polonius::Editor::Instruction::set_text(const std::string& text) {
-	this->text = text;
-	end_position = start_position + text.size();
+	if (Polonius::Editor::special_chars) {
+		this->text = process_special_chars(text);
+	} else {
+		this->text = text;
+	}
+	end_position = start_position + this->text.size();
 }

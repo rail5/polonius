@@ -16,7 +16,8 @@
 namespace Polonius {
 namespace Editor {
 
-static uint64_t block_size = 10240;
+extern uint64_t block_size;
+extern bool special_chars; // Whether to allow special characters in instructions
 
 // Forward declarations
 class File;

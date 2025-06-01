@@ -80,6 +80,7 @@ int main(int argc, char* argv[]) {
 				}
 				break;
 			case 'c':
+				Polonius::Editor::special_chars = true;
 				break;
 			case 'f':
 				{
