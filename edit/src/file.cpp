@@ -11,6 +11,8 @@
 #include <fstream>
 #include <unistd.h>
 
+#include <iostream>
+
 uint64_t Polonius::Editor::block_size = 10240; // Default block size is 10K
 
 Polonius::Editor::File::File(const std::filesystem::path& filePath) {
@@ -253,7 +255,12 @@ void Polonius::Editor::File::insert(uint64_t position, const std::string& text) 
 		fflush(file); // Ensure the data is written to disk
 
 		new_pos -= bytes_to_copy;
-		old_pos -= bytes_to_copy;
+		if (old_pos < bytes_to_copy) {
+			// Make sure it doesn't underflow
+			old_pos = 0;
+		} else {
+			old_pos -= bytes_to_copy;
+		}
 	}
 
 	// Now we can write the new text at the position
