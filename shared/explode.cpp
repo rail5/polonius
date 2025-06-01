@@ -2,17 +2,11 @@
  * Copyright (C) 2024 rail5
 */
 
-#ifndef SSTREAM
-	#define SSTREAM
-	#include <sstream>
-#endif
+#include "explode.h"
 
-#ifndef VECTOR
-	#define VECTOR	
-	#include <vector>
-#endif
+#include <sstream>
 
-std::vector<std::string> explode(std::string const &input, char delimiter, bool can_escape = false, int maximum_number_of_elements = 0) {
+std::vector<std::string> explode(const std::string& input, char delimiter, bool can_escape, int maximum_number_of_elements) {
 	/***
 	vector<string> explode(string &input, char delimiter, bool can_escape, int maximum_number_of_elements):
 		Similar to PHP's "explode" function
