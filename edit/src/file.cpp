@@ -247,6 +247,41 @@ void Polonius::Editor::File::insert(uint64_t position, const std::string& text) 
 	fflush(file); // Ensure the data is written to disk
 }
 
+void Polonius::Editor::File::remove(uint64_t start, uint64_t end) {
+	if (start > size || end > size || start > end) {
+		throw std::out_of_range("Start or end position is out of bounds");
+	}
+
+	size_t bytes_to_remove = end - start + 1;
+	size_t original_size = size;
+	size = size - bytes_to_remove;
+
+	// Left-shift the content after the removed section
+	// Do this in chunks of block_size bytes
+	// And then truncate the file to the new size
+	size_t old_pos = end + 1; // Position after the removed section
+	size_t new_pos = start;
+	while (old_pos < original_size) {
+		size_t bytes_to_copy = std::min(Polonius::Editor::block_size, original_size - old_pos);
+		std::vector<char> buffer(bytes_to_copy);
+
+		fseeko64(file, static_cast<int64_t>(old_pos), SEEK_SET);
+		if (fread(buffer.data(), 1, bytes_to_copy, file) != bytes_to_copy) {
+			throw std::runtime_error("Failed to read from file at position " + std::to_string(old_pos));
+		}
+		fseeko64(file, static_cast<int64_t>(new_pos), SEEK_SET);
+		if (fwrite(buffer.data(), 1, bytes_to_copy, file) != bytes_to_copy) {
+			throw std::runtime_error("Failed to write to file at position " + std::to_string(new_pos));
+		}
+		fflush(file); // Ensure the data is written to disk
+
+		new_pos += bytes_to_copy;
+		old_pos += bytes_to_copy;
+	}
+	// Truncate the file to the new size
+	std::filesystem::resize_file(path, size);
+}
+
 void Polonius::Editor::File::replace(uint64_t position, const std::string& text) {
 	if (position > size || position + text.size() > size) {
 		throw std::out_of_range("Position is out of bounds");
@@ -258,9 +293,6 @@ void Polonius::Editor::File::replace(uint64_t position, const std::string& text)
 		throw std::runtime_error("Failed to write text to file at position " + std::to_string(position));
 	}
 	fflush(file); // Ensure the data is written to disk
-}
-
-void Polonius::Editor::File::remove(uint64_t start, uint64_t end) {
 }
 
 void Polonius::Editor::File::executeInstructions() {
