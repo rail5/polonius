@@ -47,5 +47,13 @@ int main(int argc, char* argv[]) {
 		          << ", Start: " << instr.start() << ", End: " << instr.end()
 		          << ", Text: '" << instr.get_text() << "'" << std::endl;
 	}
+
+	try {
+		file.executeInstructions();
+	} catch (const std::exception& e) {
+		std::cerr << "Error executing instructions: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+
 	return EXIT_SUCCESS;
 }

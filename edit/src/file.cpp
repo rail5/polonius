@@ -9,6 +9,7 @@
 #include "../../shared/is_number.h"
 
 #include <fstream>
+#include <unistd.h>
 
 Polonius::Editor::File::File(const std::filesystem::path& filePath) {
 	path = filePath;
@@ -32,6 +33,70 @@ Polonius::Editor::File::File(const std::filesystem::path& filePath) {
 		}
 		size = 0; // Size is zero for a newly created file
 	}
+
+	file = fopen64(path.string().c_str(), "r+b");
+	if (!file) {
+		throw std::runtime_error("Failed to open file: " + path.string());
+	}
+	fd = fileno(file);
+	if (fd < 0) {
+		fclose(file);
+		throw std::runtime_error("Failed to get file descriptor for: " + path.string());
+	}
+
+	// Lock the file to prevent concurrent modifications
+	if (flock(fd, LOCK_EX | LOCK_NB) < 0) {
+		fclose(file);
+		throw std::runtime_error("Failed to lock file: " + path.string());
+	}
+}
+
+Polonius::Editor::File::~File() {
+	if (file) {
+		// Unlock the file before closing
+		if (fd >= 0) {
+			flock(fd, LOCK_UN);
+		}
+		fclose(file);
+	}
+}
+
+Polonius::Editor::File::File(File&& other) noexcept {
+	path = std::move(other.path);
+	file = other.file;
+	fd = other.fd;
+	size = other.size;
+	instructions = std::move(other.instructions);
+
+	// Reset the moved-from object
+	other.file = nullptr;
+	other.fd = -1;
+	other.size = 0;
+}
+
+Polonius::Editor::File& Polonius::Editor::File::operator=(File&& other) noexcept {
+	if (this != &other) {
+		// Unlock the current file if it is open
+		if (file) {
+			if (fd >= 0) {
+				flock(fd, LOCK_UN);
+			}
+			fclose(file);
+		}
+
+		path = std::move(other.path);
+		file = other.file;
+		fd = other.fd;
+		size = other.size;
+		instructions = std::move(other.instructions);
+
+		// Reset the moved-from object
+		other.file = nullptr;
+		other.fd = -1;
+		other.size = 0;
+	}
+
+	return *this;
 }
 
 void Polonius::Editor::File::parseInstructions(const std::string& instructions) {
@@ -87,6 +152,11 @@ void Polonius::Editor::File::parseInstructions(const std::string& instructions) 
 		}
 
 		for (size_t i = 1; i < parts.size(); ++i) {
+			// Trim leading whitespace from parts[i]
+			parts[i] = std::string(parts[i].begin() + parts[i].find_first_not_of(' '), parts[i].end());
+			if (parts[i].empty()) {
+				continue; // Skip empty parts
+			}
 			std::vector<std::string> additional_parts = explode(parts[i], ' ', false, 2);
 			if (additional_parts.size() < 2) {
 				throw std::invalid_argument("Invalid instruction format: " + parts[i]);
@@ -115,16 +185,84 @@ void Polonius::Editor::File::insert(uint64_t position, const std::string& text) 
 		throw std::out_of_range("Position is out of bounds");
 	}
 
-	std::ofstream file(path, std::ios::in | std::ios::out);
-	if (!file) {
-		throw std::runtime_error("Failed to open file: " + path.string());
+	size_t original_size = size;
+	size = size + text.size();
+
+	// Add blank space to the end of the file to make room for the new text
+	std::filesystem::resize_file(path, size);
+
+	// Right-shift the existing content to make room for the new text
+	// Copy block_size bytes from position to the end of the file
+	// Moving backwards until we hit the position we want to insert to
+	// And then finally, replace at that position with the new text
+	// I.e.:
+	// We're keeping 2 pointers:
+	// 1. To the old end of the file minus the block size
+	// 2. To the new end of the file minus the block size
+	// And we're continuously copying text from the old end to the new end
+	// While walking both pointers backwards by the block size
+	// Until we hit the position we want to insert to
+	size_t old_pos = original_size == 0 ? 0 : original_size - 1;
+	size_t new_pos = size - 1;
+
+	while (new_pos >= position && old_pos > position) {
+		size_t bytes_to_copy = std::min(Polonius::Editor::block_size, old_pos - position + 1);
+		std::vector<char> buffer(bytes_to_copy);
+
+		fseeko64(file, static_cast<int64_t>(old_pos - bytes_to_copy + 1), SEEK_SET);
+		if (fread(buffer.data(), 1, bytes_to_copy, file) != bytes_to_copy) {
+			throw std::runtime_error("Failed to read from file at position " + std::to_string(old_pos - bytes_to_copy));
+		}
+		fseeko64(file, static_cast<int64_t>(new_pos - bytes_to_copy + 1), SEEK_SET);
+		if (fwrite(buffer.data(), 1, bytes_to_copy, file) != bytes_to_copy) {
+			throw std::runtime_error("Failed to write to file at position " + std::to_string(new_pos - bytes_to_copy));
+		}
+		fflush(file); // Ensure the data is written to disk
+
+		new_pos -= bytes_to_copy;
+		old_pos -= bytes_to_copy;
 	}
 
-	file.seekp(static_cast<std::streamoff>(position));
-	file.write(text.c_str(), static_cast<std::streamsize>(text.size()));
-	if (!file) {
-		throw std::runtime_error("Failed to write to file: " + path.string());
+	// Now we can write the new text at the position
+	fseeko64(file, static_cast<int64_t>(position), SEEK_SET);
+	if (fwrite(text.data(), 1, text.size(), file) != text.size()) {
+		throw std::runtime_error("Failed to write text to file at position " + std::to_string(position));
 	}
 
-	size += text.size();
+	// Make sure the file ends with a newline character
+	// Does the file already end with a newline?
+	if (size > 0 && fseek(file, -1, SEEK_END) == 0) {
+		int last_char = fgetc(file);
+		if (last_char != '\n') {
+			fputc('\n', file);
+			size++;
+		}
+	} else {
+		fputc('\n', file);
+		size++;
+	}
+
+	fflush(file); // Ensure the data is written to disk
+}
+
+void Polonius::Editor::File::replace(uint64_t position, const std::string& text) {
+}
+
+void Polonius::Editor::File::remove(uint64_t start, uint64_t end) {
+}
+
+void Polonius::Editor::File::executeInstructions() {
+	for (const auto& instruction : instructions) {
+		switch (instruction.type()) {
+			case INSERT:
+				insert(instruction.start(), instruction.get_text());
+				break;
+			case REMOVE:
+				remove(instruction.start(), instruction.end());
+				break;
+			case REPLACE:
+				replace(instruction.start(), instruction.get_text());
+				break;
+		}
+	}
 }

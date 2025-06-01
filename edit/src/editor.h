@@ -11,8 +11,12 @@
 #include <cstdint>
 #include <deque>
 
+#include <sys/file.h>
+
 namespace Polonius {
 namespace Editor {
+
+static uint64_t block_size = 10240;
 
 // Forward declarations
 class File;
@@ -21,19 +25,30 @@ class Instruction;
 class File {
 	private:
 		std::filesystem::path path;
+		FILE* file = nullptr;
+		int fd = -1; // File descriptor for the file
 		uint64_t size = 0;
 		std::deque<Instruction> instructions;
+
+		void insert(uint64_t position, const std::string& text);
+		void replace(uint64_t position, const std::string& text);
+		void remove(uint64_t start, uint64_t end);
 
 	public:
 		File() = default;
 		explicit File(const std::filesystem::path& filePath);
+		~File();
+		File(const File&) = delete; // Disable copy constructor
+		File& operator=(const File&) = delete; // Disable copy assignment operator
+		File(File&& other) noexcept; // Move constructor
+		File& operator=(File&& other) noexcept; // Move assignment operator
 
 		void parseInstructions(const std::string& instructions);
 		std::deque<Instruction> get_instructions() const {
 			return instructions;
 		}
 
-		void insert(uint64_t position, const std::string& text);
+		void executeInstructions();
 };
 
 enum InstructionType {
