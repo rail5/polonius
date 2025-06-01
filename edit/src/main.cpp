@@ -15,7 +15,7 @@
 
 int main(int argc, char* argv[]) {
 	Polonius::Editor::File file;
-	std::vector<std::string> instructions;
+	std::string instructions;
 
 	const char* help_string = "polonius-editor " program_version "\n"
 		"Usage: polonius-editor <file> [options]\n"
@@ -65,7 +65,8 @@ int main(int argc, char* argv[]) {
 	while ((opt = getopt_long(argc, argv, "a:b:cf:hV", long_options, nullptr)) != -1) {
 		switch (opt) {
 			case 'a':
-				instructions.push_back(optarg);
+				instructions += optarg;
+				instructions += '\n';
 				break;
 			case 'b':
 				try {
@@ -89,10 +90,11 @@ int main(int argc, char* argv[]) {
 						std::cerr << "Error opening instruction file: " << optarg << std::endl;
 						return EXIT_FAILURE;
 					}
+					// Add the entire file content to the instructions string
 					std::string line;
 					while (std::getline(instruction_file, line)) {
 						if (!line.empty()) {
-							instructions.push_back(line);
+							instructions += line + '\n';
 						}
 					}
 					instruction_file.close();
@@ -125,18 +127,11 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	for (const auto& instruction : instructions) {
-		try {
-			file.parseInstructions(instruction);
-		} catch (const std::exception& e) {
-			std::cerr << "Error parsing instruction '" << instruction << "': " << e.what() << std::endl;
-			return EXIT_FAILURE;
-		}
-	}
-	for (const auto& instr : file.get_instructions()) {
-		std::cout << "Instruction: " << (instr.type() == Polonius::Editor::INSERT ? "INSERT" : instr.type() == Polonius::Editor::REMOVE ? "REMOVE" : "REPLACE")
-		          << ", Start: " << instr.start() << ", End: " << instr.end()
-		          << ", Text: '" << instr.get_text() << "'" << std::endl;
+	try {
+		file.parseInstructions(instructions);
+	} catch (const std::exception& e) {
+		std::cerr << "Error parsing instructions: " << e.what() << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	try {
