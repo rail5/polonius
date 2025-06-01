@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
 
 #include <getopt.h>
 
@@ -81,6 +82,20 @@ int main(int argc, char* argv[]) {
 			case 'c':
 				break;
 			case 'f':
+				{
+					std::ifstream instruction_file(optarg);
+					if (!instruction_file) {
+						std::cerr << "Error opening instruction file: " << optarg << std::endl;
+						return EXIT_FAILURE;
+					}
+					std::string line;
+					while (std::getline(instruction_file, line)) {
+						if (!line.empty()) {
+							instructions.push_back(line);
+						}
+					}
+					instruction_file.close();
+				}
 				break;
 			case 'h':
 				std::cout << help_string;
