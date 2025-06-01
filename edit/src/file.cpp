@@ -153,8 +153,10 @@ void Polonius::Editor::File::parseInstructions(const std::string& instructions) 
 
 		for (size_t i = 1; i < parts.size(); ++i) {
 			// Trim leading whitespace from parts[i]
-			parts[i] = std::string(parts[i].begin() + parts[i].find_first_not_of(' '), parts[i].end());
-			if (parts[i].empty()) {
+			size_t first_non_space = parts[i].find_first_not_of(' ');
+			if (first_non_space != std::string::npos) {
+				parts[i].erase(0, first_non_space);
+			} else {
 				continue; // Skip empty parts
 			}
 			std::vector<std::string> additional_parts = explode(parts[i], ' ', false, 2);
@@ -246,6 +248,16 @@ void Polonius::Editor::File::insert(uint64_t position, const std::string& text) 
 }
 
 void Polonius::Editor::File::replace(uint64_t position, const std::string& text) {
+	if (position > size || position + text.size() > size) {
+		throw std::out_of_range("Position is out of bounds");
+	}
+
+	// Move the file pointer to the position
+	fseeko64(file, static_cast<int64_t>(position), SEEK_SET);
+	if (fwrite(text.data(), 1, text.size(), file) != text.size()) {
+		throw std::runtime_error("Failed to write text to file at position " + std::to_string(position));
+	}
+	fflush(file); // Ensure the data is written to disk
 }
 
 void Polonius::Editor::File::remove(uint64_t start, uint64_t end) {
