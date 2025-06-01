@@ -48,7 +48,19 @@ int main(int argc, char* argv[]) {
 
 	// getopt
 	int opt;
-	while ((opt = getopt(argc, argv, "a:b:cf:hV")) != -1) {
+
+	// Long options
+	static struct option long_options[] = {
+		{"add", required_argument, nullptr, 'a'},
+		{"block-size", required_argument, nullptr, 'b'},
+		{"special-chars", no_argument, nullptr, 'c'},
+		{"instruction-file", required_argument, nullptr, 'f'},
+		{"help", no_argument, nullptr, 'h'},
+		{"version", no_argument, nullptr, 'V'},
+		{nullptr, 0, nullptr, 0} // Sentinel
+	};
+
+	while ((opt = getopt_long(argc, argv, "a:b:cf:hV", long_options, nullptr)) != -1) {
 		switch (opt) {
 			case 'a':
 				instructions.push_back(optarg);
