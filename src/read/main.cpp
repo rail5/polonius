@@ -1,227 +1,158 @@
 /***
- * Copyright (C) 2024 rail5
+ * Copyright (C) 2023-2025 rail5
 */
 
-#include "includes.h"
+#include <iostream>
+#include <string>
 
-#ifndef IOSTREAM
-	#define IOSTREAM
-	#include <iostream>
-#endif
+#include <getopt.h>
 
-#ifndef GETOPT_H
-	#define GETOPT_H
-	#include <getopt.h>
-#endif
+#include "../polonius.h"
+#include "reader.h"
+
+#include "../shared/version.h"
+#include "../shared/parse_block_units.h"
+#include "../shared/is_number.h"
 
 int main(int argc, char* argv[]) {
-	const std::string program_name = "polonius-reader";
+	Polonius::File file;
 
-	const std::string help_string =
-	program_name + " " + program_version
-	"\n"
-	"Usage: " + program_name + " [file] [options]\n"
-	""
-	"Options:\n"
-	"  -i, --input [file]       File to read\n"
-	"  -s, --start [byte]       Byte to start from (default: 0)\n"
-	"  -l, --length [bytes]     Number of bytes to read (default: until EOF)\n"
-	"  -b, --block-size [size]  Block size (default: 10K)\n"
-	"  -f, --find [string]      Search for a string\n"
-	"                             If -s is set, only search from that position\n"
-	"                             If -l is set, only search that many bytes\n"
-	"  -p, --output-pos         Output start and end position rather than text\n"
-	"                             If -f is set, output position of the match\n"
-	"  -c, --special-chars      Process escaped characters in the search string\n"
-	"                             (\\n, \\t, \\\\, \\x00 through \\xFF)\n"
-	"  -e, --regex              Treat the search string as a regular expression\n"
-	"  -V, --version            Display version information\n"
-	"  -h, --help               Display this help message\n"
-	""
-	"Examples:\n"
-	"  " + program_name + " -i file.txt -s 10 -l 100\n"
-	"  " + program_name + " -s 50 -f \"[a-zA-Z]{3}\" -e -p ./file.txt";
+	const char* help_string = "polonius-reader " program_version "\n"
+		"Usage: polonius-reader <file> [options]\n"
+		"Options:\n"
+		"-s, --start <position>       Start reading from this position (default: 0)\n"
+		"-l, --length <length>        Read this many bytes (default: until EOF)\n"
+		"-b, --block-size <size>      Set the block size for reading (default: 10K)\n"
+		"-f, --find <string>		  Search for this string in the file\n"
+		"                              If -s is set, start searching from that position\n"
+		"                              If -l is set, search only within that length\n"
+		"-e, --regex                  Treat the search string as a regular expression\n"
+		"-p, --position               Output start and end position rather than text\n"
+		"                              If -f is set, output position of the match\n"
+		"-h, --help                   Show this help message and exit\n"
+		"-V, --version                Show version information and exit\n";
 
-	const std::string version_string = 
-	program_name + " " + program_version + "\n"
-	"Copyright (C) 2023-2025 rail5\n"
-	"\n"
-	"This program is free software; you can redistribute it and/or modify\n"
-	"it under the terms of the GNU General Public License as published by\n"
-	"the Free Software Foundation; either version 3 of the License, or\n"
-	"(at your option) any later version.\n"
-	"\n"
-	"This program is distributed in the hope that it will be useful,\n"
-	"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-	"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-	"\n"
-	"You should have received a copy of the GNU General Public License\n"
-	"along with this program. If not, see http://www.gnu.org/licenses/.";
+	const char* version_string = "polonius-reader " program_version "\n"
+		"Copyright (C) 2023-2025 rail5\n"
+		"\n"
+		"This program is free software; you can redistribute it and/or modify\n"
+		"it under the terms of the GNU General Public License as published by\n"
+		"the Free Software Foundation; either version 3 of the License, or\n"
+		"(at your option) any later version.\n"
+		"\n"
+		"This program is distributed in the hope that it will be useful,\n"
+		"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+		"GNU General Public License for more details.\n"
+		"\n"
+		"You should have received a copy of the GNU General Public License\n"
+		"along with this program. If not, see http://www.gnu.org/licenses/.\n";
 	
-	/*
-	Necessary info for the program to do its job
-	The file to read (-i),
-	The byte to start from (-s) [0 if unspecified]
-	The number of bytes to read (-l) [-1 if unspecified]
-		"amount_to_read" == -1 will result in reading from the start position to the end of the file
-	*/
-	bool received_filename = false;
-	std::string file_to_read = "";
-	
-	int64_t start_position = 0;
-	int64_t amount_to_read = -1;
-	
-	int64_t block_size = 10240;
-	
-	reader::job_type job = reader::read_job;
-	std::string searching_for = "";
-	
-	bool output_position = false;
+	// getopt
+	int opt;
 
-	bool special_chars = false;
-
-	reader::search_type query_type = reader::t_normal_search;
-	
-	/*
-	GETOPT
-	*/
-	int c;
-	opterr = 0;
-	int option_index = 0;
-	
+	// Long options
 	static struct option long_options[] = {
-		{"input", required_argument, 0, 'i'},
-		{"start", required_argument, 0, 's'},
-		{"length", required_argument, 0, 'l'},
-		{"block-size", required_argument, 0, 'b'},
-		{"find", required_argument, 0, 'f'},
-		{"search", required_argument, 0, 'f'},
-		{"output-pos", no_argument, 0, 'p'},
-		{"special-chars", no_argument, 0, 'c'},
-		{"regex", no_argument, 0, 'e'},
-		{"version", no_argument, 0, 'V'},
-		{"help", no_argument, 0, 'h'}
+		{"start", required_argument, nullptr, 's'},
+		{"length", required_argument, nullptr, 'l'},
+		{"block-size", required_argument, nullptr, 'b'},
+		{"find", required_argument, nullptr, 'f'},
+		{"regex", no_argument, nullptr, 'e'},
+		{"position", no_argument, nullptr, 'p'},
+		{"help", no_argument, nullptr, 'h'},
+		{"version", no_argument, nullptr, 'V'},
+		{nullptr, 0, nullptr, 0} // Sentinel
 	};
-	
-	while ((c = getopt_long(argc, argv, "i:s:l:b:f:pceVh", long_options, &option_index)) != -1) {
-		switch(c) {
-			case 'i':
-				if (received_filename) {
-					std::cerr << program_name << ": Error: Multiple files specified" << std::endl;
-					return EXIT_BADFILE;
+
+	std::string search_query;
+
+	while ((opt = getopt_long(argc, argv, "b:ef:hl:ps:V", long_options, nullptr)) != -1) {
+		switch (opt) {
+			case 'b':
+				try {
+					Polonius::block_size = parse_block_units(optarg);
+				} catch (const std::exception& e) {
+					std::cerr << "Error parsing block size: " << e.what() << std::endl;
+					return EXIT_FAILURE;
 				}
-				file_to_read = optarg;
-				received_filename = true;
-				break;
-				
-			case 's':
-				if (!is_number(optarg)) {
-					std::cerr << program_name << ": '" << optarg << "' is not an integer" << std::endl << "Use -h for help" << std::endl;
-					return EXIT_BADARG;
+				if (Polonius::block_size == 0) {
+					std::cerr << "Error: Block size cannot be zero." << std::endl;
+					return EXIT_FAILURE;
 				}
-				start_position = (int64_t)std::stoll(optarg);
 				break;
-				
+			case 'e':
+				Polonius::Reader::search_mode = Polonius::Reader::t_regex_search;
+				break;
+			case 'f':
+				Polonius::Reader::search_mode = Polonius::Reader::t_normal_search;
+				search_query = optarg;
+				break;
+			case 'h':
+				std::cout << help_string;
+				return EXIT_SUCCESS;
 			case 'l':
 				if (!is_number(optarg)) {
-					std::cerr << program_name << ": '" << optarg << "' is not an integer" << std::endl << "Use -h for help" << std::endl;
-					return EXIT_BADARG;
+					std::cerr << "Error: Length must be a number." << std::endl;
+					return EXIT_FAILURE;
 				}
-				amount_to_read = (int64_t)std::stoll(optarg);
-				break;
-				
-			case 'b':
-				block_size = parse_block_units(optarg);
-				if (block_size < 0) {
-					std::cerr << program_name << ": Block size '" << optarg << "' is not understood or too large" << std::endl << "Use -h for help" << std::endl;
-					return EXIT_BADARG;
+				Polonius::Reader::amount_to_read = std::stoll(optarg);
+				if (Polonius::Reader::amount_to_read <= 0) {
+					std::cerr << "Error: Length must be greater than zero" << std::endl;
+					return EXIT_FAILURE;
 				}
 				break;
-			
-			case 'f':
-				job = reader::search_job;
-				searching_for = optarg;
-				break;
-			
 			case 'p':
-				output_position = true;
+				Polonius::Reader::output_positions = true;
 				break;
-			
-			case 'c':
-				special_chars = true;
-				break;
-			
-			case 'e':
-				query_type = reader::t_regex_search;
-				break;
-				
-			case 'V':
-				std::cout << version_string << std::endl;
-				return EXIT_SUCCESS;
-				break;
-				
-			case 'h':
-				std::cout << help_string << std::endl;
-				return EXIT_SUCCESS;
-				break;
-				
-			case '?':
-				if (optopt == 'i' || optopt == 's' || optopt == 'l') {
-					std::cerr << program_name << ": Option -" << static_cast<char>(optopt) << " requires an argument" << std::endl << "Use -h for help" << std::endl;
-					return EXIT_BADOPT;
+			case 's':
+				if (!is_number(optarg)) {
+					std::cerr << "Error: Start position must be a number." << std::endl;
+					return EXIT_FAILURE;
 				}
+				Polonius::Reader::start_position = std::stoull(optarg);
 				break;
+			case 'V':
+				std::cout << version_string;
+				return EXIT_SUCCESS;
+			case '?':
+				if (optopt == 'b' || optopt == 'f' || optopt == 'l' || optopt == 's') {
+					std::cerr << "Option -" << static_cast<char>(optopt) << " requires an argument." << std::endl;
+				} else {
+					std::cerr << "Unknown option: -" << static_cast<char>(optopt) << std::endl;
+				}
+				std::cerr << help_string;
+				return EXIT_FAILURE;
 		}
 	}
-	
-	for (option_index = optind; option_index < argc; option_index++) {
-		if (received_filename) {
-			std::cerr << program_name << ": Error: Multiple files specified" << std::endl;
-			return EXIT_BADFILE;
+
+	// Handle non-option arguments
+	bool received_file = false;
+	for (int index = optind; index < argc; ++index) {
+		std::string arg = argv[index];
+		if (received_file) {
+			std::cerr << "Error: Only one file can be specified." << std::endl;
+			return EXIT_FAILURE;
 		}
-		file_to_read = argv[option_index];
-		received_filename = true;
+		try {
+			file = Polonius::File(arg);
+			received_file = true;
+		} catch (const std::exception& e) {
+			std::cerr << "Error: " << e.what() << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
-	
-	// Make sure we got an input file
-	if (!received_filename) {
-		std::cerr << help_string << std::endl;
-		return EXIT_BADFILE;
-	}
-	
-	reader::file the_file;
-	
-	if (!the_file.init(file_to_read)) {
-		std::cerr << program_name << ": " << the_file.get_init_error_message() << std::endl;
-		return EXIT_BADFILE;
-	}
-	
-	// If -l / --length wasn't set, just set it to the full length of the file
-	if (amount_to_read == -1) {
-		amount_to_read = the_file.get_file_length();
-	}
-	
-	the_file.set_start_position(start_position);
-	the_file.set_amount_to_read(amount_to_read);
-	
-	the_file.set_just_outputting_positions(output_position);
-	
-	the_file.set_block_size(block_size);
 
-	if (special_chars) {
-		searching_for = process_escapedchars(searching_for);
-		searching_for = process_bytecodes(searching_for);
+	if (!received_file) {
+		std::cerr << "Error: No file specified." << std::endl;
+		std::cerr << help_string;
+		return EXIT_FAILURE;
 	}
-	
-	the_file.set_search_query(searching_for);
 
-	the_file.set_search_type(query_type);
-	
-	the_file.set_job_type(job);
-
-	if (the_file.do_job()) {
-		return EXIT_SUCCESS;
-	} else {
-		return EXIT_OTHER;
+	try {
+		file.setSearchQuery(search_query);
+		file.read();
+	} catch (const std::exception& e) {
+		std::cerr << "Error reading file: " << e.what() << std::endl;
+		return EXIT_FAILURE;
 	}
 }

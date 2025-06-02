@@ -139,6 +139,12 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	if (!received_file) {
+		std::cerr << "Error: No file specified." << std::endl;
+		std::cerr << help_string;
+		return EXIT_FAILURE;
+	}
+
 	try {
 		file.parseInstructions(instructions);
 	} catch (const std::exception& e) {

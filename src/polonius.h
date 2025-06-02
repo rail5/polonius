@@ -10,15 +10,18 @@
 #include <filesystem>
 
 #include "edit/editor.h"
+#include "read/reader.h"
 
 namespace Polonius {
 
 // Forward declarations
 namespace Editor {
-
 class Instruction;
 enum InstructionType : uint8_t;
+}
 
+namespace Reader {
+enum search_type : uint8_t;
 }
 
 extern uint64_t block_size;
@@ -31,11 +34,17 @@ class File {
 		uint64_t size = 0;
 		std::deque<Polonius::Editor::Instruction> instructions;
 
+		std::string search_query;
+
 		void insert(uint64_t position, const std::string& text);
 		void replace(uint64_t position, const std::string& text);
 		void remove(uint64_t start, uint64_t end);
 
 		void validateInstructions() const;
+
+		void readFromFile() const;
+		void search() const;
+		void regex_search() const;
 
 	public:
 		File() = default;
@@ -48,6 +57,10 @@ class File {
 
 		void parseInstructions(const std::string& instructions);
 		void executeInstructions();
+
+		void setSearchQuery(const std::string& query);
+
+		void read() const;
 };
 
 } // namespace Polonius

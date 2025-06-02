@@ -6,15 +6,21 @@ CXX = g++
 CXXFLAGS = -O2 -s -std=gnu++17
 
 all: src/shared/version.h
-	$(MAKE) bin/polonius-editor
+	$(MAKE) bin/polonius-editor bin/polonius-reader
 
 bin/polonius-editor: bin/obj/edit/main.o bin/obj/file.o bin/obj/edit/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+bin/polonius-reader: bin/obj/read/main.o bin/obj/file.o bin/obj/edit/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 bin/obj/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 bin/obj/edit/%.o: src/edit/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+bin/obj/read/%.o: src/read/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 bin/obj/shared/%.o: src/shared/%.cpp

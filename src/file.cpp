@@ -12,8 +12,18 @@
 #include <fstream>
 #include <unistd.h>
 
+// General options:
 uint64_t Polonius::block_size = 10240; // Default block size is 10K
+
+// Editor options:
 bool Polonius::Editor::append_newline = true; // Default is to append a newline at the end of the file
+
+// Reader options:
+bool Polonius::Reader::output_positions = false; // Default is to output text
+Polonius::Reader::search_type Polonius::Reader::search_mode = Polonius::Reader::t_normal_search; // Default search mode is normal search
+uint64_t Polonius::Reader::start_position = 0; // Default start position is 0
+int64_t Polonius::Reader::amount_to_read = -1; // Default is to read until EOF
+std::ostream& Polonius::Reader::output_stream = std::cout; // Default output stream is std::cout
 
 Polonius::File::File(const std::filesystem::path& filePath) {
 	path = filePath;
@@ -338,4 +348,71 @@ void Polonius::File::executeInstructions() {
 		}
 	}
 	instructions.clear(); // Clear instructions after execution
+}
+
+void Polonius::File::setSearchQuery(const std::string& query) {
+	search_query = query;
+}
+
+void Polonius::File::readFromFile() const {
+	// Calculate the end position of the read operation
+	uint64_t end_position = Polonius::Reader::start_position + Polonius::Reader::amount_to_read;
+	if (Polonius::Reader::amount_to_read < 0 || end_position > size) {
+		end_position = size; // Read until the end of the file
+	}
+	if (Polonius::Reader::start_position >= size) {
+		throw std::out_of_range("Start position is out of bounds");
+	}
+
+	if (Polonius::Reader::output_positions) {
+		Polonius::Reader::output_stream << Polonius::Reader::start_position << " " << end_position << std::endl;
+		return;
+	}
+
+	// Read the file in blocks of Polonius::block_size
+	uint64_t current_position = Polonius::Reader::start_position;
+	while (current_position < end_position) {
+		uint64_t bytes_to_read = std::min(Polonius::block_size, end_position - current_position);
+		std::vector<char> buffer(bytes_to_read);
+
+		fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
+		size_t bytes_read = fread(buffer.data(), 1, bytes_to_read, file);
+		if (bytes_read == 0) {
+			if (ferror(file)) {
+				throw std::runtime_error("Error reading from file at position " + std::to_string(current_position));
+			}
+			break; // EOF reached
+		}
+
+		Polonius::Reader::output_stream.write(buffer.data(), bytes_read);
+		current_position += bytes_read;
+	}
+	if (ferror(file)) {
+		throw std::runtime_error("Error reading from file at position " + std::to_string(current_position));
+	}
+	Polonius::Reader::output_stream.flush(); // Ensure all data is written to the output stream
+}
+
+void Polonius::File::search() const {
+
+}
+
+void Polonius::File::regex_search() const {
+
+}
+
+void Polonius::File::read() const {
+	if (!search_query.empty()) {
+		switch (Polonius::Reader::search_mode) {
+			case Polonius::Reader::t_normal_search:
+				search();
+				return;
+			case Polonius::Reader::t_regex_search:
+				regex_search();
+				return;
+		}
+	}
+
+	// If we're here, the search query is empty, and it's just a normal read
+	readFromFile();
 }
