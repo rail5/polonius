@@ -361,12 +361,9 @@ std::string Polonius::File::readFromFile(uint64_t start, int64_t length, bool fo
 	if (length < 0 || end_position > size) {
 		end_position = size; // Read until the end of the file
 	}
-	if (start >= size) {
-		throw std::out_of_range("Start position is out of bounds");
-	}
 
 	if (Polonius::Reader::output_positions && !force_output_text) {
-		return std::to_string(start) + " " + std::to_string(end_position) + "\n";
+		return std::to_string(start) + " " + std::to_string(end_position - 1) + "\n";
 	}
 
 	// Read the file in blocks of Polonius::block_size
