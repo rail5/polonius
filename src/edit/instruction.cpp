@@ -4,7 +4,7 @@
 
 #include "editor.h"
 
-#include "../../shared/process_special_chars.h"
+#include "../shared/process_special_chars.h"
 
 bool Polonius::Editor::special_chars = false; // Default is to not process special characters
 

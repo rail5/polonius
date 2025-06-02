@@ -10,8 +10,8 @@
 #include <getopt.h>
 
 #include "editor.h"
-#include "../../shared/version.h"
-#include "../../shared/parse_block_units.h"
+#include "../shared/version.h"
+#include "../shared/parse_block_units.h"
 
 int main(int argc, char* argv[]) {
 	Polonius::Editor::File file;

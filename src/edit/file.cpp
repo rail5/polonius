@@ -4,9 +4,9 @@
 
 #include "editor.h"
 
-#include "../../shared/explode.h"
-#include "../../shared/to_lower.h"
-#include "../../shared/is_number.h"
+#include "../shared/explode.h"
+#include "../shared/to_lower.h"
+#include "../shared/is_number.h"
 
 #include <fstream>
 #include <unistd.h>
