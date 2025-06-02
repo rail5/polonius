@@ -8,10 +8,9 @@
 #include "../shared/to_lower.h"
 #include "../shared/is_number.h"
 
+#include <vector>
 #include <fstream>
 #include <unistd.h>
-
-#include <iostream>
 
 uint64_t Polonius::Editor::block_size = 10240; // Default block size is 10K
 bool Polonius::Editor::append_newline = true; // Default is to append a newline at the end of the file

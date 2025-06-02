@@ -2,8 +2,8 @@
  * Copyright (C) 2023-2025 rail5
  */
 
-#ifndef EDIT_SRC_EDITOR_H_
-#define EDIT_SRC_EDITOR_H_
+#ifndef SRC_EDIT_EDITOR_H_
+#define SRC_EDIT_EDITOR_H_
 
 #include <filesystem>
 #include <string>
@@ -88,4 +88,4 @@ Instruction parse(const std::string& instruction);
 } // namespace Editor
 } // namespace Polonius
 
-#endif // EDIT_SRC_EDITOR_H_
+#endif // SRC_EDIT_EDITOR_H_
