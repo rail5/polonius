@@ -354,23 +354,23 @@ void Polonius::File::setSearchQuery(const std::string& query) {
 	search_query = query;
 }
 
-void Polonius::File::readFromFile() const {
+std::string Polonius::File::readFromFile(uint64_t start, int64_t length, bool force_output_text) const {
+	std::string result;
 	// Calculate the end position of the read operation
-	uint64_t end_position = Polonius::Reader::start_position + Polonius::Reader::amount_to_read;
-	if (Polonius::Reader::amount_to_read < 0 || end_position > size) {
+	uint64_t end_position = start + static_cast<uint64_t>(length);
+	if (length < 0 || end_position > size) {
 		end_position = size; // Read until the end of the file
 	}
-	if (Polonius::Reader::start_position >= size) {
+	if (start >= size) {
 		throw std::out_of_range("Start position is out of bounds");
 	}
 
-	if (Polonius::Reader::output_positions) {
-		Polonius::Reader::output_stream << Polonius::Reader::start_position << " " << end_position << std::endl;
-		return;
+	if (Polonius::Reader::output_positions && !force_output_text) {
+		return std::to_string(start) + " " + std::to_string(end_position) + "\n";
 	}
 
 	// Read the file in blocks of Polonius::block_size
-	uint64_t current_position = Polonius::Reader::start_position;
+	uint64_t current_position = start;
 	while (current_position < end_position) {
 		uint64_t bytes_to_read = std::min(Polonius::block_size, end_position - current_position);
 		std::vector<char> buffer(bytes_to_read);
@@ -384,17 +384,72 @@ void Polonius::File::readFromFile() const {
 			break; // EOF reached
 		}
 
-		Polonius::Reader::output_stream.write(buffer.data(), bytes_read);
+		result += std::string(buffer.data(), bytes_read);
 		current_position += bytes_read;
 	}
 	if (ferror(file)) {
 		throw std::runtime_error("Error reading from file at position " + std::to_string(current_position));
 	}
-	Polonius::Reader::output_stream.flush(); // Ensure all data is written to the output stream
+	return result;
 }
 
 void Polonius::File::search() const {
+	// Calculate the end position of the read operation
+	uint64_t end_position = Polonius::Reader::start_position + static_cast<uint64_t>(Polonius::Reader::amount_to_read);
+	if (Polonius::Reader::amount_to_read < 0 || end_position > size) {
+		end_position = size; // Read until the end of the file
+	}
+	if (Polonius::Reader::start_position >= size) {
+		throw std::out_of_range("Start position is out of bounds");
+	}
 
+	uint64_t match_start = 0;
+	uint64_t match_end = 0;
+
+	uint64_t bs = Polonius::block_size;
+
+	uint64_t query_length = search_query.length();
+
+	if (bs <= query_length) {
+		bs = query_length + 1; // Ensure block size is at least the length of the search query
+	}
+
+	uint64_t shift_amount = bs - query_length;
+
+	// Here's the procedure:
+	// 1. Set start position to Polonius::Reader::start_position
+	// 1. Scan a chunk of block_size bytes from the start position for a match
+	// 2. If a match is found, return it
+	// 3. If a match is not found, set the start position to the next chunk minus the size of the search query
+	// 4. Repeat until the end of the file is reached or a match is found
+	// Setting the chunks in this way ensures that we don't miss any matches that might span across chunks.
+
+	for (uint64_t pos = Polonius::Reader::start_position; pos < end_position; pos += shift_amount) {
+		uint64_t remaining = end_position - pos;
+		if (bs > remaining || shift_amount > remaining) {
+			bs = remaining;
+			shift_amount = remaining;
+		}
+
+		std::string data = readFromFile(pos, static_cast<int64_t>(bs), true);
+
+		// Check if the search query is in the data
+		size_t search_result = data.find(search_query);
+		if (search_result == std::string::npos) {
+			continue; // No match found, continue to the next chunk
+		}
+		// Match found, calculate the start and end positions
+		match_start = pos + search_result;
+		match_end = match_start + query_length;
+
+		if (Polonius::Reader::output_positions) {
+			Polonius::Reader::output_stream << match_start << " " << match_end - 1 << "\n";
+			return;
+		} else {
+			Polonius::Reader::output_stream << data.substr(search_result, query_length) << "\n";
+			return;
+		}
+	}
 }
 
 void Polonius::File::regex_search() const {
@@ -414,5 +469,6 @@ void Polonius::File::read() const {
 	}
 
 	// If we're here, the search query is empty, and it's just a normal read
-	readFromFile();
+	Polonius::Reader::output_stream << readFromFile();
+	Polonius::Reader::output_stream.flush();
 }

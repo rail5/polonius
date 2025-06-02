@@ -42,7 +42,9 @@ class File {
 
 		void validateInstructions() const;
 
-		void readFromFile() const;
+		std::string readFromFile(uint64_t start = Polonius::Reader::start_position,
+			int64_t length = Polonius::Reader::amount_to_read,
+			bool force_output_text = false) const;
 		void search() const;
 		void regex_search() const;
 
