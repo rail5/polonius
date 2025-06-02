@@ -1,3 +1,14 @@
+polonius (0.6.0) unstable; urgency=medium
+
+  * Merge pull request #37 from rail5/total-rewrite
+    The editor and reader have been completely re-written
+    from scratch.
+    This closes #23 and #16
+  * Use all CPU cores for builds unless otherwise specified
+  * Support for the 'end' keyword has been removed
+
+ -- rail5 <andrew@rail5.org>  Mon, 02 Jun 2025 16:44:52 +0800
+
 polonius (0.5.16) unstable; urgency=medium
 
   * Super hacky fix for a bug inserting to files of 0 size
