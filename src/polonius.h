@@ -28,6 +28,7 @@ extern uint8_t exit_code; // Exit code for the program
 extern uint64_t block_size;
 extern bool editor_mode;
 extern bool reader_mode;
+extern bool special_chars; // Whether to process escape sequences in strings
 
 class File {
 	private:
@@ -65,7 +66,7 @@ class File {
 
 		void setSearchQuery(const std::string& query);
 
-		void read() const;
+		void read();
 };
 
 } // namespace Polonius

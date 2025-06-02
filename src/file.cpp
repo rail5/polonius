@@ -8,6 +8,7 @@
 #include "shared/to_lower.h"
 #include "shared/is_number.h"
 #include "shared/parse_regex.h"
+#include "shared/process_special_chars.h"
 
 #include <vector>
 #include <fstream>
@@ -19,6 +20,7 @@
 uint64_t Polonius::block_size = 10240; // Default block size is 10K
 bool Polonius::editor_mode = true;
 bool Polonius::reader_mode = true;
+bool Polonius::special_chars = false; // Default is to not process special characters
 
 uint8_t Polonius::exit_code = EXIT_SUCCESS; // Default exit code is success
 
@@ -640,8 +642,12 @@ void Polonius::File::regex_search() const {
  * If a search query is set, it performs a search based on the search mode (normal or regex).
  * If no search query is set, it reads the file from the specified start position and for the specified length.
  */
-void Polonius::File::read() const {
+void Polonius::File::read() {
 	if (!search_query.empty()) {
+		if (Polonius::special_chars) {
+			search_query = process_special_chars(search_query);
+		}
+
 		switch (Polonius::Reader::search_mode) {
 			case Polonius::Reader::t_normal_search:
 				search();

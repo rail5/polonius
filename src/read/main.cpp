@@ -23,17 +23,19 @@ int main(int argc, char* argv[]) {
 	const char* help_string = "polonius-reader " program_version "\n"
 		"Usage: polonius-reader <file> [options]\n"
 		"Options:\n"
-		"-s, --start <position>       Start reading from this position (default: 0)\n"
-		"-l, --length <length>        Read this many bytes (default: until EOF)\n"
-		"-b, --block-size <size>      Set the block size for reading (default: 10K)\n"
-		"-f, --find <string>		  Search for this string in the file\n"
-		"                              If -s is set, start searching from that position\n"
-		"                              If -l is set, search only within that length\n"
-		"-e, --regex                  Treat the search string as a regular expression\n"
-		"-p, --position               Output start and end position rather than text\n"
-		"                              If -f is set, output position of the match\n"
-		"-h, --help                   Show this help message and exit\n"
-		"-V, --version                Show version information and exit\n";
+		"  -s, --start <position>       Start reading from this position (default: 0)\n"
+		"  -l, --length <length>        Read this many bytes (default: until EOF)\n"
+		"  -b, --block-size <size>      Set the block size for reading (default: 10K)\n"
+		"  -f, --find <string>		    Search for this string in the file\n"
+		"                                If -s is set, start searching from that position\n"
+		"                                If -l is set, search only within that length\n"
+		"  -e, --regex                  Treat the search string as a regular expression\n"
+		"  -c, --special-chars          Process escaped characters in the search string\n"
+		"                                (\\n, \\t, \\\\, \\x00 through \\xFF)\n"
+		"  -p, --position               Output start and end position rather than text\n"
+		"                                If -f is set, output position of the match\n"
+		"  -h, --help                   Show this help message and exit\n"
+		"  -V, --version                Show version information and exit\n";
 
 	const char* version_string = "polonius-reader " program_version "\n"
 		"Copyright (C) 2023-2025 rail5\n"
@@ -61,6 +63,7 @@ int main(int argc, char* argv[]) {
 		{"block-size", required_argument, nullptr, 'b'},
 		{"find", required_argument, nullptr, 'f'},
 		{"regex", no_argument, nullptr, 'e'},
+		{"special-chars", no_argument, nullptr, 'c'},
 		{"position", no_argument, nullptr, 'p'},
 		{"help", no_argument, nullptr, 'h'},
 		{"version", no_argument, nullptr, 'V'},
@@ -69,7 +72,7 @@ int main(int argc, char* argv[]) {
 
 	std::string search_query;
 
-	while ((opt = getopt_long(argc, argv, "b:ef:hl:ps:V", long_options, nullptr)) != -1) {
+	while ((opt = getopt_long(argc, argv, "b:cef:hl:ps:V", long_options, nullptr)) != -1) {
 		switch (opt) {
 			case 'b':
 				try {
@@ -82,6 +85,9 @@ int main(int argc, char* argv[]) {
 					std::cerr << "Error: Block size cannot be zero." << std::endl;
 					return EXIT_FAILURE;
 				}
+				break;
+			case 'c':
+				Polonius::special_chars = true;
 				break;
 			case 'e':
 				Polonius::Reader::search_mode = Polonius::Reader::t_regex_search;
