@@ -49,6 +49,13 @@ manual:
 	pandoc --standalone --to man "$(WIKIDIRECTORY)/Polonius-Editor.md" -o debian/polonius-editor.1
 	pandoc --standalone --to man "$(WIKIDIRECTORY)/Polonius-Reader.md" -o debian/polonius-reader.1
 
+test:
+	@if [ ! -f bin/polonius-editor ] || [ ! -f bin/polonius-reader ]; then \
+		echo "Binaries not found. Please run 'make all' first."; \
+		exit 1; \
+	fi
+	@cd tests && ./run-tests
+
 clean:
 	@rm -f bin/obj/*.o
 	@rm -f bin/obj/polonius-editor/*.o
@@ -59,10 +66,12 @@ clean:
 	@rm -f src/shared/version.h
 	@rm -f debian/polonius-editor.1
 	@rm -f debian/polonius-reader.1
+	@rm -f tests/debug/*
+	@rm -f tests/results/*
 	@echo "Cleaned up build artifacts."
 	@if [ -d "$(WIKIDIRECTORY)" ]; then \
 		rm -rf "$(WIKIDIRECTORY)"; \
 		echo "Removed wiki directory $(WIKIDIRECTORY)"; \
 	fi
 
-.PHONY: all clean manual
+.PHONY: all clean manual test
