@@ -1,3 +1,9 @@
+# Default to using all available CPU cores for parallel builds
+# unless the user specifies a different number of jobs with -jN
+ifeq ($(filter -j%,$(MAKEFLAGS)),)
+MAKEFLAGS += -j$(shell nproc)
+endif
+
 WIKIDIRECTORY=polonius.wiki
 WIKIUPSTREAM=https://github.com/rail5/polonius.wiki.git
 VERSION=$$(dpkg-parsechangelog -l debian/changelog --show-field version)
