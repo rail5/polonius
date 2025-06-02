@@ -56,6 +56,15 @@ Polonius::Editor::File::File(const std::filesystem::path& filePath) {
 }
 
 Polonius::Editor::File::~File() {
+	// Add a newline to the end of the file if it does not end with one
+	if (size > 0 && fseek(file, -1, SEEK_END) == 0) {
+		int last_char = fgetc(file);
+		if (last_char != '\n') {
+			fputc('\n', file);
+			size++;
+		}
+	}
+
 	if (file) {
 		// Unlock the file before closing
 		if (fd >= 0) {
@@ -237,30 +246,23 @@ void Polonius::Editor::File::insert(uint64_t position, const std::string& text) 
 	// And we're continuously copying text from the old end to the new end
 	// While walking both pointers backwards by the block size
 	// Until we hit the position we want to insert to
-	size_t old_pos = original_size == 0 ? 0 : original_size - 1;
-	size_t new_pos = size - 1;
+	uint64_t old_pointer = original_size;
+	uint64_t new_pointer = size;
 
-	while (new_pos >= position && old_pos > position) {
-		size_t bytes_to_copy = std::min(Polonius::Editor::block_size, old_pos - position + 1);
+	while (old_pointer > position) {
+		uint64_t bytes_to_copy = std::min(Polonius::Editor::block_size, old_pointer - position);
 		std::vector<char> buffer(bytes_to_copy);
 
-		fseeko64(file, static_cast<int64_t>(old_pos - bytes_to_copy + 1), SEEK_SET);
-		if (fread(buffer.data(), 1, bytes_to_copy, file) != bytes_to_copy) {
-			throw std::runtime_error("Failed to read from file at position " + std::to_string(old_pos - bytes_to_copy));
-		}
-		fseeko64(file, static_cast<int64_t>(new_pos - bytes_to_copy + 1), SEEK_SET);
-		if (fwrite(buffer.data(), 1, bytes_to_copy, file) != bytes_to_copy) {
-			throw std::runtime_error("Failed to write to file at position " + std::to_string(new_pos - bytes_to_copy));
-		}
-		fflush(file); // Ensure the data is written to disk
+		fseeko64(file, static_cast<int64_t>(old_pointer - bytes_to_copy), SEEK_SET);
+		fread(buffer.data(), 1, bytes_to_copy, file);
 
-		new_pos -= bytes_to_copy;
-		if (old_pos < bytes_to_copy) {
-			// Make sure it doesn't underflow
-			old_pos = 0;
-		} else {
-			old_pos -= bytes_to_copy;
-		}
+		fseeko64(file, static_cast<int64_t>(new_pointer - bytes_to_copy), SEEK_SET);
+		fwrite(buffer.data(), 1, bytes_to_copy, file);
+
+		fflush(file);
+
+		new_pointer -= bytes_to_copy;
+		old_pointer -= bytes_to_copy;
 	}
 
 	// Now we can write the new text at the position
@@ -268,20 +270,6 @@ void Polonius::Editor::File::insert(uint64_t position, const std::string& text) 
 	if (fwrite(text.data(), 1, text.size(), file) != text.size()) {
 		throw std::runtime_error("Failed to write text to file at position " + std::to_string(position));
 	}
-
-	// Make sure the file ends with a newline character
-	// Does the file already end with a newline?
-	if (size > 0 && fseek(file, -1, SEEK_END) == 0) {
-		int last_char = fgetc(file);
-		if (last_char != '\n') {
-			fputc('\n', file);
-			size++;
-		}
-	} else {
-		fputc('\n', file);
-		size++;
-	}
-
 	fflush(file); // Ensure the data is written to disk
 }
 
