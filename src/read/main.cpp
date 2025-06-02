@@ -15,6 +15,8 @@
 #include "../shared/is_number.h"
 
 int main(int argc, char* argv[]) {
+	Polonius::reader_mode = true;
+	Polonius::editor_mode = false; // Disable editor mode for the reader
 	Polonius::File file;
 
 	const char* help_string = "polonius-reader " program_version "\n"

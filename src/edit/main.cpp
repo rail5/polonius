@@ -15,6 +15,8 @@
 #include "../shared/parse_block_units.h"
 
 int main(int argc, char* argv[]) {
+	Polonius::editor_mode = true;
+	Polonius::reader_mode = false; // Disable reader mode for the editor
 	Polonius::File file;
 	std::string instructions;
 

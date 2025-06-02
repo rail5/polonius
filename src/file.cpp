@@ -14,6 +14,8 @@
 
 // General options:
 uint64_t Polonius::block_size = 10240; // Default block size is 10K
+bool Polonius::editor_mode = true;
+bool Polonius::reader_mode = true;
 
 // Editor options:
 bool Polonius::Editor::append_newline = true; // Default is to append a newline at the end of the file
@@ -29,11 +31,18 @@ Polonius::File::File(const std::filesystem::path& filePath) {
 	path = filePath;
 	if (std::filesystem::exists(path)) {
 		size = std::filesystem::file_size(path);
-		// Verify that we have write permissions
-		if ((std::filesystem::status(path).permissions() & std::filesystem::perms::owner_write) == std::filesystem::perms::none) {
-			throw std::runtime_error("File is not writable: " + path.string());
+		
+		// If we're in editor mode, we need write permissions on the file
+		if (Polonius::editor_mode) {
+			// Verify that we have write permissions
+			if ((std::filesystem::status(path).permissions() & std::filesystem::perms::owner_write) == std::filesystem::perms::none) {
+				throw std::runtime_error("File is not writable: " + path.string());
+			}
 		}
-	} else {
+
+	} else if (Polonius::editor_mode) {
+		// If we're in editor mode and the file does not exist, create it
+
 		// Verify that we have write permissions to the directory
 		auto parentPath = path.parent_path();
 		if (!std::filesystem::exists(parentPath) || 
@@ -46,6 +55,10 @@ Polonius::File::File(const std::filesystem::path& filePath) {
 			throw std::runtime_error("Failed to create file: " + path.string());
 		}
 		size = 0; // Size is zero for a newly created file
+	} else {
+		// If we're in reader mode and the file does not exist, throw an error
+		// We do not create files in reader mode
+		throw std::runtime_error("File does not exist: " + path.string());
 	}
 
 	file = fopen64(path.string().c_str(), "r+b");

@@ -25,6 +25,8 @@ enum search_type : uint8_t;
 }
 
 extern uint64_t block_size;
+extern bool editor_mode;
+extern bool reader_mode;
 
 class File {
 	private:
