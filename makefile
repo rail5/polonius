@@ -8,19 +8,16 @@ CXXFLAGS = -O2 -s -std=gnu++20 -lboost_regex
 all: src/shared/version.h
 	$(MAKE) bin/polonius-editor bin/polonius-reader
 
-bin/polonius-editor: bin/obj/edit/main.o bin/obj/file.o bin/obj/edit/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o bin/obj/shared/parse_regex.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
-
-bin/polonius-reader: bin/obj/read/main.o bin/obj/file.o bin/obj/edit/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o bin/obj/shared/parse_regex.o
+bin/%: bin/obj/%/main.o bin/obj/file.o bin/obj/polonius-editor/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o bin/obj/shared/parse_regex.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 bin/obj/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-bin/obj/edit/%.o: src/edit/%.cpp
+bin/obj/polonius-editor/%.o: src/edit/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-bin/obj/read/%.o: src/read/%.cpp
+bin/obj/polonius-reader/%.o: src/read/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 bin/obj/shared/%.o: src/shared/%.cpp
@@ -54,9 +51,11 @@ manual:
 
 clean:
 	@rm -f bin/obj/*.o
-	@rm -f bin/obj/edit/*.o
+	@rm -f bin/obj/polonius-editor/*.o
+	@rm -f bin/obj/polonius-reader/*.0
 	@rm -f bin/obj/shared/*.o
 	@rm -f bin/polonius-editor
+	@rm -f bin/polonius-reader
 	@rm -f src/shared/version.h
 	@rm -f debian/polonius-editor.1
 	@rm -f debian/polonius-reader.1
