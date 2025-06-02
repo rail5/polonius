@@ -93,7 +93,6 @@ int main(int argc, char* argv[]) {
 				Polonius::Reader::search_mode = Polonius::Reader::t_regex_search;
 				break;
 			case 'f':
-				Polonius::Reader::search_mode = Polonius::Reader::t_normal_search;
 				search_query = optarg;
 				break;
 			case 'h':
