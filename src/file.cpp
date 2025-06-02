@@ -56,17 +56,6 @@ Polonius::File::File(const std::filesystem::path& filePath) {
 }
 
 Polonius::File::~File() {
-	if (Polonius::Editor::append_newline && edits_made) {
-		// Add a newline to the end of the file if it does not end with one
-		if (size > 0 && fseek(file, -1, SEEK_END) == 0) {
-			int last_char = fgetc(file);
-			if (last_char != '\n') {
-				fputc('\n', file);
-				size++;
-			}
-		}
-	}
-
 	if (file) {
 		// Unlock the file before closing
 		if (fd >= 0) {
@@ -338,6 +327,15 @@ void Polonius::File::executeInstructions() {
 				break;
 		}
 	}
-	edits_made = !instructions.empty();
+	if (Polonius::Editor::append_newline && !instructions.empty()) {
+		// Add a newline to the end of the file if it does not end with one
+		if (size > 0 && fseek(file, -1, SEEK_END) == 0) {
+			int last_char = fgetc(file);
+			if (last_char != '\n') {
+				fputc('\n', file);
+				size++;
+			}
+		}
+	}
 	instructions.clear(); // Clear instructions after execution
 }

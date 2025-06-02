@@ -29,7 +29,6 @@ class File {
 		FILE* file = nullptr;
 		int fd = -1; // File descriptor for the file
 		uint64_t size = 0;
-		bool edits_made = false; // Flag to indicate if any edits were made
 		std::deque<Polonius::Editor::Instruction> instructions;
 
 		void insert(uint64_t position, const std::string& text);
