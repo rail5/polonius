@@ -3,5 +3,9 @@
 	dh $@
 
 override_dh_auto_install:
-	install -D -m 0755 polonius-reader $$(pwd)/debian/polonius/usr/bin/polonius-reader
-	install -D -m 0755 polonius-editor $$(pwd)/debian/polonius/usr/bin/polonius-editor
+	make manual
+	install -D -m 0755 bin/polonius-reader $$(pwd)/debian/polonius/usr/bin/polonius-reader
+	install -D -m 0755 bin/polonius-editor $$(pwd)/debian/polonius/usr/bin/polonius-editor
+
+override_dh_strip:
+	dh_strip --no-automatic-dbgsym
