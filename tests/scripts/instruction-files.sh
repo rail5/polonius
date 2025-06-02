@@ -8,12 +8,16 @@ test_title="instruction-files"
 . scripts/common
 
 check_output_of_instruction_file_is_correct "hello world" "insert 0 these contents will be removed
-remove 3 end; 0 1; 0 end
+remove 3 29; 0 1; 0 0
+
 
 insert 0 o; 0 l; 0 l; 0 e; 0 h
-insert end  ; 6 watla
+insert 5  ; 6 watla
 
-replace end d; 7 orl
+
+
+replace 10 d; 7 orl
+
 
 " "$test_title" 1
 

@@ -45,7 +45,7 @@ function execute_instruction_sequence() {
 	# Returns the return code or resulting file contents from polonius-editor
 	local instruction_sequence="$1" file_name="$2" get_output="$3" return_code="" output="" passed_args=()
 
-	passed_args+=("-s")
+	passed_args+=("-a")
 	passed_args+=("$instruction_sequence")
 	passed_args+=("-c") # Parse special chars
 
