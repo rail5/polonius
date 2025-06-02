@@ -28,7 +28,7 @@ for test_script in scripts/*.sh; do
 
 	echo -n "Running \"$test_name\"... "
 	
-	PATH="$(realpath "$(pwd)/../"):$PATH"
+	PATH="$(realpath "$(pwd)/../bin/"):$PATH"
 	export PATH
 
 	if [[ "$("$test_script")" == "0" ]]; then

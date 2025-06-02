@@ -15,7 +15,7 @@ check_instruction "remove -1 -2" "$test_title" 0 0 1
 check_instruction "not a valid instruction code" "$test_title" 0 0 1
 
 new_file=$(create_test_file "0123456789")
-check_instruction "insert 11 invalid" "$test_title" 0 1 0 "$new_file"
+check_instruction "insert 12 invalid" "$test_title" 0 1 0 "$new_file"
 
 new_file=$(create_test_file "0123456789")
 check_instruction "insert 0 valid; 100 invalid" "$test_title" 0 1 0 "$new_file"
@@ -33,6 +33,6 @@ new_file=$(create_test_file "0123456789")
 check_instruction "remove a 0" "$test_title" 0 1 0 "$new_file"
 
 new_file=$(create_test_file "0123456789")
-check_instruction "remove 10 10" "$test_title" 0 1 0 "$new_file"
+check_instruction "remove 11 11" "$test_title" 0 1 0 "$new_file"
 
 echo "$all_ok"

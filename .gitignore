@@ -1,0 +1,6 @@
+src/shared/version.h
+bin/*
+debian/*.1
+.vscode/
+tests/debug/
+tests/results/

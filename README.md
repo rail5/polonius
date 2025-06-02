@@ -1,6 +1,6 @@
-# polonius
-A uniquely memory-efficient and modular text editor
+# Polonius
 
+A text editor for very large files
 
 > Therefore, since brevity is the soul of wit
 > 
@@ -30,7 +30,7 @@ Polonius is made up of separate **binary modules**:
 **[See the wiki](../../../../../../rail5/polonius/wiki/) for full documentation**. Manual pages are also available in the Debian packages.
 
 ## Development Progress
-Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD**. Releases will be provided for **amd64**, **i386**, and **arm64** architectures.
+Development is done on **Debian GNU/Linux**. Releases will be provided for the **amd64** and **arm64** architectures.
 
 **polonius-reader**:
 
@@ -44,7 +44,7 @@ Development is done on **Debian GNU/Linux**. Builds are also tested on **OpenBSD
 
 **CLI (polonius)**:
 
-  ![1%](https://geps.dev/progress/1)
+  ![0%](https://geps.dev/progress/1)
   
 
 **GUI (polonius-gui)**:

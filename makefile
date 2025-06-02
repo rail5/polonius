@@ -1,23 +1,51 @@
+# Default to using all available CPU cores for parallel builds
+# unless the user specifies a different number of jobs with -jN
+ifeq ($(filter -j%,$(MAKEFLAGS)),)
+MAKEFLAGS += -j$(shell nproc)
+endif
+
 WIKIDIRECTORY=polonius.wiki
 WIKIUPSTREAM=https://github.com/rail5/polonius.wiki.git
 VERSION=$$(dpkg-parsechangelog -l debian/changelog --show-field version)
 
-all: update-version reader editor
+CXX = g++
+CXXFLAGS = -O2 -s -std=gnu++20 -lboost_regex
 
-update-version:
-	# Read the latest version number from debian/changelog
-	# And update shared/version.h with that number
-	# This ensures that the output of --version
-	# For each of the binaries is always up-to-date
+all: src/shared/version.h
+	$(MAKE) bin/polonius-editor bin/polonius-reader
+
+bin/%: bin/obj/%/main.o bin/obj/file.o bin/obj/polonius-editor/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o bin/obj/shared/parse_regex.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+bin/obj/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+bin/obj/polonius-editor/%.o: src/edit/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+bin/obj/polonius-reader/%.o: src/read/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+bin/obj/shared/%.o: src/shared/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/shared/version.h: debian/changelog
+	@# Read the latest version number from debian/changelog
+	@# And update shared/version.h with that number
+	@# This ensures that the output of --version
+	@# For each of the binaries is always up-to-date
 	@ \
 	if [ "$(VERSION)" != "" ]; then \
-		echo "#define program_version \"$(VERSION)\"" > shared/version.h; \
+		echo "#define program_version \"$(VERSION)\"" > src/shared/version.h; \
 		echo "$(VERSION)"; \
-	fi;
+	else \
+		echo "#define program_version \"unknown\"" > src/shared/version.h; \
+		echo "Could not parse debian/changelog for version number"; \
+	fi
 
 manual:
-	# Git pull wiki & run pandoc to create manual pages
-	# You must have Git and Pandoc installed for this
+	@# Git pull wiki & run pandoc to create manual pages
+	@# You must have Git and Pandoc installed for this
 	@ \
 	if [ -d "$(WIKIDIRECTORY)" ]; then \
 		cd "$(WIKIDIRECTORY)" && git pull "$(WIKIUPSTREAM)"; \
@@ -27,36 +55,29 @@ manual:
 	pandoc --standalone --to man "$(WIKIDIRECTORY)/Polonius-Editor.md" -o debian/polonius-editor.1
 	pandoc --standalone --to man "$(WIKIDIRECTORY)/Polonius-Reader.md" -o debian/polonius-reader.1
 
-reader:
-	cd read && $(MAKE)
-	mv read/bin/polonius-reader ./
+test:
+	@if [ ! -f bin/polonius-editor ] || [ ! -f bin/polonius-reader ]; then \
+		echo "Binaries not found. Please run 'make all' first."; \
+		exit 1; \
+	fi
+	@cd tests && ./run-tests
 
-editor:
-	cd edit && $(MAKE)
-	mv edit/bin/polonius-editor ./
+clean:
+	@rm -f bin/obj/*.o
+	@rm -f bin/obj/polonius-editor/*.o
+	@rm -f bin/obj/polonius-reader/*.0
+	@rm -f bin/obj/shared/*.o
+	@rm -f bin/polonius-editor
+	@rm -f bin/polonius-reader
+	@rm -f src/shared/version.h
+	@rm -f debian/polonius-editor.1
+	@rm -f debian/polonius-reader.1
+	@rm -f tests/debug/*
+	@rm -f tests/results/*
+	@echo "Cleaned up build artifacts."
+	@if [ -d "$(WIKIDIRECTORY)" ]; then \
+		rm -rf "$(WIKIDIRECTORY)"; \
+		echo "Removed wiki directory $(WIKIDIRECTORY)"; \
+	fi
 
-curses:
-	cd cli && $(MAKE)
-	mv cli/bin/polonius ./
-
-test: clean all
-	cd tests && ./run-tests
-
-install:
-	install -m 0755 polonius-reader /usr/bin
-	install -m 0755 polonius-editor /usr/bin
-
-clean: clean-builds clean-tests
-
-clean-builds:
-	rm -f ./polonius-reader
-	cd read && $(MAKE) clean
-	rm -f ./polonius-editor
-	cd edit && $(MAKE) clean
-	rm -f ./polonius
-	cd cli && $(MAKE) clean
-
-clean-tests:
-	rm -f ./tests/results/*
-	rm -f ./tests/debug/*
-	rm -f ./tests/tmp/*
+.PHONY: all clean manual test
