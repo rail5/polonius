@@ -1,3 +1,13 @@
+polonius (0.6.1) unstable; urgency=medium
+
+  * Do not reset search mode on -f
+    Previously, -f set search mode to 'normal'
+    This would mean that if a search command was entered with -e
+    preceding -f, the search mode would be reset to normal from regex
+    mode. This would be incorrect behavior
+
+ -- rail5 <andrew@rail5.org>  Tue, 03 Jun 2025 00:14:21 +0800
+
 polonius (0.6.0) unstable; urgency=medium
 
   * Merge pull request #37 from rail5/total-rewrite
