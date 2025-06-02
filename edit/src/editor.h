@@ -18,6 +18,7 @@ namespace Editor {
 
 extern uint64_t block_size;
 extern bool special_chars; // Whether to allow special characters in instructions
+extern bool append_newline; // Whether to append a newline to the end of the file after executing instructions
 
 // Forward declarations
 class File;

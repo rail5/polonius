@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
 		"  -f, --instruction-file <file>    Read instructions from a file\n"
 		"  -c, --special-chars              Process escaped chars in instructions\n"
 		"                                    (\\n, \\t, \\\\, \\x00 through \\xFF)\n"
+		"  -n, --no-newline                 Do not add a newline to the end of the file\n"
 		"  -b, --block-size <size>          Set the block size for file operations\n"
 		"                                    Default is 10K\n"
 		"  -V, --version                    Show version information and exit\n"
@@ -58,11 +59,12 @@ int main(int argc, char* argv[]) {
 		{"special-chars", no_argument, nullptr, 'c'},
 		{"instruction-file", required_argument, nullptr, 'f'},
 		{"help", no_argument, nullptr, 'h'},
+		{"no-newline", no_argument, nullptr, 'n'},
 		{"version", no_argument, nullptr, 'V'},
 		{nullptr, 0, nullptr, 0} // Sentinel
 	};
 
-	while ((opt = getopt_long(argc, argv, "a:b:cf:hV", long_options, nullptr)) != -1) {
+	while ((opt = getopt_long(argc, argv, "a:b:cf:hnV", long_options, nullptr)) != -1) {
 		switch (opt) {
 			case 'a':
 				instructions += optarg;
@@ -103,6 +105,9 @@ int main(int argc, char* argv[]) {
 			case 'h':
 				std::cout << help_string;
 				return EXIT_SUCCESS;
+			case 'n':
+				Polonius::Editor::append_newline = false;
+				break;
 			case 'V':
 				std::cout << version_string;
 				return EXIT_SUCCESS;

@@ -14,6 +14,7 @@
 #include <iostream>
 
 uint64_t Polonius::Editor::block_size = 10240; // Default block size is 10K
+bool Polonius::Editor::append_newline = true; // Default is to append a newline at the end of the file
 
 Polonius::Editor::File::File(const std::filesystem::path& filePath) {
 	path = filePath;
@@ -56,12 +57,14 @@ Polonius::Editor::File::File(const std::filesystem::path& filePath) {
 }
 
 Polonius::Editor::File::~File() {
-	// Add a newline to the end of the file if it does not end with one
-	if (size > 0 && fseek(file, -1, SEEK_END) == 0) {
-		int last_char = fgetc(file);
-		if (last_char != '\n') {
-			fputc('\n', file);
-			size++;
+	if (append_newline) {
+		// Add a newline to the end of the file if it does not end with one
+		if (size > 0 && fseek(file, -1, SEEK_END) == 0) {
+			int last_char = fgetc(file);
+			if (last_char != '\n') {
+				fputc('\n', file);
+				size++;
+			}
 		}
 	}
 
