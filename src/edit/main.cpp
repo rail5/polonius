@@ -9,12 +9,13 @@
 
 #include <getopt.h>
 
+#include "../polonius.h"
 #include "editor.h"
 #include "../shared/version.h"
 #include "../shared/parse_block_units.h"
 
 int main(int argc, char* argv[]) {
-	Polonius::Editor::File file;
+	Polonius::File file;
 	std::string instructions;
 
 	const char* help_string = "polonius-editor " program_version "\n"
@@ -72,12 +73,12 @@ int main(int argc, char* argv[]) {
 				break;
 			case 'b':
 				try {
-					Polonius::Editor::block_size = parse_block_units(optarg);
+					Polonius::block_size = parse_block_units(optarg);
 				} catch (const std::exception& e) {
 					std::cerr << "Error parsing block size: " << e.what() << std::endl;
 					return EXIT_FAILURE;
 				}
-				if (Polonius::Editor::block_size == 0) {
+				if (Polonius::block_size == 0) {
 					std::cerr << "Error: Block size cannot be zero." << std::endl;
 					return EXIT_FAILURE;
 				}
@@ -125,7 +126,7 @@ int main(int argc, char* argv[]) {
 	for (int index = optind; index < argc; ++index) {
 		std::string arg = argv[index];
 		try {
-			file = Polonius::Editor::File(arg);
+			file = Polonius::File(arg);
 		} catch (const std::exception& e) {
 			std::cerr << "Error: " << e.what() << std::endl;
 			return EXIT_FAILURE;

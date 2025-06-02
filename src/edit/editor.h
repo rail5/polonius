@@ -13,49 +13,20 @@
 
 #include <sys/file.h>
 
+#include "../polonius.h"
+
 namespace Polonius {
+
+class File;
+
 namespace Editor {
 
-extern uint64_t block_size;
 extern bool special_chars; // Whether to allow special characters in instructions
 extern bool append_newline; // Whether to append a newline to the end of the file after executing instructions
 
-// Forward declarations
-class File;
 class Instruction;
 
-class File {
-	private:
-		std::filesystem::path path;
-		FILE* file = nullptr;
-		int fd = -1; // File descriptor for the file
-		uint64_t size = 0;
-		std::deque<Instruction> instructions;
-
-		void insert(uint64_t position, const std::string& text);
-		void replace(uint64_t position, const std::string& text);
-		void remove(uint64_t start, uint64_t end);
-
-		void validateInstructions() const;
-
-	public:
-		File() = default;
-		explicit File(const std::filesystem::path& filePath);
-		~File();
-		File(const File&) = delete; // Disable copy constructor
-		File& operator=(const File&) = delete; // Disable copy assignment operator
-		File(File&& other) noexcept; // Move constructor
-		File& operator=(File&& other) noexcept; // Move assignment operator
-
-		void parseInstructions(const std::string& instructions);
-		std::deque<Instruction> get_instructions() const {
-			return instructions;
-		}
-
-		void executeInstructions();
-};
-
-enum InstructionType {
+enum InstructionType : uint8_t {
 	INSERT,
 	REMOVE,
 	REPLACE
@@ -82,8 +53,6 @@ class Instruction {
 		void set_end(uint64_t end);
 		void set_text(const std::string& text);
 };
-
-Instruction parse(const std::string& instruction);
 
 } // namespace Editor
 } // namespace Polonius
