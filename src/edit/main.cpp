@@ -123,10 +123,16 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	// Handle non-option arguments
+	bool received_file = false;
 	for (int index = optind; index < argc; ++index) {
 		std::string arg = argv[index];
+		if (received_file) {
+			std::cerr << "Error: Multiple files specified. Only one file can be edited at a time." << std::endl;
+			return EXIT_FAILURE;
+		}
 		try {
 			file = Polonius::File(arg);
+			received_file = true;
 		} catch (const std::exception& e) {
 			std::cerr << "Error: " << e.what() << std::endl;
 			return EXIT_FAILURE;
