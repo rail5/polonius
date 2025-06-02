@@ -27,6 +27,16 @@ uint64_t Polonius::Reader::start_position = 0; // Default start position is 0
 int64_t Polonius::Reader::amount_to_read = -1; // Default is to read until EOF
 std::ostream& Polonius::Reader::output_stream = std::cout; // Default output stream is std::cout
 
+/**
+ * @brief Constructs a Polonius::File object.
+ * 
+ * This constructor initializes the file object by opening the specified file path.
+ * 
+ * It checks if the file exists and whether it is writable. If the file does not exist and we are in editor mode, it creates the file.
+ * If the file does not exist and we are in reader mode, it throws an error.
+ * 
+ * It also locks the file to prevent concurrent modifications.
+ */
 Polonius::File::File(const std::filesystem::path& filePath) {
 	path = filePath;
 	if (std::filesystem::exists(path)) {
@@ -78,6 +88,11 @@ Polonius::File::File(const std::filesystem::path& filePath) {
 	}
 }
 
+/**
+ * @brief Destructor for Polonius::File.
+ * 
+ * This destructor closes the file and unlocks it if it is currently open.
+ */
 Polonius::File::~File() {
 	if (file) {
 		// Unlock the file before closing
@@ -126,6 +141,13 @@ Polonius::File& Polonius::File::operator=(File&& other) noexcept {
 	return *this;
 }
 
+/**
+ * @brief Validates the instruction sequence for the file.
+ * 
+ * This function checks the sequence of instructions to ensure that they are valid and do not exceed the bounds of the file.
+ * 
+ * If any instruction is invalid, it throws an exception with a descriptive error message.
+ */
 void Polonius::File::validateInstructions() const {
 	// Keep a running tally of the size of the file
 	uint64_t size_after_last_instruction = size;
@@ -155,6 +177,25 @@ void Polonius::File::validateInstructions() const {
 	}
 }
 
+/**
+ * @brief Parses an instruction sequence from a string.
+ * 
+ * This function takes a string containing multiple instructions, each separated by newlines,
+ * and adds the parsed instructions to the file's instruction list.
+ * 
+ * The format of the instruction sequence is:
+ * ```
+ * [INSERT|REMOVE|REPLACE] <start> <text|end>; <start> <text|end> ...
+ * ```
+ * 
+ * For example:
+ * 
+ * ```
+ * INSERT 0 hello; 5 world
+ * REPLACE 15 goodbye; 20 farewell
+ * REMOVE 10 15; 20 25
+ * ```
+ */
 void Polonius::File::parseInstructions(const std::string& instructions) {
 	// First, split the instructions string by newlines
 	std::vector<std::string> lines = explode(instructions, '\n');
@@ -238,6 +279,9 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 	}
 }
 
+/**
+ * @brief Executes an INSERT instruction at the specified position.
+ */
 void Polonius::File::insert(uint64_t position, const std::string& text) {
 	if (position > size) {
 		throw std::out_of_range("Position is out of bounds");
@@ -287,6 +331,9 @@ void Polonius::File::insert(uint64_t position, const std::string& text) {
 	fflush(file); // Ensure the data is written to disk
 }
 
+/**
+ * @brief Executes a REMOVE instruction to delete a range of text from the file.
+ */
 void Polonius::File::remove(uint64_t start, uint64_t end) {
 	if (start > size || end > size || start > end) {
 		throw std::out_of_range("Start or end position is out of bounds");
@@ -322,6 +369,9 @@ void Polonius::File::remove(uint64_t start, uint64_t end) {
 	std::filesystem::resize_file(path, size);
 }
 
+/**
+ * @brief Executes a REPLACE instruction to replace text at a specific position.
+ */
 void Polonius::File::replace(uint64_t position, const std::string& text) {
 	if (position > size || position + text.size() > size) {
 		throw std::out_of_range("Position is out of bounds");
@@ -335,6 +385,12 @@ void Polonius::File::replace(uint64_t position, const std::string& text) {
 	fflush(file); // Ensure the data is written to disk
 }
 
+/**
+ * @brief Executes all instructions in the file's instruction list.
+ * 
+ * At the end of execution, if the file has been modified and the `append_newline` option is enabled,
+ * it appends a newline character to the end of the file if it does not already end with one.
+ */
 void Polonius::File::executeInstructions() {
 	validateInstructions();
 	for (const auto& instruction : instructions) {
@@ -363,10 +419,22 @@ void Polonius::File::executeInstructions() {
 	instructions.clear(); // Clear instructions after execution
 }
 
+/**
+ * @brief Sets the search query for the file.
+ */
 void Polonius::File::setSearchQuery(const std::string& query) {
 	search_query = query;
 }
 
+/**
+ * @brief Reads data from the file starting from a specific position.
+ * 
+ * This function reads data from the file starting at the specified position and for the specified length.
+ * If the length is negative, it reads until the end of the file.
+ * If the end position exceeds the file size, it reads until the end of the file.
+ * If `force_output_text` is true, it forces the output to be text even if `output_positions` is enabled.
+ * If `output_positions` is enabled, it returns the start and end positions of the read operation instead of the text.
+ */
 std::string Polonius::File::readFromFile(uint64_t start, int64_t length, bool force_output_text) const {
 	std::string result;
 	// Calculate the end position of the read operation
@@ -403,6 +471,13 @@ std::string Polonius::File::readFromFile(uint64_t start, int64_t length, bool fo
 	return result;
 }
 
+/**
+ * @brief Searches for a specific query in the file.
+ * 
+ * This function searches for the specified search query in the file starting from the position defined by `Polonius::Reader::start_position`.
+ * It reads the file in chunks of size `Polonius::block_size` and checks if the search query is present in each chunk.
+ * If a match is found, it outputs the start and end positions of the match or the matched text, depending on the value of `Polonius::Reader::output_positions`.
+ */
 void Polonius::File::search() const {
 	// Calculate the end position of the read operation
 	uint64_t end_position = Polonius::Reader::start_position + static_cast<uint64_t>(Polonius::Reader::amount_to_read);
@@ -466,6 +541,12 @@ void Polonius::File::regex_search() const {
 
 }
 
+/**
+ * @brief Performs a read operation on the file.
+ * 
+ * If a search query is set, it performs a search based on the search mode (normal or regex).
+ * If no search query is set, it reads the file from the specified start position and for the specified length.
+ */
 void Polonius::File::read() const {
 	if (!search_query.empty()) {
 		switch (Polonius::Reader::search_mode) {
