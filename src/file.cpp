@@ -20,6 +20,8 @@ uint64_t Polonius::block_size = 10240; // Default block size is 10K
 bool Polonius::editor_mode = true;
 bool Polonius::reader_mode = true;
 
+uint8_t Polonius::exit_code = EXIT_SUCCESS; // Default exit code is success
+
 // Editor options:
 bool Polonius::Editor::append_newline = true; // Default is to append a newline at the end of the file
 
@@ -538,6 +540,9 @@ void Polonius::File::search() const {
 			return;
 		}
 	}
+
+	// If we reach here, no match was found in the entire file
+	Polonius::exit_code = EXIT_FAILURE;
 }
 
 /**
@@ -612,8 +617,8 @@ void Polonius::File::regex_search() const {
 			}
 		} else {
 			// Full match found
-			match_start = pos + regex_search_result.prefix().length();
-			match_end = pos + (bs - regex_search_result.suffix().length());
+			match_start = pos + static_cast<uint64_t>(regex_search_result.prefix().length());
+			match_end = pos + (bs - static_cast<uint64_t>(regex_search_result.suffix().length()));
 
 			if (Polonius::Reader::output_positions) {
 				Polonius::Reader::output_stream << match_start << " " << match_end - 1 << "\n";
@@ -624,6 +629,9 @@ void Polonius::File::regex_search() const {
 			}
 		}
 	}
+
+	// If we reach here, no match was found in the entire file
+	Polonius::exit_code = EXIT_FAILURE;
 }
 
 /**

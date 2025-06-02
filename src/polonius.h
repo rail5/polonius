@@ -24,6 +24,7 @@ namespace Reader {
 enum search_type : uint8_t;
 }
 
+extern uint8_t exit_code; // Exit code for the program
 extern uint64_t block_size;
 extern bool editor_mode;
 extern bool reader_mode;

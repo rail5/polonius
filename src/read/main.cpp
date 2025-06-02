@@ -17,6 +17,7 @@
 int main(int argc, char* argv[]) {
 	Polonius::reader_mode = true;
 	Polonius::editor_mode = false; // Disable editor mode for the reader
+	Polonius::exit_code = EXIT_SUCCESS;
 	Polonius::File file;
 
 	const char* help_string = "polonius-reader " program_version "\n"
@@ -157,4 +158,6 @@ int main(int argc, char* argv[]) {
 		std::cerr << "Error reading file: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
+
+	return Polonius::exit_code;
 }
