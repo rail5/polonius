@@ -1,6 +1,6 @@
-# polonius
-A uniquely memory-efficient and modular text editor
+# Polonius
 
+A text editor for very large files
 
 > Therefore, since brevity is the soul of wit
 > 
