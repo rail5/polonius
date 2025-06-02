@@ -35,6 +35,8 @@ class File {
 		std::filesystem::path path;
 		FILE* file = nullptr;
 		int fd = -1; // File descriptor for the file
+		bool new_file = false; // Whether the file was created by this instance
+		bool instructions_valid = true; // Whether the instructions are valid
 		uint64_t size = 0;
 		std::deque<Polonius::Editor::Instruction> instructions;
 
@@ -44,7 +46,7 @@ class File {
 		void replace(uint64_t position, const std::string& text);
 		void remove(uint64_t start, uint64_t end);
 
-		void validateInstructions() const;
+		void validateInstructions();
 
 		std::string readFromFile(uint64_t start = Polonius::Reader::start_position,
 			int64_t length = Polonius::Reader::amount_to_read,

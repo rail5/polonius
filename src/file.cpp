@@ -56,7 +56,6 @@ Polonius::File::File(const std::filesystem::path& filePath) {
 				throw std::runtime_error("File is not writable: " + path.string());
 			}
 		}
-
 	} else if (Polonius::editor_mode) {
 		// If we're in editor mode and the file does not exist, create it
 
@@ -71,6 +70,7 @@ Polonius::File::File(const std::filesystem::path& filePath) {
 		if (!file) {
 			throw std::runtime_error("Failed to create file: " + path.string());
 		}
+		new_file = true;
 		size = 0; // Size is zero for a newly created file
 	} else {
 		// If we're in reader mode and the file does not exist, throw an error
@@ -108,6 +108,12 @@ Polonius::File::~File() {
 		}
 		fclose(file);
 	}
+
+	if (!instructions_valid && new_file) {
+		// If the instructions are not valid and the file was created by this instance,
+		// remove the file to avoid leaving an invalid file behind
+		std::filesystem::remove(path);
+	}
 }
 
 Polonius::File::File(File&& other) noexcept {
@@ -115,6 +121,8 @@ Polonius::File::File(File&& other) noexcept {
 	file = other.file;
 	fd = other.fd;
 	size = other.size;
+	new_file = other.new_file;
+	instructions_valid = other.instructions_valid;
 	instructions = std::move(other.instructions);
 
 	// Reset the moved-from object
@@ -137,6 +145,8 @@ Polonius::File& Polonius::File::operator=(File&& other) noexcept {
 		file = other.file;
 		fd = other.fd;
 		size = other.size;
+		new_file = other.new_file;
+		instructions_valid = other.instructions_valid;
 		instructions = std::move(other.instructions);
 
 		// Reset the moved-from object
@@ -155,28 +165,32 @@ Polonius::File& Polonius::File::operator=(File&& other) noexcept {
  * 
  * If any instruction is invalid, it throws an exception with a descriptive error message.
  */
-void Polonius::File::validateInstructions() const {
+void Polonius::File::validateInstructions() {
 	// Keep a running tally of the size of the file
 	uint64_t size_after_last_instruction = size;
 	for (const auto& instruction : instructions) {
 		switch (instruction.type()) {
 			case Polonius::Editor::INSERT:
 				if (instruction.start() > size_after_last_instruction) {
+					instructions_valid = false;
 					throw std::out_of_range("Insert position is out of bounds: " + std::to_string(instruction.start()));
 				}
 				size_after_last_instruction += instruction.size();
 				break;
 			case Polonius::Editor::REMOVE:
 				if (instruction.end() > size_after_last_instruction || size_after_last_instruction == 0) {
+					instructions_valid = false;
 					throw std::out_of_range("Remove position is out of bounds: " + std::to_string(instruction.start()) + " - " + std::to_string(instruction.end()));
 				}
 				if (instruction.start() > instruction.end()) {
+					instructions_valid = false;
 					throw std::invalid_argument("Remove start position is greater than end position: " + std::to_string(instruction.start()) + " - " + std::to_string(instruction.end()));
 				}
 				size_after_last_instruction -= instruction.size();
 				break;
 			case Polonius::Editor::REPLACE:
 				if (instruction.start() > size_after_last_instruction || instruction.start() + instruction.size() > size_after_last_instruction) {
+					instructions_valid = false;
 					throw std::out_of_range("Replace position is out of bounds: " + std::to_string(instruction.start()));
 				}
 				break; // REPLACE instructions do not change the size of the file
@@ -222,6 +236,7 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 
 		std::vector<std::string> first_part = explode(parts[0], ' ', false, 3);
 		if (first_part.size() < 3) {
+			instructions_valid = false;
 			throw std::invalid_argument("Invalid instruction format: " + parts[0]);
 		}
 
@@ -235,11 +250,13 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 		} else if (op == "replace") {
 			type = Polonius::Editor::REPLACE;
 		} else {
+			instructions_valid = false;
 			throw std::invalid_argument("Unknown instruction type: " + first_part[0]);
 		}
 
 		// Verify the position is a number
 		if (!is_number(first_part[1])) {
+			instructions_valid = false;
 			throw std::invalid_argument("Invalid start position: " + first_part[1]);
 		}
 		uint64_t start_position = std::stoull(first_part[1]);
@@ -249,6 +266,7 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 			this->instructions.emplace_back(type, start_position, text);
 		} else if (type == Polonius::Editor::REMOVE) {
 			if (!is_number(first_part[2])) {
+				instructions_valid = false;
 				throw std::invalid_argument("Invalid end position for remove operation: " + first_part[2]);
 			}
 			uint64_t end_position = std::stoull(first_part[2]);
@@ -269,6 +287,7 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 			}
 			// Verify the position is a number
 			if (!is_number(additional_parts[0])) {
+				instructions_valid = false;
 				throw std::invalid_argument("Invalid start position: " + additional_parts[0]);
 			}
 			uint64_t additional_start_position = std::stoull(additional_parts[0]);
@@ -277,6 +296,7 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 				this->instructions.emplace_back(type, additional_start_position, additional_text);
 			} else if (type == Polonius::Editor::REMOVE) {
 				if (!is_number(additional_parts[1])) {
+					instructions_valid = false;
 					throw std::invalid_argument("Invalid end position for remove operation: " + additional_parts[1]);
 				}
 				uint64_t additional_end_position = std::stoull(additional_parts[1]);
