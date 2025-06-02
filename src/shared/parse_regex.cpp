@@ -2,35 +2,12 @@
  * Copyright (C) 2024 rail5
 */
 
-#ifndef REGEX
-	#define REGEX
-	#include <boost/regex.hpp>
-#endif
-
-#ifndef VECTOR
-	#define VECTOR
-	#include <vector>
-#endif
-
-#ifndef FN_IS_NUMBER
-	#define FN_IS_NUMBER
-	#include "is_number.cpp"
-#endif
-
-#ifndef FN_EXPLODE
-	#define FN_EXPLODE
-	#include "explode.cpp"
-#endif
-
-#ifndef FN_STRING_STARTS_WITH
-	#define FN_STRING_STARTS_WITH
-	#include "string_starts_with.cpp"
-#endif
-
-#ifndef FN_STRING_ENDS_WITH
-	#define FN_STRING_ENDS_WITH
-	#include "string_ends_with.cpp"
-#endif
+#include "parse_regex.h"
+#include <boost/regex.hpp>
+#include <string>
+#include <vector>
+#include "is_number.h"
+#include "explode.h"
 
 #define FN_PARSE_REGEX_CLEAR_ALL_MAIN_FLAGS escaped = false; \
 	caret = false; \
@@ -90,7 +67,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 	// Iterate through each character in the string
 	for(char& c : expression) {
 		std::string part(1, c);
-		int current_index = parsed_expression.size()-1;
+		std::size_t current_index = parsed_expression.size()-1;
 
 		multi_char_entry = (square_brackets_open || parentheses_level > 0 || escaped || caret || or_operator || backslash_b || backslash_capital_b);
 
@@ -322,7 +299,7 @@ std::vector<std::string> parse_regex(std::string expression) {
 
 						// Push each of the characters we had been saving for the buffer
 						// Back into the output vector one by one
-						for (int i=0; i < curly_braces_buffer.size(); i++) {
+						for (std::size_t i=0; i < curly_braces_buffer.size(); i++) {
 							std::string bufferpart(1, curly_braces_buffer[i]);
 
 							if (multi_char_entry) {
@@ -383,13 +360,13 @@ std::vector<std::string> create_sub_expressions(std::string expression) {
 
 	std::vector<std::string> output;
 
-	for (int i = 0; i < components.size()-1; i++) {
-		int upper_limit = components.size() - i;
+	for (std::size_t i = 0; i < components.size()-1; i++) {
+		std::size_t upper_limit = components.size() - i;
 
 		std::string sub_expression = "";
 
-		for (int j = 0; j < upper_limit; j++) {
-			if (string_starts_with(components[j], "{") && string_ends_with(components[j], "}")) {
+		for (std::size_t j = 0; j < upper_limit; j++) {
+			if (components[j].starts_with("{") && components[j].ends_with("}")) {
 				std::string curly_braces_term = components[j];
 
 				// Remove the surrounding curly braces

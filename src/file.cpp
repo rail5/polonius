@@ -7,10 +7,13 @@
 #include "shared/explode.h"
 #include "shared/to_lower.h"
 #include "shared/is_number.h"
+#include "shared/parse_regex.h"
 
 #include <vector>
 #include <fstream>
 #include <unistd.h>
+
+#include <boost/regex.hpp>
 
 // General options:
 uint64_t Polonius::block_size = 10240; // Default block size is 10K
@@ -537,8 +540,90 @@ void Polonius::File::search() const {
 	}
 }
 
+/**
+ * @brief Performs a regex search on the file.
+ * 
+ * A regex search in Polonius should happen this way:
+ * 1. Parse the regular expression into its component parts
+ * 		e.g:
+ * 		Expression: 'abc[a-z]+235'
+ * 		Should be split into:
+ * 		'a' 'b' 'c'
+ * 		'[a-z]+'
+ * 		'2' '3' '5'
+ * 2. Recombine the components into multiple expressions:
+ * 		a. 'abc[a-z]+235'
+ * 		b. 'abc[a-z]+23'
+ * 		c. 'abc[a-z]+2'
+ * 		d. 'abc[a-z]+'
+ * 		e. 'abc'
+ * 		f. 'ab'
+ * 		g. 'a'
+ * 3. Scan the file in blocks of size `Polonius::block_size` for a match of the full expression (a)
+ * 4. If no full match is found, check if the block ENDS with a PARTIAL MATCH? (any of b, c, d, e, f, g)
+ * 5. If no, load the next block and repeat
+ * 6. If yes, load a new block starting from the start position of the partial match
+ * 7. Repeat until the end of the file is reached or a match is found
+ */
 void Polonius::File::regex_search() const {
+	// Calculate the end position of the read operation
+	uint64_t end_position = Polonius::Reader::start_position + static_cast<uint64_t>(Polonius::Reader::amount_to_read);
+	if (Polonius::Reader::amount_to_read < 0 || end_position > size) {
+		end_position = size; // Read until the end of the file
+	}
 
+	uint64_t bs = Polonius::block_size;
+	if (bs <= search_query.length()) {
+		bs = search_query.length() + 1; // Ensure block size is at least the length of the search query
+	}
+
+	uint64_t match_start = 0;
+	uint64_t match_end = 0;
+
+	std::vector<std::string> sub_expressions = create_sub_expressions(search_query);
+
+	for (uint64_t pos = Polonius::Reader::start_position; pos < end_position; pos += bs) {
+		regex_scan:
+		uint64_t remaining = end_position - pos;
+
+		if (bs > remaining) {
+			bs = remaining; // Adjust block size to the remaining bytes
+		}
+
+		std::string data = readFromFile(pos, static_cast<int64_t>(bs), true);
+		boost::smatch regex_search_result;
+
+		boost::regex expression(search_query);
+		bool full_match_found = boost::regex_search(data, regex_search_result, expression);
+
+		if (!full_match_found) {
+			// Check for partial matches with sub-expressions
+			for (const auto& subexpr : sub_expressions) {
+				boost::smatch sub_expression_search_result;
+				boost::regex sub_expression(subexpr + R"($)"); // 'R"($)"' signifies that the std::string must END with the match
+
+				// Partial match found?
+				bool partial_match_found = boost::regex_search(data, sub_expression_search_result, sub_expression);
+				if (partial_match_found) {
+					uint64_t partial_match_position = static_cast<uint64_t>(sub_expression_search_result.prefix().length());
+					pos += partial_match_position; // Move to the next position after the partial match
+					goto regex_scan; // Restart the loop with the new position
+				}
+			}
+		} else {
+			// Full match found
+			match_start = pos + regex_search_result.prefix().length();
+			match_end = pos + (bs - regex_search_result.suffix().length());
+
+			if (Polonius::Reader::output_positions) {
+				Polonius::Reader::output_stream << match_start << " " << match_end - 1 << "\n";
+				return;
+			} else {
+				Polonius::Reader::output_stream << regex_search_result[0] << "\n";
+				return;
+			}
+		}
+	}
 }
 
 /**

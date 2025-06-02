@@ -3,15 +3,15 @@ WIKIUPSTREAM=https://github.com/rail5/polonius.wiki.git
 VERSION=$$(dpkg-parsechangelog -l debian/changelog --show-field version)
 
 CXX = g++
-CXXFLAGS = -O2 -s -std=gnu++17
+CXXFLAGS = -O2 -s -std=gnu++20 -lboost_regex
 
 all: src/shared/version.h
 	$(MAKE) bin/polonius-editor bin/polonius-reader
 
-bin/polonius-editor: bin/obj/edit/main.o bin/obj/file.o bin/obj/edit/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o
+bin/polonius-editor: bin/obj/edit/main.o bin/obj/file.o bin/obj/edit/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o bin/obj/shared/parse_regex.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-bin/polonius-reader: bin/obj/read/main.o bin/obj/file.o bin/obj/edit/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o
+bin/polonius-reader: bin/obj/read/main.o bin/obj/file.o bin/obj/edit/instruction.o bin/obj/shared/explode.o bin/obj/shared/to_lower.o bin/obj/shared/is_number.o bin/obj/shared/parse_block_units.o bin/obj/shared/process_special_chars.o bin/obj/shared/parse_regex.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 bin/obj/%.o: src/%.cpp
