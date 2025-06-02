@@ -71,20 +71,20 @@ std::vector<std::string> explode(const std::string& input, char delimiter, bool 
 		int last_permissible_element = maximum_number_of_elements - 1;
 		
 		// Store the current actual highest index of the vector
-		int last_element = output_vector.size() - 1;
+		size_t last_element = output_vector.size() - 1;
 		
 		// Cycle through the vector and combine into the last_permissible_element
 		// (re-inserting the delimiter character between previously split elements)
 		// Then delete the higher elements
-		for (int i = maximum_number_of_elements; i <= last_element; i++) {
-			output_vector[last_permissible_element] = output_vector[last_permissible_element] + delimiter + output_vector[last_permissible_element + 1];
-			output_vector.erase(output_vector.begin() + (last_permissible_element + 1));
+		for (size_t i = static_cast<size_t>(maximum_number_of_elements); i <= last_element; i++) {
+			output_vector[static_cast<size_t>(last_permissible_element)] = output_vector[static_cast<size_t>(last_permissible_element)] + delimiter + output_vector[static_cast<size_t>(last_permissible_element + 1)];
+			output_vector.erase(output_vector.begin() + static_cast<std::vector<std::string>::difference_type>(last_permissible_element + 1));
 		}
 		
 		// If the input string originally ended with the delimiter char,
 		// Let's put that back in place at the end
 		if (input[input.length()-1] == delimiter) {
-			output_vector[last_permissible_element] = output_vector[last_permissible_element] + delimiter;
+			output_vector[static_cast<std::vector<std::string>::size_type>(last_permissible_element)] = output_vector[static_cast<std::vector<std::string>::size_type>(last_permissible_element)] + delimiter;
 		}
 	}
 	
