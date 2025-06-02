@@ -178,7 +178,7 @@ void Polonius::File::validateInstructions() {
 				size_after_last_instruction += instruction.size();
 				break;
 			case Polonius::Editor::REMOVE:
-				if (instruction.end() > size_after_last_instruction || size_after_last_instruction == 0) {
+				if (instruction.end() >= size_after_last_instruction || size_after_last_instruction == 0) {
 					instructions_valid = false;
 					throw std::out_of_range("Remove position is out of bounds: " + std::to_string(instruction.start()) + " - " + std::to_string(instruction.end()));
 				}
