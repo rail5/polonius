@@ -8,11 +8,9 @@ WIKIDIRECTORY=polonius.wiki
 WIKIUPSTREAM=https://github.com/rail5/polonius.wiki.git
 VERSION=$(shell dpkg-parsechangelog -l debian/changelog --show-field version)
 
-FTXUI_LIBS = $(shell pkg-config --libs ftxui 2>/dev/null)
-
 CXX = g++
 CXXFLAGS = -O2 -std=gnu++20 -Wall -Wextra
-LDFLAGS = -s -lboost_regex $(FTXUI_LIBS)
+LDFLAGS = -s -lboost_regex -lncurses -ltinfo -lncurses++
 
 # Install directories
 PREFIX ?= /usr/local
@@ -26,7 +24,8 @@ SHARED_OBJS = \
 	bin/obj/shared/process_special_chars.o \
 	bin/obj/shared/parse_regex.o \
 	bin/obj/file.o \
-	bin/obj/polonius-editor/instruction.o
+	bin/obj/polonius-editor/instruction.o \
+	bin/obj/polonius/window.o
 
 all: src/shared/version.h
 	$(MAKE) bin/polonius-editor bin/polonius-reader
