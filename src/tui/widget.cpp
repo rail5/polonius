@@ -161,11 +161,29 @@ void Polonius::TUI::HelpPane::draw(WINDOW* window) {
 	box(pane, 0, 0); // Draw a box at the specified position with the given width and height
 
 	// Print the label in the top-center of the pane
-	int label_x = (width - static_cast<int>(topLabel.length())) / 2; // Center the label
-	mvwprintw(pane, 0, label_x, "%s", topLabel.c_str()); // Print the label at the top of the pane
+	if (!topLabel.empty()) {
+		// If the label is too long, truncate it to fit
+		// Do so by showing the beginning of the label, then ellipses, then the end of the label
+		auto maxContent = static_cast<std::string::size_type>(width - 2); // -2 for the box borders
+		if (topLabel.length() > maxContent) {
+			auto trim = static_cast<std::string::size_type>((width - 5) / 2);
+			std::string truncatedLabel = topLabel.substr(0, trim) + "..." + topLabel.substr(topLabel.length() - trim);
+			topLabel = truncatedLabel;
+		}
+		int label_x = (width - static_cast<int>(topLabel.length())) / 2; // Center the label
+		mvwprintw(pane, 0, label_x, "%s", topLabel.c_str()); // Print the label at the top of the pane
+	}
 
 	// Print the bottom label in the bottom-center of the pane
 	if (!bottomLabel.empty()) {
+		// If the bottom label is too long, truncate it to fit
+		// Do so by showing the beginning of the label, then ellipses, then the end of the label
+		auto maxContent = static_cast<std::string::size_type>(width - 2); // -2 for the box borders
+		if (bottomLabel.length() > maxContent) {
+			auto trim = static_cast<std::string::size_type>((width - 5) / 2);
+			std::string truncatedLabel = bottomLabel.substr(0, trim) + "..." + bottomLabel.substr(bottomLabel.length() - trim);
+			bottomLabel = truncatedLabel;
+		}
 		int bottom_label_x = (width - static_cast<int>(bottomLabel.length())) / 2; // Center the bottom label
 		mvwprintw(pane, height - 1, bottom_label_x, "%s", bottomLabel.c_str()); // Print the bottom label
 	}
