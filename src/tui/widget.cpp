@@ -6,6 +6,8 @@
 #include <array>
 #include "widget.h"
 
+Polonius::TUI::Widget::Widget() = default;
+
 Polonius::TUI::Widget::Widget(int x, int y, int w, int h)
 	: x_(x), y_(y), w_(w), h_(h),
 	position(Polonius::TUI::ABSOLUTE) {}
@@ -32,6 +34,48 @@ int Polonius::TUI::Widget::getHeight() const {
 	return h_;
 }
 
+bool Polonius::TUI::Widget::isRelativelyPositioned() const {
+	return position == Polonius::TUI::RELATIVE;
+}
+
+void Polonius::TUI::Widget::setX(int x) {
+	x_ = x;
+}
+
+void Polonius::TUI::Widget::setY(int y) {
+	y_ = y;
+}
+
+/**
+ * @brief Set the width of the widget
+ * 
+ * You can set the width to a specific value, or use the predefined constants:
+ * - Polonius::TUI::FULL for full width
+ * - Polonius::TUI::HALF for half width
+ * - Polonius::TUI::QUARTER for quarter width
+ * - Polonius::TUI::THREE_QUARTERS for three-quarters width
+ * 
+ * These predefined constants will be automatically recalculated when the window is resized.
+ */
+void Polonius::TUI::Widget::setWidth(int w) {
+	w_ = w;
+}
+
+/**
+ * @brief Set the height of the widget
+ * 
+ * You can set the height to a specific value, or use the predefined constants:
+ * - Polonius::TUI::FULL for full height
+ * - Polonius::TUI::HALF for half height
+ * - Polonius::TUI::QUARTER for quarter height
+ * - Polonius::TUI::THREE_QUARTERS for three-quarters height
+ * 
+ * These predefined constants will be automatically recalculated when the window is resized.
+ */
+void Polonius::TUI::Widget::setHeight(int h) {
+	h_ = h;
+}
+
 Polonius::TUI::HelpPane::HelpPane(int x, int y, int w, int h, const std::string& label)
 	: Widget(x, y, w, h), topLabel(label) {}
 
@@ -44,8 +88,7 @@ void Polonius::TUI::HelpPane::setBottomLabel(const std::string& label) {
 
 void Polonius::TUI::HelpPane::draw(WINDOW* window) {
 	// Get the width and height
-	int width = w_;
-	int height = h_;
+	int width, height;
 	int x = x_;
 	int y = y_;
 

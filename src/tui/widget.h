@@ -33,14 +33,15 @@ enum RelativeSize : int {
 
 class Widget {
 	protected:
-		int x_;
-		int y_;
-		int w_;
-		int h_;
+		int x_ = 0;
+		int y_ = 0;
+		int w_ = Polonius::TUI::FULL; // Default to full width
+		int h_ = Polonius::TUI::FULL; // Default to full height
 		Polonius::TUI::Positioning position = Polonius::TUI::RELATIVE;
 		Polonius::TUI::Edge anchor = Polonius::TUI::BOTTOM;
 
 	public:
+		Widget();
 		Widget(int x, int y, int w, int h);
 		Widget(Polonius::TUI::Edge anchor, int width, int height);
 
@@ -52,6 +53,13 @@ class Widget {
 		int getY() const;
 		int getWidth() const;
 		int getHeight() const;
+		bool isRelativelyPositioned() const;
+
+		void setX(int x);
+		void setY(int y);
+		void setWidth(int w);
+		void setHeight(int h);
+		void setPositioning(Polonius::TUI::Positioning pos);
 };
 
 class HelpPane : public Widget {
