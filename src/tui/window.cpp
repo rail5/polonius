@@ -37,6 +37,18 @@ WINDOW* Polonius::Window::getScreen() const {
 	return screen;
 }
 
+void Polonius::Window::refreshScreen() {
+	if (!screen) {
+		throw std::runtime_error("Screen is not initialized");
+	}
+	endwin();
+	refresh();
+	clear();
+	attroff(A_REVERSE);
+	drawWidgets();
+	move(cursor_y, cursor_x);
+}
+
 void Polonius::Window::setTop(int top) {
 	if (top > LINES) {
 		throw std::out_of_range("Top value is out of range");
@@ -124,7 +136,6 @@ int Polonius::Window::run() {
 		initialize(); // Initialize the window and widgets if not already done
 	}
 	int ch;
-	int x = 0, y = 0;
 
 	drawWidgets();
 
@@ -132,51 +143,45 @@ int Polonius::Window::run() {
 	move(0, 0);
 
 	while ((ch = getch())) {
-		erase();
-		attroff(A_REVERSE); // Turn off reverse attribute
-		drawWidgets(); // Redraw widgets on each key press
-		refresh();
+		refreshScreen();
 
 		switch (ch) {
 			case KEY_RESIZE:
 				// Handle window resize
-				endwin();
-				refresh();
-				clear();
-				drawWidgets();
-				move(y, x); // Move cursor to the current position after resize
+				refreshScreen();
 				break;
 			case KEY_UP:
-				if (y > 0) {
-					y--;
+				if (cursor_y > textDisplay->getTopEdge()) {
+					cursor_y--;
 				} else {
 					textDisplay->scrollUp();
 				}
 				break;
 			case KEY_DOWN:
-				if (y < textDisplay->getBottom()) {
-					y++;
+				if (cursor_y < textDisplay->getBottomEdge()) {
+					cursor_y++;
 				} else {
 					textDisplay->scrollDown();
-					// Refresh
-					endwin();
-					refresh();
-					clear();
-					drawWidgets();
-					move(y, x);
 				}
 				break;
 			case KEY_LEFT:
-				if (x > 0) {
-					x--;
-				} else if (y > 0) {
+				if (cursor_x > textDisplay->getLeftEdge()) {
+					cursor_x--;
+				} else if (cursor_y > textDisplay->getTopEdge()) {
 					// Move up one line, and land at the rightmost position
-					y--;
-					x = getRight(); // Move to the rightmost position of the previous line
+					cursor_y--;
+					cursor_x = textDisplay->getRightEdge(); // Move to the rightmost position of the previous line
 				}
 				break;
 			case KEY_RIGHT:
-				if (x < COLS - 1) x++;
+				//if (cursor_x < COLS - 1) cursor_x++;
+				if (cursor_x < textDisplay->getRightEdge()) {
+					cursor_x++;
+				} else if (cursor_y < textDisplay->getBottomEdge()) {
+					// Move down one line, and land at the leftmost position
+					cursor_y++;
+					cursor_x = textDisplay->getLeftEdge(); // Move to the leftmost position of the next line
+				}
 				break;
 			case 24: // Ctrl+X
 				clear();
@@ -186,7 +191,7 @@ int Polonius::Window::run() {
 				//buffer += static_cast<char>(ch);
 				break;
 		}
-		move(y, x);
+		move(cursor_y, cursor_x);
 		// Highlight the current position
 		attron(A_REVERSE);
 	}

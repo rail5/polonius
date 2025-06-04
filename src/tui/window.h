@@ -40,6 +40,9 @@ class Window {
 		int right = 80;
 		bool initialized = false;
 
+		int cursor_x = 0;
+		int cursor_y = 0;
+
 		std::vector<std::shared_ptr<Polonius::TUI::Widget>> widgets;
 		void drawWidgets();
 		void updateBoundaries(std::shared_ptr<Polonius::TUI::Widget> widget);
@@ -53,6 +56,8 @@ class Window {
 		int run();
 
 		WINDOW* getScreen() const;
+
+		void refreshScreen();
 
 		void setTop(int top);
 		void setBottom(int bottom);

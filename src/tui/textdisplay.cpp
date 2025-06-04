@@ -11,8 +11,20 @@ Polonius::TUI::TextDisplay::TextDisplay(int x, int y, int w, int h)
 Polonius::TUI::TextDisplay::TextDisplay(Polonius::TUI::Edge anchor, int width, int height)
 	: Widget(anchor, width, height) {}
 
-int Polonius::TUI::TextDisplay::getBottom() const {
+int Polonius::TUI::TextDisplay::getTopEdge() const {
+	return editorTop;
+}
+
+int Polonius::TUI::TextDisplay::getBottomEdge() const {
 	return editorBottom;
+}
+
+int Polonius::TUI::TextDisplay::getLeftEdge() const {
+	return editorLeft;
+}
+
+int Polonius::TUI::TextDisplay::getRightEdge() const {
+	return editorRight;
 }
 
 void Polonius::TUI::TextDisplay::setBuffer(const std::string& newBuffer) {
@@ -23,12 +35,14 @@ void Polonius::TUI::TextDisplay::setBuffer(const std::string& newBuffer) {
 void Polonius::TUI::TextDisplay::scrollUp() {
 	if (scrollOffset > 0) {
 		scrollOffset--;
+		parent->refreshScreen(); // Refresh the screen to reflect the scroll change
 	}
 }
 
 void Polonius::TUI::TextDisplay::scrollDown() {
 	if (scrollOffset < static_cast<int>(lines.size())) {
 		scrollOffset++;
+		parent->refreshScreen(); // Refresh the screen to reflect the scroll change
 	}
 }
 
@@ -75,7 +89,11 @@ void Polonius::TUI::TextDisplay::draw() {
 	int available_width = parent->getRight() - parent->getLeft();
 	int available_height = parent->getBottom() - parent->getTop();
 
-	editorBottom = parent->getBottom() - 1; // Set the bottom of the editor window
+	// Store the editor window margins
+	editorTop = parent->getTop();
+	editorBottom = parent->getBottom() - 1; 
+	editorLeft = parent->getLeft();
+	editorRight = parent->getRight() - 1;
 
 	switch (w_) {
 		case Polonius::TUI::FULL:

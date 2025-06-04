@@ -95,7 +95,12 @@ class TextDisplay : public Widget {
 	private:
 		std::vector<std::string> lines; // The lines of text in the buffer
 		int scrollOffset = 0; // The offset for scrolling through the buffer
-		int editorBottom = 0; // The bottom of the editor window
+
+		// Margins of the editor window:
+		int editorTop = 0;
+		int editorBottom = 0;
+		int editorLeft = 0;
+		int editorRight = 0;
 
 		void refreshBuffer(); // Refresh the buffer with new content from the file
 		void drawText(WINDOW* window); // Draw the text in the buffer to the window
@@ -104,7 +109,10 @@ class TextDisplay : public Widget {
 		TextDisplay(int x, int y, int w, int h);
 		TextDisplay(Polonius::TUI::Edge anchor, int width, int height);
 
-		int getBottom() const;
+		int getTopEdge() const;
+		int getBottomEdge() const;
+		int getLeftEdge() const;
+		int getRightEdge() const;
 
 		void draw() override;
 
