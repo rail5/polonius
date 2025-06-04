@@ -12,15 +12,37 @@ namespace Polonius {
 namespace TUI {
 
 
+enum Positioning {
+	RELATIVE,
+	ABSOLUTE
+};
+
+enum Edge {
+	LEFT,
+	RIGHT,
+	TOP,
+	BOTTOM
+};
+
+enum RelativeSize : int {
+	FULL = -1,
+	HALF = -2,
+	QUARTER = -3,
+	THREE_QUARTERS = -4
+};
+
 class Widget {
 	protected:
 		int x_;
 		int y_;
 		int w_;
 		int h_;
+		Polonius::TUI::Positioning position = Polonius::TUI::RELATIVE;
+		Polonius::TUI::Edge anchor = Polonius::TUI::BOTTOM;
 
 	public:
 		Widget(int x, int y, int w, int h);
+		Widget(Polonius::TUI::Edge anchor, int width, int height);
 
 		virtual ~Widget();
 
@@ -38,6 +60,7 @@ class HelpPane : public Widget {
 		std::string bottomLabel;
 	public:
 		HelpPane(int x, int y, int w, int h, const std::string& label);
+		HelpPane(Polonius::TUI::Edge anchor, int width, int height, const std::string& label);
 		void setBottomLabel(const std::string& label);
 
 		void draw(WINDOW* window) override;

@@ -10,6 +10,7 @@ Polonius::Window::Window() : screen(nullptr) {
 	noecho(); // Don't echo input characters
 	keypad(stdscr, TRUE); // Enable special keys
 	start_color(); // Start color functionality
+	use_default_colors(); // Use default terminal colors
 	screen = stdscr;
 
 	initialize();
@@ -26,7 +27,7 @@ void Polonius::Window::initialize() {
 	}
 
 	std::shared_ptr<Polonius::TUI::HelpPane> bottom_pane = std::make_shared<Polonius::TUI::HelpPane>
-		(0, LINES - 4, COLS, 4, "Polonius");
+		(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 4, "Polonius");
 	bottom_pane->setBottomLabel("New File");
 	widgets.push_back(bottom_pane);
 	
@@ -57,6 +58,14 @@ int Polonius::Window::run() {
 		refresh();
 
 		switch (ch) {
+			case KEY_RESIZE:
+				// Handle window resize
+				endwin();
+				refresh();
+				clear();
+				drawWidgets();
+				move(y, x); // Move cursor to the current position after resize
+				break;
 			case KEY_UP:
 				if (y > 0) y--;
 				break;

@@ -6,7 +6,14 @@
 #include <array>
 #include "widget.h"
 
-Polonius::TUI::Widget::Widget(int x, int y, int w, int h) : x_(x), y_(y), w_(w), h_(h) {}
+Polonius::TUI::Widget::Widget(int x, int y, int w, int h)
+	: x_(x), y_(y), w_(w), h_(h),
+	position(Polonius::TUI::ABSOLUTE) {}
+
+Polonius::TUI::Widget::Widget(Polonius::TUI::Edge anchor, int width, int height)
+	: x_(0), y_(0), w_(width), h_(height),
+	position(Polonius::TUI::RELATIVE), anchor(anchor) {}
+
 Polonius::TUI::Widget::~Widget() = default;
 
 int Polonius::TUI::Widget::getX() const {
@@ -28,13 +35,81 @@ int Polonius::TUI::Widget::getHeight() const {
 Polonius::TUI::HelpPane::HelpPane(int x, int y, int w, int h, const std::string& label)
 	: Widget(x, y, w, h), topLabel(label) {}
 
+Polonius::TUI::HelpPane::HelpPane(Polonius::TUI::Edge anchor, int width, int height, const std::string& label)
+	: Widget(anchor, width, height), topLabel(label) {}
+
 void Polonius::TUI::HelpPane::setBottomLabel(const std::string& label) {
 	bottomLabel = label;
 }
 
 void Polonius::TUI::HelpPane::draw(WINDOW* window) {
+	// Get the width and height
+	int width = w_;
+	int height = h_;
+	int x = x_;
+	int y = y_;
+
+	switch (w_) {
+		case Polonius::TUI::FULL:
+			width = COLS; // Full width
+			break;
+		case Polonius::TUI::HALF:
+			width = COLS / 2; // Half width
+			break;
+		case Polonius::TUI::QUARTER:
+			width = COLS / 4; // Quarter width
+			break;
+		case Polonius::TUI::THREE_QUARTERS:
+			width = (COLS * 3) / 4; // Three-quarters width
+			break;
+		default:
+			width = w_ <= 0 ? COLS : w_; // Use the specified width or default to COLS
+			break;
+	}
+
+	switch (h_) {
+		case Polonius::TUI::FULL:
+			height = LINES; // Full height
+			break;
+		case Polonius::TUI::HALF:
+			height = LINES / 2; // Half height
+			break;
+		case Polonius::TUI::QUARTER:
+			height = LINES / 4; // Quarter height
+			break;
+		case Polonius::TUI::THREE_QUARTERS:
+			height = (LINES * 3) / 4; // Three-quarters height
+			break;
+		default:
+			height = h_ <= 0 ? LINES : h_; // Use the specified height or default to LINES
+			break;
+	}
+
+	// Are we relatively or absolutely positioned?
+	if (position == Polonius::TUI::RELATIVE) {
+		// If relative, we need to calculate the position based on the anchor and width/height
+		switch (anchor) {
+			case Polonius::TUI::LEFT:
+				x = 0; // Left edge
+				y = (LINES - height) / 2; // Center vertically
+				break;
+			case Polonius::TUI::RIGHT:
+				x = COLS - width; // Right edge
+				y = (LINES - height) / 2; // Center vertically
+				break;
+			case Polonius::TUI::TOP:
+				x = (COLS - width) / 2; // Center horizontally
+				y = 0; // Top edge
+				break;
+			case Polonius::TUI::BOTTOM:
+				x = (COLS - width) / 2; // Center horizontally
+				y = LINES - height; // Bottom edge
+				break;
+		}
+	}
+
 	// Draw a box at the specified position with the given width and height
-	WINDOW* pane = subwin(window, h_, w_, y_, x_);
+	WINDOW* pane = subwin(window, height, width, y, x);
 
 	if (pane == nullptr) {
 		return;
@@ -43,13 +118,13 @@ void Polonius::TUI::HelpPane::draw(WINDOW* window) {
 	box(pane, 0, 0); // Draw a box at the specified position with the given width and height
 
 	// Print the label in the top-center of the pane
-	int label_x = (w_ - static_cast<int>(topLabel.length())) / 2; // Center the label
+	int label_x = (width - static_cast<int>(topLabel.length())) / 2; // Center the label
 	mvwprintw(pane, 0, label_x, "%s", topLabel.c_str()); // Print the label at the top of the pane
 
 	// Print the bottom label in the bottom-center of the pane
 	if (!bottomLabel.empty()) {
-		int bottom_label_x = (w_ - static_cast<int>(bottomLabel.length())) / 2; // Center the bottom label
-		mvwprintw(pane, h_ - 1, bottom_label_x, "%s", bottomLabel.c_str()); // Print the bottom label
+		int bottom_label_x = (width - static_cast<int>(bottomLabel.length())) / 2; // Center the bottom label
+		mvwprintw(pane, height - 1, bottom_label_x, "%s", bottomLabel.c_str()); // Print the bottom label
 	}
 
 	// Place some helpful text in the pane
@@ -64,7 +139,7 @@ void Polonius::TUI::HelpPane::draw(WINDOW* window) {
 	};
 
 	int num_columns = std::max(shortcuts.size() / 2, static_cast<size_t>(1));
-	int num_rows = h_ / 2;
+	int num_rows = height / 2;
 
 	int row = 1;
 	int col = 1;
@@ -87,7 +162,7 @@ void Polonius::TUI::HelpPane::draw(WINDOW* window) {
 
 		// Calculate the actual x position based on the column number
 		// Divide the width by the number of columns
-		int x_position = (col - 1) * (w_ / num_columns) + 1;
+		int x_position = (col - 1) * (width / num_columns) + 1;
 		
 		// Print the first two chars with a standout (or bold) attribute
 		wattron(pane, A_STANDOUT);
