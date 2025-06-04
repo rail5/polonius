@@ -8,7 +8,7 @@ A text editor for very large files
 > 
 > I will be brief.
 > 
-  – Hamlet, Act II, Scene II
+  &mdash; Hamlet, Act II, Scene II
 
 ## About
 Polonius can be used to edit files of any size (up to just over **8 million terabytes**) on systems with as little as only **a few kilobytes** of available memory.
@@ -42,9 +42,9 @@ Development is done on **Debian GNU/Linux**. Releases will be provided for the *
   ![99%](https://geps.dev/progress/99)
   
 
-**CLI (polonius)**:
+**Terminal UI (polonius)**:
 
-  ![0%](https://geps.dev/progress/1)
+  ![15%](https://geps.dev/progress/15)
   
 
 **GUI (polonius-gui)**:
