@@ -5,6 +5,8 @@
 #include "window.h"
 #include "widget.h"
 
+#include "../shared/version.h"
+
 #include <iostream>
 
 Polonius::Window::Window() : screen(nullptr) {
@@ -86,7 +88,7 @@ void Polonius::Window::initialize() {
 	}
 
 	std::shared_ptr<Polonius::TUI::HelpPane> bottom_pane = std::make_shared<Polonius::TUI::HelpPane>
-		(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 4, "Polonius");
+		(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 4, "Polonius v" program_version);
 	bottom_pane->setBottomLabel("New File");
 	widgets.push_back(bottom_pane);
 
