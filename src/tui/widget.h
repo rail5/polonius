@@ -32,11 +32,13 @@ class Widget {
 		int getHeight() const;
 };
 
-class Pane : public Widget {
+class HelpPane : public Widget {
 	private:
-		std::string label;
+		std::string topLabel;
+		std::string bottomLabel;
 	public:
-		Pane(int x, int y, int w, int h, const std::string& label);
+		HelpPane(int x, int y, int w, int h, const std::string& label);
+		void setBottomLabel(const std::string& label);
 
 		void draw(WINDOW* window) override;
 };

@@ -25,8 +25,9 @@ void Polonius::Window::initialize() {
 		throw std::runtime_error("Screen is not initialized");
 	}
 
-	std::shared_ptr<Polonius::TUI::Widget> bottom_pane = std::make_shared<Polonius::TUI::Pane>
-		(0, LINES - 3, COLS, 3, "Polonius TUI");
+	std::shared_ptr<Polonius::TUI::HelpPane> bottom_pane = std::make_shared<Polonius::TUI::HelpPane>
+		(0, LINES - 4, COLS, 4, "Polonius");
+	bottom_pane->setBottomLabel("New File");
 	widgets.push_back(bottom_pane);
 	
 }
@@ -49,8 +50,9 @@ int Polonius::Window::run() {
 	// Move cursor to 0,0
 	move(0, 0);
 
-	while ((ch = getch()) != 'q') {
+	while ((ch = getch())) {
 		erase();
+		attroff(A_REVERSE); // Turn off reverse attribute
 		drawWidgets(); // Redraw widgets on each key press
 		refresh();
 
@@ -67,6 +69,9 @@ int Polonius::Window::run() {
 			case KEY_RIGHT:
 				if (x < COLS - 1) x++;
 				break;
+			case 24: // Ctrl+X
+				clear();
+				return 0; // Exit the application
 			default:
 				// Handle other keys or input
 				buffer += static_cast<char>(ch);
