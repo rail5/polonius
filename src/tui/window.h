@@ -19,7 +19,15 @@ namespace TUI {
 class Widget;
 class TextDisplay;
 class HelpPane;
+class Message;
+
+enum Color : uint8_t;
 } // namespace TUI
+
+class Window;
+
+[[maybe_unused]] static Polonius::Window* mainWindow;
+[[maybe_unused]] static bool command_key_pressed = false;
 
 /**
  * @class Window
@@ -44,6 +52,7 @@ class Window {
 		int cursor_y = 0;
 
 		std::vector<std::shared_ptr<Polonius::TUI::Widget>> widgets;
+		std::shared_ptr<Polonius::TUI::Message> current_message;
 		void drawWidgets();
 		void updateBoundaries(std::shared_ptr<Polonius::TUI::Widget> widget);
 		void resetBoundaries();
@@ -58,6 +67,7 @@ class Window {
 		WINDOW* getScreen() const;
 
 		void refreshScreen();
+		void clearScreen();
 
 		void setTop(int top);
 		void setBottom(int bottom);
@@ -72,6 +82,12 @@ class Window {
 		void setFile(Polonius::File* file);
 
 		void addWidget(std::shared_ptr<Polonius::TUI::Widget> widget);
+		void showMessage();
+
+		void restoreCursorPosition();
+
+		// Interrupt handling
+		static void handleInterrupt(int signal);
 };
 
 

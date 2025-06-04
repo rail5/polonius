@@ -141,6 +141,26 @@ class HelpPane : public Widget {
 		void draw() override;
 };
 
+enum Color : uint8_t {
+	DEFAULT = 0,
+	RED = 10,
+	GREEN = 11,
+	YELLOW = 12
+};
+
+class Message : public Widget {
+	private:
+		std::string message;
+		Polonius::TUI::Color color = Polonius::TUI::DEFAULT;
+	public:
+		Message();
+		explicit Message(const std::string& msg);
+
+		void draw() override;
+		void setMessage(const std::string& msg);
+		void setColor(Polonius::TUI::Color color);
+};
+
 } // namespace TUI
 } // namespace Polonius
 

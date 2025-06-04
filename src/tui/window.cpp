@@ -8,6 +8,11 @@
 #include "../shared/version.h"
 
 #include <iostream>
+#include <signal.h>
+#include <unistd.h>
+
+extern Polonius::Window* mainWindow;
+extern bool command_key_pressed;
 
 Polonius::Window::Window() : screen(nullptr) {
 	initscr(); // Initialize ncurses
@@ -24,6 +29,19 @@ Polonius::Window::Window() : screen(nullptr) {
 	bottom = LINES; // Set default bottom to last line
 	left = 0; // Set default left to 0
 	right = COLS; // Set default right to last column
+
+	// Set up signal handlers
+	signal(SIGTSTP, handleInterrupt);
+	signal(SIGINT, handleInterrupt);
+
+	Polonius::command_key_pressed = false;
+
+	Polonius::mainWindow = this; // Set the main window pointer to this instance
+
+	// Set up color pairs
+	init_pair(Polonius::TUI::Color::RED, COLOR_WHITE, COLOR_RED); // Error color pair
+	init_pair(Polonius::TUI::Color::GREEN, COLOR_WHITE, COLOR_GREEN); // Success color pair
+	init_pair(Polonius::TUI::Color::YELLOW, COLOR_WHITE, COLOR_YELLOW); // Warning color pair
 }
 
 Polonius::Window::~Window() {
@@ -47,6 +65,14 @@ void Polonius::Window::refreshScreen() {
 	attroff(A_REVERSE);
 	drawWidgets();
 	move(cursor_y, cursor_x);
+	// Reset any message on a screen refresh
+	current_message.reset();
+}
+
+void Polonius::Window::clearScreen() {
+	clear();
+	refresh();
+	attroff(A_REVERSE);
 }
 
 void Polonius::Window::setTop(int top) {
@@ -143,8 +169,6 @@ int Polonius::Window::run() {
 	move(0, 0);
 
 	while ((ch = getch())) {
-		refreshScreen();
-
 		switch (ch) {
 			case KEY_RESIZE:
 				// Handle window resize
@@ -183,6 +207,9 @@ int Polonius::Window::run() {
 					cursor_x = textDisplay->getLeftEdge(); // Move to the leftmost position of the next line
 				}
 				break;
+			case 20: // Ctrl+T
+				command_key_pressed = !command_key_pressed; // Toggle Ctrl+T state
+				break;
 			case 24: // Ctrl+X
 				clear();
 				return 0; // Exit the application
@@ -191,6 +218,9 @@ int Polonius::Window::run() {
 				//buffer += static_cast<char>(ch);
 				break;
 		}
+
+		showMessage();
+
 		move(cursor_y, cursor_x);
 		// Highlight the current position
 		attron(A_REVERSE);
@@ -315,4 +345,51 @@ void Polonius::Window::resetBoundaries() {
 	bottom = LINES;
 	left = 0;
 	right = COLS;
+}
+
+void Polonius::Window::showMessage() {
+	if (current_message) {
+		current_message->draw();
+	}
+}
+
+void Polonius::Window::restoreCursorPosition() {
+	// Restore the cursor position to the last known position
+	move(cursor_y, cursor_x);
+	// Highlight the current position
+	attron(A_REVERSE);
+	refresh();
+}
+
+void Polonius::Window::handleInterrupt(int signal) {
+	// Handle interrupts (e.g., Ctrl+C)
+	switch (signal) {
+		case SIGINT: // Ctrl+C
+			break;
+		case SIGTSTP: // Ctrl+Z
+			// Do not stop the application on Ctrl+Z
+			// Ctrl+T + Ctrl+Z will suspend the application instead
+			if (!Polonius::mainWindow) {
+				// No window is initialized, just suspend
+				kill(getpid(), SIGSTOP); // Suspend the process
+				return;
+			}
+			if (Polonius::command_key_pressed) {
+				Polonius::command_key_pressed = false;
+				Polonius::mainWindow->clearScreen();
+				kill(getpid(), SIGSTOP); // Suspend the process
+				// After resuming:
+				Polonius::mainWindow->refreshScreen();
+				Polonius::mainWindow->restoreCursorPosition();
+			} else {
+				// Draw a message indicating that Ctrl+T is required to suspend
+				std::shared_ptr<Polonius::TUI::Message> msg = std::make_shared<Polonius::TUI::Message>();
+				msg->setMessage("[ To suspend, type ^T^Z ]");
+				msg->setColor(Polonius::TUI::RED);
+				msg->setParent(Polonius::mainWindow);
+				Polonius::mainWindow->current_message = msg;
+				msg->draw();
+			}
+			break;
+	}
 }
