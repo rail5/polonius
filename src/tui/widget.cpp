@@ -76,6 +76,17 @@ void Polonius::TUI::Widget::setHeight(int h) {
 	h_ = h;
 }
 
+/**
+ * @brief Set positioning (absolute or relative) of the widget
+ * 
+ * You can set the positioning to either:
+ * - Polonius::TUI::RELATIVE for relative positioning
+ * - Polonius::TUI::ABSOLUTE for absolute positioning
+ */
+void Polonius::TUI::Widget::setPositioning(Polonius::TUI::Positioning pos) {
+	position = pos;
+}
+
 Polonius::TUI::HelpPane::HelpPane(int x, int y, int w, int h, const std::string& label)
 	: Widget(x, y, w, h), topLabel(label) {}
 
