@@ -12,9 +12,14 @@
 #include <vector>
 #include <memory>
 
-#include "widget.h"
-
 namespace Polonius {
+
+// Forward declarations
+namespace TUI {
+class Widget;
+class TextDisplay;
+class HelpPane;
+} // namespace TUI
 
 /**
  * @class Window
@@ -27,11 +32,18 @@ class Window {
 		WINDOW* screen;
 		Polonius::File* file;
 		std::string buffer;
-		unsigned int width = 80;
-		unsigned int height = 24;
+		int width = 80;
+		int height = 24;
+		int top = 0;
+		int bottom = 24;
+		int left = 0;
+		int right = 80;
+		bool initialized = false;
 
 		std::vector<std::shared_ptr<Polonius::TUI::Widget>> widgets;
 		void drawWidgets();
+		void updateBoundaries(std::shared_ptr<Polonius::TUI::Widget> widget);
+		void resetBoundaries();
 
 		void initialize();
 
@@ -39,6 +51,18 @@ class Window {
 		Window();
 		~Window();
 		int run();
+
+		WINDOW* getScreen() const;
+
+		void setTop(int top);
+		void setBottom(int bottom);
+		void setLeft(int left);
+		void setRight(int right);
+
+		int getTop() const;
+		int getBottom() const;
+		int getLeft() const;
+		int getRight() const;
 
 		void setFile(Polonius::File* file);
 

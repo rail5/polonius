@@ -8,6 +8,8 @@
 #include <ncurses.h>
 #include <string>
 
+#include "window.h"
+
 namespace Polonius {
 namespace TUI {
 
@@ -31,8 +33,16 @@ enum RelativeSize : int {
 	THREE_QUARTERS = -4
 };
 
+/**
+ * @class Widget
+ * @brief Base class for all widgets in the Terminal UI
+ * 
+ * This class provides a base for all widgets in the Terminal UI.
+ * It includes positioning, size, and a pure virtual draw function that must be implemented by derived classes.
+ */
 class Widget {
 	protected:
+		Polonius::Window* parent;
 		int x_ = 0;
 		int y_ = 0;
 		int w_ = Polonius::TUI::FULL; // Default to full width
@@ -47,12 +57,15 @@ class Widget {
 
 		virtual ~Widget();
 
-		virtual void draw(WINDOW* window) = 0; // Pure virtual function for drawing the widget
+		virtual void draw() = 0; // Pure virtual function for drawing the widget
+
+		void setParent(Polonius::Window* parent);
 
 		int getX() const;
 		int getY() const;
 		int getWidth() const;
 		int getHeight() const;
+		Polonius::TUI::Edge getAnchor() const;
 		bool isRelativelyPositioned() const;
 
 		void setX(int x);
@@ -62,6 +75,49 @@ class Widget {
 		void setPositioning(Polonius::TUI::Positioning pos);
 };
 
+/**
+ * @class TextDisplay
+ * @brief The widget that controls the text editing functionality in the Terminal UI
+ * 
+ * Because Polonius never reads the entire file into memory,
+ * this widget contains a buffer of size Polonius::block_size with text from the file
+ * and only displays a *portion* of that buffer (as much as will fit on screen).
+ * 
+ * When the user scrolls the window, we change the part of the buffer we display
+ * I.e, without updating the buffer, we change which part of it we're displaying to
+ * reflect the user's scrolled position.
+ * 
+ * When the user nears the bottom or top of the buffer,
+ * the buffer is refreshed with new content from the file, simulating an ordinary
+ * text editor.
+ */
+class TextDisplay : public Widget {
+	private:
+		std::string buffer; // The buffer that contains the text to display
+		int scrollOffset = 0; // The offset for scrolling through the buffer
+
+		void refreshBuffer(); // Refresh the buffer with new content from the file
+		void drawText(WINDOW* window); // Draw the text in the buffer to the window
+
+	public:
+		TextDisplay(int x, int y, int w, int h);
+		TextDisplay(Polonius::TUI::Edge anchor, int width, int height);
+
+		void draw() override;
+
+		void setBuffer(const std::string& newBuffer); // Set the buffer to a new string
+		void scrollUp(); // Scroll up in the buffer
+		void scrollDown(); // Scroll down in the buffer
+		void clearBuffer(); // Clear the buffer
+};
+
+/**
+ * @class HelpPane
+ * @brief A pane that displays help information in the Terminal UI
+ * 
+ * This class extends Widget to provide a pane that can display help information.
+ * It includes a top label and a bottom label, which can be set and displayed.
+ */
 class HelpPane : public Widget {
 	private:
 		std::string topLabel;
@@ -71,7 +127,7 @@ class HelpPane : public Widget {
 		HelpPane(Polonius::TUI::Edge anchor, int width, int height, const std::string& label);
 		void setBottomLabel(const std::string& label);
 
-		void draw(WINDOW* window) override;
+		void draw() override;
 };
 
 } // namespace TUI
