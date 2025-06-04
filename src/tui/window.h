@@ -31,7 +31,7 @@ class Window {
 	private:
 		WINDOW* screen;
 		Polonius::File* file;
-		std::string buffer;
+		std::shared_ptr<Polonius::TUI::TextDisplay> textDisplay;
 		int width = 80;
 		int height = 24;
 		int top = 0;

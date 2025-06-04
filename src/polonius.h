@@ -59,6 +59,8 @@ class File {
 		File& operator=(const File&) = delete; // Disable copy assignment operator
 		File(File&& other) noexcept; // Move constructor
 		File& operator=(File&& other) noexcept; // Move assignment operator
+		
+		std::string getPath() const;
 
 		void parseInstructions(const std::string& instructions);
 		void executeInstructions();

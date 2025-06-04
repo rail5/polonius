@@ -49,7 +49,6 @@ class Widget {
 		int h_ = Polonius::TUI::FULL; // Default to full height
 		Polonius::TUI::Positioning position = Polonius::TUI::RELATIVE;
 		Polonius::TUI::Edge anchor = Polonius::TUI::BOTTOM;
-
 	public:
 		Widget();
 		Widget(int x, int y, int w, int h);
@@ -65,6 +64,7 @@ class Widget {
 		int getY() const;
 		int getWidth() const;
 		int getHeight() const;
+		int getAbsoluteBottom() const;
 		Polonius::TUI::Edge getAnchor() const;
 		bool isRelativelyPositioned() const;
 
@@ -93,8 +93,9 @@ class Widget {
  */
 class TextDisplay : public Widget {
 	private:
-		std::string buffer; // The buffer that contains the text to display
+		std::vector<std::string> lines; // The lines of text in the buffer
 		int scrollOffset = 0; // The offset for scrolling through the buffer
+		int editorBottom = 0; // The bottom of the editor window
 
 		void refreshBuffer(); // Refresh the buffer with new content from the file
 		void drawText(WINDOW* window); // Draw the text in the buffer to the window
@@ -102,6 +103,8 @@ class TextDisplay : public Widget {
 	public:
 		TextDisplay(int x, int y, int w, int h);
 		TextDisplay(Polonius::TUI::Edge anchor, int width, int height);
+
+		int getBottom() const;
 
 		void draw() override;
 

@@ -158,6 +158,10 @@ Polonius::File& Polonius::File::operator=(File&& other) noexcept {
 	return *this;
 }
 
+std::string Polonius::File::getPath() const {
+	return path.string();
+}
+
 /**
  * @brief Validates the instruction sequence for the file.
  * 

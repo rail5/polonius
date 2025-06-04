@@ -89,8 +89,20 @@ void Polonius::Window::initialize() {
 
 	std::shared_ptr<Polonius::TUI::HelpPane> bottom_pane = std::make_shared<Polonius::TUI::HelpPane>
 		(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 4, "Polonius v" program_version);
-	bottom_pane->setBottomLabel("New File");
+
+	if (file) {
+		bottom_pane->setBottomLabel(file->getPath());
+	} else {
+		bottom_pane->setBottomLabel("New File");
+	}
+
 	widgets.push_back(bottom_pane);
+
+	textDisplay = std::make_shared<Polonius::TUI::TextDisplay>
+		(Polonius::TUI::TOP, Polonius::TUI::FULL, Polonius::TUI::FULL);
+	textDisplay->setBuffer(file->readFromFile(0, static_cast<int64_t>(Polonius::block_size)));
+
+	widgets.push_back(textDisplay);
 
 	initialized = true;
 }
@@ -135,13 +147,33 @@ int Polonius::Window::run() {
 				move(y, x); // Move cursor to the current position after resize
 				break;
 			case KEY_UP:
-				if (y > 0) y--;
+				if (y > 0) {
+					y--;
+				} else {
+					textDisplay->scrollUp();
+				}
 				break;
 			case KEY_DOWN:
-				if (y < LINES - 1) y++;
+				if (y < textDisplay->getBottom()) {
+					y++;
+				} else {
+					textDisplay->scrollDown();
+					// Refresh
+					endwin();
+					refresh();
+					clear();
+					drawWidgets();
+					move(y, x);
+				}
 				break;
 			case KEY_LEFT:
-				if (x > 0) x--;
+				if (x > 0) {
+					x--;
+				} else if (y > 0) {
+					// Move up one line, and land at the rightmost position
+					y--;
+					x = getRight(); // Move to the rightmost position of the previous line
+				}
 				break;
 			case KEY_RIGHT:
 				if (x < COLS - 1) x++;
@@ -151,7 +183,7 @@ int Polonius::Window::run() {
 				return 0; // Exit the application
 			default:
 				// Handle other keys or input
-				buffer += static_cast<char>(ch);
+				//buffer += static_cast<char>(ch);
 				break;
 		}
 		move(y, x);
@@ -165,11 +197,6 @@ int Polonius::Window::run() {
 
 void Polonius::Window::setFile(Polonius::File* file) {
 	this->file = file;
-
-	// Populate the initial buffer
-	if (file) {
-		buffer = file->readFromFile(0, static_cast<int64_t>(Polonius::block_size));
-	}
 }
 
 void Polonius::Window::addWidget(std::shared_ptr<Polonius::TUI::Widget> widget) {
