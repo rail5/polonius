@@ -158,7 +158,12 @@ int main(int argc, char* argv[]) {
 
 	try {
 		file.setSearchQuery(search_query);
-		file.read();
+		Polonius::Block response = file.read();
+		if (Polonius::Reader::output_positions) {
+			std::cout << response.start << " " << response.start + response.contents.size() - 1 << std::endl;
+		} else {
+			std::cout << response.contents;
+		}
 	} catch (const std::exception& e) {
 		std::cerr << "Error reading file: " << e.what() << std::endl;
 		return EXIT_FAILURE;

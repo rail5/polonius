@@ -30,6 +30,12 @@ extern bool editor_mode;
 extern bool reader_mode;
 extern bool special_chars; // Whether to process escape sequences in strings
 
+struct Block {
+	uint64_t start = 0;
+	std::string contents = "";
+	bool initialized = false;
+};
+
 class File {
 	private:
 		std::filesystem::path path;
@@ -48,9 +54,6 @@ class File {
 
 		void validateInstructions();
 
-		void search() const;
-		void regex_search() const;
-
 	public:
 		File() = default;
 		explicit File(const std::filesystem::path& filePath);
@@ -67,10 +70,13 @@ class File {
 
 		void setSearchQuery(const std::string& query);
 
+		Polonius::Block search(uint64_t start, int64_t length, const std::string& query) const;
+		Polonius::Block regex_search(uint64_t start, int64_t length, const std::string& query) const;
+
 		std::string readFromFile(uint64_t start = Polonius::Reader::start_position,
 			int64_t length = Polonius::Reader::amount_to_read,
 			bool force_output_text = false) const;
-		void read();
+		Polonius::Block read();
 };
 
 } // namespace Polonius
