@@ -6,10 +6,13 @@
 #define SRC_TUI_WINDOW_H_
 
 #include "../polonius.h"
-#include <cursesapp.h>
-#include <cursesw.h>
+#include <ncurses.h>
 #include <string>
 #include <cstdint>
+#include <vector>
+#include <memory>
+
+#include "widget.h"
 
 namespace Polonius {
 
@@ -19,16 +22,30 @@ namespace Polonius {
  * 
  * This UI is done with ncurses
  */
-class Window : public NCursesApplication {
+class Window {
 	private:
-		NCursesWindow* screen;
+		WINDOW* screen;
+		Polonius::File* file;
 		std::string buffer;
+		unsigned int width = 80;
+		unsigned int height = 24;
+
+		std::vector<std::shared_ptr<Polonius::TUI::Widget>> widgets;
+		void drawWidgets();
+
+		void initialize();
 
 	public:
 		Window();
 		~Window();
-		int run() override;
+		int run();
+
+		void setFile(Polonius::File* file);
+
+		void addWidget(std::shared_ptr<Polonius::TUI::Widget> widget);
 };
+
+
 
 } // namespace Polonius
 

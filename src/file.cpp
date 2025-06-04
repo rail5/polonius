@@ -463,6 +463,9 @@ void Polonius::File::setSearchQuery(const std::string& query) {
  * If `output_positions` is enabled, it returns the start and end positions of the read operation instead of the text.
  */
 std::string Polonius::File::readFromFile(uint64_t start, int64_t length, bool force_output_text) const {
+	if (!file) {
+		return "";
+	}
 	std::string result;
 	// Calculate the end position of the read operation
 	uint64_t end_position = start + static_cast<uint64_t>(length);

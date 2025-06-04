@@ -2,10 +2,6 @@
  * Copyright (C) 2025 rail5
  */
 
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/screen/screen.hpp>
-#include <ftxui/component/component.hpp>
-#include <ftxui/component/screen_interactive.hpp>
 #include <iostream>
 #include <string>
 
@@ -14,15 +10,18 @@
 #include "../polonius.h"
 #include "../read/reader.h"
 #include "../edit/editor.h"
+#include "window.h"
 
 #include "../shared/version.h"
 #include "../shared/parse_block_units.h"
 #include "../shared/is_number.h"
  
 int main(int argc, char* argv[]) {
-	Polonius::File file;
 	Polonius::reader_mode = true;
 	Polonius::editor_mode = true;
+	Polonius::File file;
+
+	Polonius::Window window;
 
 	const char* help_string = "polonius " program_version "\n"
 		"Usage: polonius [file] [options]\n"
@@ -115,15 +114,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// If we haven't received a file, we're creating a new one
+	window.setFile(&file);
 
-	// Create an FTXUI interactive screen
-	ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::TerminalOutput();
-	// Set up the main component
-	auto main_component = ftxui::Container::Vertical({
-		// Get the file contents and create a text element
-		ftxui::Button("TODO", [&] { screen.ExitLoopClosure()(); }),
-		ftxui::Button("Exit", [&] { screen.ExitLoopClosure()(); })
-	});
-
-	screen.Loop(main_component);
+	return window.run();
 }

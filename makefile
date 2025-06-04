@@ -10,7 +10,7 @@ VERSION=$(shell dpkg-parsechangelog -l debian/changelog --show-field version)
 
 CXX = g++
 CXXFLAGS = -O2 -std=gnu++20 -Wall -Wextra
-LDFLAGS = -s -lboost_regex -lncurses -ltinfo -lncurses++
+LDFLAGS = -s -lboost_regex -lncurses -ltinfo
 
 # Install directories
 PREFIX ?= /usr/local
@@ -25,7 +25,8 @@ SHARED_OBJS = \
 	bin/obj/shared/parse_regex.o \
 	bin/obj/file.o \
 	bin/obj/polonius-editor/instruction.o \
-	bin/obj/polonius/window.o
+	bin/obj/polonius/window.o \
+	bin/obj/polonius/widget.o
 
 all: src/shared/version.h
 	$(MAKE) bin/polonius-editor bin/polonius-reader
