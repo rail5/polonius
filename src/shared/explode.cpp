@@ -34,29 +34,54 @@ std::vector<std::string> explode(
 
 	std::string current_element;
 	for (auto& c : input) {
-		switch (c) {
-			case '\\':
-				if (can_escape) {
-					escaped = !escaped;
-				}
-				[[ fallthrough ]];
-			default:
-				if (static_cast<int>(result.size()) == maximum_number_of_elements - 1 && maximum_number_of_elements > 0) {
-					// If we reached the maximum number of elements, append the rest of the string to the last element
-					current_element += c;
-					continue;
-				}
-				if (c == delimiter && !escaped) {
-					if (!current_element.empty() || preserve_empty) {
-						result.push_back(current_element);
-						current_element.clear();
-					}
-				} else {
-					current_element += c;
+		if (c == '\\') {
+			if (escaped) {
+				// If we are already escaped or escaping is not allowed, treat it as a normal character
+				current_element += '\\';
+				current_element += c;
+				escaped = false; // Reset the escaped state
+				continue;
+			}
+
+			if (!can_escape) {
+				current_element += c; // Add the backslash as a normal character
+				escaped = false;
+			} else {
+				escaped = true;
+			}
+			continue;
+		}
+
+		if (c == delimiter) {
+			if (maximum_number_of_elements > 0 && result.size() >= static_cast<size_t>(maximum_number_of_elements - 1)) {
+				// If we have reached the maximum number of elements, append the rest of the string to the last element
+				if (escaped) {
+					current_element += '\\';
 					escaped = false;
 				}
-				break;
+				current_element += c; // Add the delimiter to the last element
+				continue;
+			}
+
+			if (escaped) {
+				current_element += c;
+				escaped = false;
+			} else {
+				// If we are not escaped, treat it as a delimiter
+				if (!current_element.empty() || preserve_empty) {
+					result.push_back(current_element);
+					current_element.clear();
+				}
+			}
+			continue;
 		}
+
+		// If we reach here, it means we are not dealing with an escape character or a delimiter
+		if (escaped) {
+			current_element += '\\';
+			escaped = false;
+		}
+		current_element += c;
 	}
 	if (!current_element.empty() || preserve_empty) {
 		result.push_back(current_element);
