@@ -32,6 +32,12 @@ extern bool special_chars; // Whether to process escape sequences in strings
 
 struct Block {
 	uint64_t start = 0;
+	uint64_t end() const {
+		if (!initialized || contents.empty()) {
+			return 0; // If not initialized, return 0
+		}
+		return start + contents.size() - 1; // -1 because the end is inclusive
+	}
 	std::string contents = "";
 	bool initialized = false;
 };
@@ -73,9 +79,9 @@ class File {
 		Polonius::Block search(uint64_t start, int64_t length, const std::string& query) const;
 		Polonius::Block regex_search(uint64_t start, int64_t length, const std::string& query) const;
 
-		std::string readFromFile(uint64_t start = Polonius::Reader::start_position,
+		Polonius::Block readFromFile(uint64_t start = Polonius::Reader::start_position,
 			int64_t length = Polonius::Reader::amount_to_read,
-			bool force_output_text = false) const;
+			bool to_nearest_newline = false) const;
 		Polonius::Block read();
 };
 

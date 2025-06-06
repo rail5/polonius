@@ -55,6 +55,10 @@ WINDOW* Polonius::Window::getScreen() const {
 	return screen;
 }
 
+Polonius::File* Polonius::Window::getFile() const {
+	return file;
+}
+
 void Polonius::Window::refreshScreen() {
 	if (!screen) {
 		throw std::runtime_error("Screen is not initialized");
@@ -138,7 +142,7 @@ void Polonius::Window::initialize() {
 
 	textDisplay = std::make_shared<Polonius::TUI::TextDisplay>
 		(Polonius::TUI::TOP, Polonius::TUI::FULL, Polonius::TUI::FULL);
-	textDisplay->setBuffer(file->readFromFile(0, static_cast<int64_t>(Polonius::block_size)));
+	textDisplay->setInitialBuffer(file->readFromFile(0, static_cast<int64_t>(Polonius::block_size), true));
 
 	widgets.push_back(textDisplay);
 

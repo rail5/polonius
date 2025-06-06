@@ -4,8 +4,6 @@
 
 #include "explode.h"
 
-#include <sstream>
-
 /**
  * @brief Splits a string into a vector of strings based on a delimiter.
  * 

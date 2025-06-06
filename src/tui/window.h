@@ -65,6 +65,7 @@ class Window {
 		int run();
 
 		WINDOW* getScreen() const;
+		Polonius::File* getFile() const;
 
 		void refreshScreen();
 		void clearScreen();

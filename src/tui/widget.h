@@ -102,6 +102,10 @@ class TextDisplay : public Widget {
 		int editorLeft = 0;
 		int editorRight = 0;
 
+		uint64_t bufferStart = 0;
+		uint64_t bufferEnd = 0;
+
+		void setBuffer(const std::string& newBuffer); // Set the buffer to a new string
 		void refreshBuffer(); // Refresh the buffer with new content from the file
 		void drawText(WINDOW* window); // Draw the text in the buffer to the window
 
@@ -114,9 +118,14 @@ class TextDisplay : public Widget {
 		int getLeftEdge() const;
 		int getRightEdge() const;
 
+		int getScrollOffset() const {
+			return scrollOffset;
+		}
+
 		void draw() override;
 
-		void setBuffer(const std::string& newBuffer); // Set the buffer to a new string
+		void setInitialBuffer(const Polonius::Block& initialBuffer);
+
 		void scrollUp(); // Scroll up in the buffer
 		void scrollDown(); // Scroll down in the buffer
 		void clearBuffer(); // Clear the buffer

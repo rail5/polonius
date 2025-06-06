@@ -28,8 +28,32 @@ int Polonius::TUI::TextDisplay::getRightEdge() const {
 }
 
 void Polonius::TUI::TextDisplay::setBuffer(const std::string& newBuffer) {
-	lines = explode(newBuffer, '\n');
+	lines.clear();
+	lines = explode(newBuffer, '\n', false, 0, true);
+	lines.pop_back(); // Remove the last empty line if it exists
 	scrollOffset = 0; // Reset scroll offset when setting a new buffer
+}
+
+void Polonius::TUI::TextDisplay::refreshBuffer() {
+	uint64_t newBufferStart = bufferStart;
+	int64_t newBufferSize = static_cast<int64_t>(std::max(Polonius::block_size, bufferEnd - bufferStart + 1));
+	// Which line is the first line being displayed on screen?
+	// If the scroll offset is 0, we are displaying the first line of the buffer
+	// If the scroll offset is greater than 0, we are displaying the line at scrollOffset
+	for (size_t i = 0; i < static_cast<size_t>(scrollOffset) + 1 && i < lines.size(); i++) {
+		newBufferStart += lines[i].length() + 1; // +1 for the newline character
+	}
+	Polonius::Block newBuffer = parent->getFile()->readFromFile(newBufferStart, newBufferSize, true);
+	bufferStart = newBuffer.start;
+	bufferEnd = newBuffer.end();
+	setBuffer(newBuffer.contents);
+	scrollOffset = 0;
+}
+
+void Polonius::TUI::TextDisplay::setInitialBuffer(const Polonius::Block& initialBuffer) {
+	bufferStart = initialBuffer.start;
+	bufferEnd = initialBuffer.end();
+	setBuffer(initialBuffer.contents);
 }
 
 void Polonius::TUI::TextDisplay::scrollUp() {
@@ -40,10 +64,14 @@ void Polonius::TUI::TextDisplay::scrollUp() {
 }
 
 void Polonius::TUI::TextDisplay::scrollDown() {
-	if (scrollOffset < static_cast<int>(lines.size())) {
+	int numberOfLinesBeingDisplayed = editorBottom - editorTop + 1;
+	if (scrollOffset < static_cast<int>(lines.size()) - numberOfLinesBeingDisplayed) {
 		scrollOffset++;
-		parent->refreshScreen(); // Refresh the screen to reflect the scroll change
+	} else {
+		// Load more from the file if we're at the end of the buffer
+		refreshBuffer();
 	}
+	parent->refreshScreen(); // Refresh the screen to reflect the scroll change
 }
 
 void Polonius::TUI::TextDisplay::clearBuffer() {
@@ -74,10 +102,6 @@ void Polonius::TUI::TextDisplay::drawText(WINDOW* window) {
 			mvwprintw(window, i, 0, "%s", line.c_str()); // Print the line to the window
 		}
 	}
-}
-
-void Polonius::TUI::TextDisplay::refreshBuffer() {
-	// TODO(@rail5)
 }
 
 void Polonius::TUI::TextDisplay::draw() {
