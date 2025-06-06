@@ -483,7 +483,6 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
 		uint64_t bytes_to_read = std::min(Polonius::block_size, end_position - current_position);
 		if (to_nearest_newline) {
 			Polonius::Block next_newline = search(current_position + bytes_to_read + 1, -1, "\n");
-				<< " to EOF" << std::endl;
 			if (next_newline.initialized) {
 				// If we found a newline, adjust the bytes to read to include it
 				bytes_to_read = next_newline.start - current_position + 1; // +1 to include the newline character
