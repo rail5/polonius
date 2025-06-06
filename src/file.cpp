@@ -162,6 +162,10 @@ std::string Polonius::File::getPath() const {
 	return path.string();
 }
 
+uint64_t Polonius::File::getSize() const {
+	return size;
+}
+
 /**
  * @brief Validates the instruction sequence for the file.
  * 
@@ -451,20 +455,11 @@ void Polonius::File::executeInstructions() {
 }
 
 /**
- * @brief Sets the search query for the file.
- */
-void Polonius::File::setSearchQuery(const std::string& query) {
-	search_query = query;
-}
-
-/**
  * @brief Reads data from the file starting from a specific position.
  * 
  * This function reads data from the file starting at the specified position and for the specified length.
  * If the length is negative, it reads until the end of the file.
  * If the end position exceeds the file size, it reads until the end of the file.
- * If `force_output_text` is true, it forces the output to be text even if `output_positions` is enabled.
- * If `output_positions` is enabled, it returns the start and end positions of the read operation instead of the text.
  */
 Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, bool to_nearest_newline) const {
 	Polonius::Block result;
@@ -477,35 +472,36 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
 		end_position = size; // Read until the end of the file
 	}
 
-	// Read the file in blocks of Polonius::block_size
-	uint64_t current_position = start;
-	while (current_position < end_position) {
-		uint64_t bytes_to_read = std::min(Polonius::block_size, end_position - current_position);
-		if (to_nearest_newline) {
-			Polonius::Block next_newline = search(current_position + bytes_to_read + 1, -1, "\n");
-			if (next_newline.initialized) {
-				// If we found a newline, adjust the bytes to read to include it
-				bytes_to_read = next_newline.start - current_position + 1; // +1 to include the newline character
-			}
-		}
-		std::vector<char> buffer(bytes_to_read);
-
-		fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
-		size_t bytes_read = fread(buffer.data(), 1, bytes_to_read, file);
-		if (bytes_read == 0) {
-			if (ferror(file)) {
-				throw std::runtime_error("Error reading from file at position " + std::to_string(current_position));
-			}
-			break; // EOF reached
-		}
-
-		result.contents += std::string(buffer.data(), bytes_read);
-		result.start = start;
-		result.initialized = true;
-		current_position += bytes_read;
+	if (start >= size || start >= end_position) {
+		return result; // If the start position is beyond the file size, return an empty block
 	}
+
+	// Read the file as directed by the start and end positions
+	if (to_nearest_newline) {
+		Polonius::Block next_newline = search(end_position, -1, "\n");
+		if (next_newline.initialized) {
+			end_position = next_newline.start + 1;
+		}
+	}
+	uint64_t bytes_to_read = end_position - start;
+	std::vector<char> buffer(bytes_to_read);
+
+	// Move the file pointer to the start position
+	fseeko64(file, static_cast<int64_t>(start), SEEK_SET);
+	size_t bytes_read = fread(buffer.data(), 1, bytes_to_read, file);
+	if (bytes_read == 0) {
+		if (ferror(file)) {
+			throw std::runtime_error("Error reading from file at position " + std::to_string(start));
+		}
+		return result; // EOF reached, return empty block
+	}
+	// If we read some data, set the contents of the result block
+	result.contents = std::string(buffer.data(), bytes_read);
+	result.start = start;
+	result.initialized = true;
+	
 	if (ferror(file)) {
-		throw std::runtime_error("Error reading from file at position " + std::to_string(current_position));
+		throw std::runtime_error("Error reading from file");
 	}
 	return result;
 }
@@ -651,28 +647,4 @@ Polonius::Block Polonius::File::regex_search(uint64_t start, int64_t length, con
 	// If we reach here, no match was found in the entire file
 	Polonius::exit_code = EXIT_FAILURE;
 	return result;
-}
-
-/**
- * @brief Performs a read operation on the file.
- * 
- * If a search query is set, it performs a search based on the search mode (normal or regex).
- * If no search query is set, it reads the file from the specified start position and for the specified length.
- */
-Polonius::Block Polonius::File::read() {
-	if (!search_query.empty()) {
-		if (Polonius::special_chars) {
-			search_query = process_special_chars(search_query);
-		}
-
-		switch (Polonius::Reader::search_mode) {
-			case Polonius::Reader::t_normal_search:
-				return search(Polonius::Reader::start_position, Polonius::Reader::amount_to_read, search_query);
-			case Polonius::Reader::t_regex_search:
-				return regex_search(Polonius::Reader::start_position, Polonius::Reader::amount_to_read, search_query);
-		}
-	}
-
-	// If we're here, the search query is empty, and it's just a normal read
-	return readFromFile(Polonius::Reader::start_position, Polonius::Reader::amount_to_read);
 }

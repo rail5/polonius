@@ -13,6 +13,7 @@
 #include "../shared/version.h"
 #include "../shared/parse_block_units.h"
 #include "../shared/is_number.h"
+#include "../shared/process_special_chars.h"
 
 int main(int argc, char* argv[]) {
 	Polonius::reader_mode = true;
@@ -157,13 +158,67 @@ int main(int argc, char* argv[]) {
 	}
 
 	try {
-		file.setSearchQuery(search_query);
-		Polonius::Block response = file.read();
-		if (Polonius::Reader::output_positions) {
-			std::cout << response.start << " " << response.start + response.contents.size() - 1 << std::endl;
-		} else {
-			std::cout << response.contents;
+		// Calculate amount to read
+		if (Polonius::Reader::amount_to_read < 0) {
+			uint64_t eof = file.getSize();
+			Polonius::Reader::amount_to_read = static_cast<int64_t>(eof - Polonius::Reader::start_position);
 		}
+
+		// Search
+		if (!search_query.empty()) {
+			// Searching
+			Polonius::Block search_result;
+
+			if (Polonius::special_chars) {
+				search_query = process_special_chars(search_query);
+			}
+
+			switch (Polonius::Reader::search_mode) {
+				case Polonius::Reader::t_normal_search:
+					search_result = file.search(Polonius::Reader::start_position, Polonius::Reader::amount_to_read, search_query);
+					break;
+				case Polonius::Reader::t_regex_search:
+					search_result = file.regex_search(Polonius::Reader::start_position, Polonius::Reader::amount_to_read, search_query);
+					break;
+			}
+
+			if (search_result.initialized) {
+				if (Polonius::Reader::output_positions) {
+					std::cout << search_result.start << " " << search_result.end() << std::endl;
+				} else {
+					std::cout << search_result.contents << std::endl;
+				}
+				return EXIT_SUCCESS;
+			} else {
+				return EXIT_FAILURE;
+			}
+		}
+
+		// Normal read
+		Polonius::Block read_result = file.readFromFile(Polonius::Reader::start_position,
+			std::min(static_cast<int64_t>(Polonius::block_size), Polonius::Reader::amount_to_read));
+		
+		uint64_t requested_end_position = Polonius::Reader::start_position + static_cast<uint64_t>(Polonius::Reader::amount_to_read);
+
+		uint64_t actual_end_position = read_result.end();
+
+		uint64_t actual_start_position = Polonius::Reader::start_position;
+		if (actual_start_position >= file.getSize()) {
+			actual_start_position = 0;
+		}
+
+		while (read_result.initialized && read_result.end() < requested_end_position) {
+			actual_end_position = read_result.end();
+			if (!Polonius::Reader::output_positions) {
+				std::cout << read_result.contents;
+			}
+			read_result = file.readFromFile(read_result.end() + 1,
+				std::min(static_cast<int64_t>(Polonius::block_size), Polonius::Reader::amount_to_read));
+		}
+		if (Polonius::Reader::output_positions) {
+			std::cout << actual_start_position << " " << actual_end_position << std::endl;
+		}
+
 	} catch (const std::exception& e) {
 		std::cerr << "Error reading file: " << e.what() << std::endl;
 		return EXIT_FAILURE;

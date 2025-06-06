@@ -52,8 +52,6 @@ class File {
 		uint64_t size = 0;
 		std::deque<Polonius::Editor::Instruction> instructions;
 
-		std::string search_query;
-
 		void insert(uint64_t position, const std::string& text);
 		void replace(uint64_t position, const std::string& text);
 		void remove(uint64_t start, uint64_t end);
@@ -70,11 +68,10 @@ class File {
 		File& operator=(File&& other) noexcept; // Move assignment operator
 		
 		std::string getPath() const;
+		uint64_t getSize() const;
 
 		void parseInstructions(const std::string& instructions);
 		void executeInstructions();
-
-		void setSearchQuery(const std::string& query);
 
 		Polonius::Block search(uint64_t start, int64_t length, const std::string& query) const;
 		Polonius::Block regex_search(uint64_t start, int64_t length, const std::string& query) const;
@@ -82,7 +79,6 @@ class File {
 		Polonius::Block readFromFile(uint64_t start = Polonius::Reader::start_position,
 			int64_t length = Polonius::Reader::amount_to_read,
 			bool to_nearest_newline = false) const;
-		Polonius::Block read();
 };
 
 } // namespace Polonius
