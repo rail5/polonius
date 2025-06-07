@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 	Polonius::editor_mode = true;
 	Polonius::File file;
 
-	Polonius::Window window;
+	Polonius::TUI::Window window;
 
 	const char* help_string = "polonius " program_version "\n"
 		"Usage: polonius [file] [options]\n"

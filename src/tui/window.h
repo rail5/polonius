@@ -22,11 +22,10 @@ class HelpPane;
 class Message;
 
 enum Color : uint8_t;
-} // namespace TUI
 
 class Window;
 
-[[maybe_unused]] static Polonius::Window* mainWindow;
+[[maybe_unused]] static Polonius::TUI::Window* mainWindow;
 [[maybe_unused]] static bool command_key_pressed = false;
 
 /**
@@ -90,9 +89,7 @@ class Window {
 		// Interrupt handling
 		static void handleInterrupt(int signal);
 };
-
-
-
+} // namespace TUI
 } // namespace Polonius
 
 #endif // SRC_TUI_WINDOW_H_

@@ -11,10 +11,10 @@
 #include <signal.h>
 #include <unistd.h>
 
-extern Polonius::Window* mainWindow;
+extern Polonius::TUI::Window* mainWindow;
 extern bool command_key_pressed;
 
-Polonius::Window::Window() : screen(nullptr) {
+Polonius::TUI::Window::Window() : screen(nullptr) {
 	initscr(); // Initialize ncurses
 	cbreak(); // Disable line buffering
 	noecho(); // Don't echo input characters
@@ -34,9 +34,9 @@ Polonius::Window::Window() : screen(nullptr) {
 	signal(SIGTSTP, handleInterrupt);
 	signal(SIGINT, handleInterrupt);
 
-	Polonius::command_key_pressed = false;
+	Polonius::TUI::command_key_pressed = false;
 
-	Polonius::mainWindow = this; // Set the main window pointer to this instance
+	Polonius::TUI::mainWindow = this; // Set the main window pointer to this instance
 
 	// Set up color pairs
 	init_pair(Polonius::TUI::Color::RED, COLOR_WHITE, COLOR_RED); // Error color pair
@@ -44,22 +44,22 @@ Polonius::Window::Window() : screen(nullptr) {
 	init_pair(Polonius::TUI::Color::YELLOW, COLOR_WHITE, COLOR_YELLOW); // Warning color pair
 }
 
-Polonius::Window::~Window() {
+Polonius::TUI::Window::~Window() {
 	endwin(); // End ncurses mode
 }
 
-WINDOW* Polonius::Window::getScreen() const {
+WINDOW* Polonius::TUI::Window::getScreen() const {
 	if (!screen) {
 		throw std::runtime_error("Screen is not initialized");
 	}
 	return screen;
 }
 
-Polonius::File* Polonius::Window::getFile() const {
+Polonius::File* Polonius::TUI::Window::getFile() const {
 	return file;
 }
 
-void Polonius::Window::refreshScreen() {
+void Polonius::TUI::Window::refreshScreen() {
 	if (!screen) {
 		throw std::runtime_error("Screen is not initialized");
 	}
@@ -73,57 +73,57 @@ void Polonius::Window::refreshScreen() {
 	current_message.reset();
 }
 
-void Polonius::Window::clearScreen() {
+void Polonius::TUI::Window::clearScreen() {
 	clear();
 	refresh();
 	attroff(A_REVERSE);
 }
 
-void Polonius::Window::setTop(int top) {
+void Polonius::TUI::Window::setTop(int top) {
 	if (top > LINES) {
 		throw std::out_of_range("Top value is out of range");
 	}
 	this->top = top;
 }
 
-void Polonius::Window::setBottom(int bottom) {
+void Polonius::TUI::Window::setBottom(int bottom) {
 	if (bottom > LINES) {
 		throw std::out_of_range("Bottom value is out of range");
 	}
 	this->bottom = bottom;
 }
 
-void Polonius::Window::setLeft(int left) {
+void Polonius::TUI::Window::setLeft(int left) {
 	if (left > COLS) {
 		throw std::out_of_range("Left value is out of range");
 	}
 	this->left = left;
 }
 
-void Polonius::Window::setRight(int right) {
+void Polonius::TUI::Window::setRight(int right) {
 	if (right > COLS) {
 		throw std::out_of_range("Right value is out of range");
 	}
 	this->right = right;
 }
 
-int Polonius::Window::getTop() const {
+int Polonius::TUI::Window::getTop() const {
 	return top;
 }
 
-int Polonius::Window::getBottom() const {
+int Polonius::TUI::Window::getBottom() const {
 	return bottom;
 }
 
-int Polonius::Window::getLeft() const {
+int Polonius::TUI::Window::getLeft() const {
 	return left;
 }
 
-int Polonius::Window::getRight() const {
+int Polonius::TUI::Window::getRight() const {
 	return right;
 }
 
-void Polonius::Window::initialize() {
+void Polonius::TUI::Window::initialize() {
 	// Add the bottom pane of the window displaying some basic information
 	if (!screen) {
 		throw std::runtime_error("Screen is not initialized");
@@ -149,7 +149,7 @@ void Polonius::Window::initialize() {
 	initialized = true;
 }
 
-void Polonius::Window::drawWidgets() {
+void Polonius::TUI::Window::drawWidgets() {
 	if (!screen) {
 		return; // Ensure screen is initialized
 	}
@@ -161,7 +161,7 @@ void Polonius::Window::drawWidgets() {
 	}
 }
 
-int Polonius::Window::run() {
+int Polonius::TUI::Window::run() {
 	if (!initialized) {
 		initialize(); // Initialize the window and widgets if not already done
 	}
@@ -234,15 +234,15 @@ int Polonius::Window::run() {
 	return 0;
 }
 
-void Polonius::Window::setFile(Polonius::File* file) {
+void Polonius::TUI::Window::setFile(Polonius::File* file) {
 	this->file = file;
 }
 
-void Polonius::Window::addWidget(std::shared_ptr<Polonius::TUI::Widget> widget) {
+void Polonius::TUI::Window::addWidget(std::shared_ptr<Polonius::TUI::Widget> widget) {
 	widgets.push_back(widget);
 }
 
-void Polonius::Window::updateBoundaries(std::shared_ptr<Polonius::TUI::Widget> widget) {
+void Polonius::TUI::Window::updateBoundaries(std::shared_ptr<Polonius::TUI::Widget> widget) {
 	// Update the top, bottom, left, and right boundaries if necessary
 	// Only if the widget is positioned relatively
 	if (widget->isRelativelyPositioned()) {
@@ -343,7 +343,7 @@ void Polonius::Window::updateBoundaries(std::shared_ptr<Polonius::TUI::Widget> w
 	}
 }
 
-void Polonius::Window::resetBoundaries() {
+void Polonius::TUI::Window::resetBoundaries() {
 	// Reset boundaries to the initial state
 	top = 0;
 	bottom = LINES;
@@ -351,13 +351,13 @@ void Polonius::Window::resetBoundaries() {
 	right = COLS;
 }
 
-void Polonius::Window::showMessage() {
+void Polonius::TUI::Window::showMessage() {
 	if (current_message) {
 		current_message->draw();
 	}
 }
 
-void Polonius::Window::restoreCursorPosition() {
+void Polonius::TUI::Window::restoreCursorPosition() {
 	// Restore the cursor position to the last known position
 	move(cursor_y, cursor_x);
 	// Highlight the current position
@@ -365,7 +365,7 @@ void Polonius::Window::restoreCursorPosition() {
 	refresh();
 }
 
-void Polonius::Window::handleInterrupt(int signal) {
+void Polonius::TUI::Window::handleInterrupt(int signal) {
 	// Handle interrupts (e.g., Ctrl+C)
 	switch (signal) {
 		case SIGINT: // Ctrl+C
@@ -373,25 +373,25 @@ void Polonius::Window::handleInterrupt(int signal) {
 		case SIGTSTP: // Ctrl+Z
 			// Do not stop the application on Ctrl+Z
 			// Ctrl+T + Ctrl+Z will suspend the application instead
-			if (!Polonius::mainWindow) {
+			if (!Polonius::TUI::mainWindow) {
 				// No window is initialized, just suspend
 				kill(getpid(), SIGSTOP); // Suspend the process
 				return;
 			}
-			if (Polonius::command_key_pressed) {
-				Polonius::command_key_pressed = false;
-				Polonius::mainWindow->clearScreen();
+			if (Polonius::TUI::command_key_pressed) {
+				Polonius::TUI::command_key_pressed = false;
+				Polonius::TUI::mainWindow->clearScreen();
 				kill(getpid(), SIGSTOP); // Suspend the process
 				// After resuming:
-				Polonius::mainWindow->refreshScreen();
-				Polonius::mainWindow->restoreCursorPosition();
+				Polonius::TUI::mainWindow->refreshScreen();
+				Polonius::TUI::mainWindow->restoreCursorPosition();
 			} else {
 				// Draw a message indicating that Ctrl+T is required to suspend
 				std::shared_ptr<Polonius::TUI::Message> msg = std::make_shared<Polonius::TUI::Message>();
 				msg->setMessage("[ To suspend, type ^T^Z ]");
 				msg->setColor(Polonius::TUI::RED);
-				msg->setParent(Polonius::mainWindow);
-				Polonius::mainWindow->current_message = msg;
+				msg->setParent(Polonius::TUI::mainWindow);
+				Polonius::TUI::mainWindow->current_message = msg;
 				msg->draw();
 			}
 			break;

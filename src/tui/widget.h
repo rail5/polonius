@@ -42,7 +42,7 @@ enum RelativeSize : int {
  */
 class Widget {
 	protected:
-		Polonius::Window* parent;
+		Polonius::TUI::Window* parent;
 		int x_ = 0;
 		int y_ = 0;
 		int w_ = Polonius::TUI::FULL; // Default to full width
@@ -58,7 +58,7 @@ class Widget {
 
 		virtual void draw() = 0; // Pure virtual function for drawing the widget
 
-		void setParent(Polonius::Window* parent);
+		void setParent(Polonius::TUI::Window* parent);
 
 		int getX() const;
 		int getY() const;

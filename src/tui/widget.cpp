@@ -17,7 +17,7 @@ Polonius::TUI::Widget::Widget(Polonius::TUI::Edge anchor, int width, int height)
 
 Polonius::TUI::Widget::~Widget() = default;
 
-void Polonius::TUI::Widget::setParent(Polonius::Window* parent) {
+void Polonius::TUI::Widget::setParent(Polonius::TUI::Window* parent) {
 	this->parent = parent;
 }
 
