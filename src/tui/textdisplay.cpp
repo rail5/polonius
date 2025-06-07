@@ -44,6 +44,9 @@ void Polonius::TUI::TextDisplay::setBuffer(const std::string& newBuffer) {
  * 		3. Set the buffer. Start position: that one, size: the block size
  */
 void Polonius::TUI::TextDisplay::refreshBuffer_upward() {
+	if (bufferStart == 0) {
+		return; // No more to load from the file
+	}
 	// Find the most recent newline before the start of the current buffer
 	Polonius::Block previous_newline = parent->getFile()->search_backwards(bufferStart - 1, -1, "\n");
 	// Mark that position as the start of the new buffer (loading one full line into the buffer)
@@ -81,6 +84,9 @@ void Polonius::TUI::TextDisplay::refreshBuffer_upward() {
  * 			until it hits a newline character
  */
 void Polonius::TUI::TextDisplay::refreshBuffer_downward() {
+	if (bufferEnd == parent->getFile()->getSize() - 1) {
+		return; // No more to load from the file
+	}
 	uint64_t newBufferStart = bufferStart;
 	int64_t newBufferSize = static_cast<int64_t>(std::max(Polonius::block_size, bufferEnd - bufferStart + 1));
 	// Which line is the first line being displayed on screen?
