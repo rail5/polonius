@@ -47,7 +47,11 @@ void Polonius::TUI::TextDisplay::refreshBuffer_upward() {
 	// Find the most recent newline before the start of the current buffer
 	Polonius::Block previous_newline = parent->getFile()->search_backwards(bufferStart - 1, -1, "\n");
 	// Mark that position as the start of the new buffer (loading one full line into the buffer)
-	uint64_t newBufferStart = previous_newline.start + 1; // +1 to skip the newline character
+	uint64_t newBufferStart = 0;
+	if (previous_newline.initialized) {
+	newBufferStart = previous_newline.start + 1; // +1 to skip the newline character
+	}
+	// If no match was found, the new start of the buffer is the start of the file
 	Polonius::Block newBuffer = parent->getFile()->readFromFile(newBufferStart, static_cast<int64_t>(Polonius::block_size), true);
 	bufferStart = newBuffer.start;
 	bufferEnd = newBuffer.end();
