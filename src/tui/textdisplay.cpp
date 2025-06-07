@@ -135,12 +135,18 @@ void Polonius::TUI::TextDisplay::pageUp() {
 }
 
 void Polonius::TUI::TextDisplay::pageDown() {
-	if (bufferEnd == parent->getFile()->getSize() - 1) {
-		return; // No more to load from the file
-	}
 	// What's the last line currently being displayed on screen?
 	int numberOfLinesBeingDisplayed = editorBottom - editorTop + 1;
 	int lastLineBeingDisplayed = scrollOffset + numberOfLinesBeingDisplayed;
+
+	uint64_t displayEnd = bufferEnd;
+	for (size_t i = lines.size() - 1; i >= static_cast<size_t>(lastLineBeingDisplayed); i--) {
+		displayEnd -= lines[i].length();
+	}
+	if (displayEnd == parent->getFile()->getSize() - 1) {
+		return; // No more to load from the file
+	}
+
 	// Calculate the new start position of the buffer
 	uint64_t newBufferStart = bufferEnd + 1;
 	for (int i = static_cast<int>(lines.size()) - 1; i >= lastLineBeingDisplayed; i--) {
