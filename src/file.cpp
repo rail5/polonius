@@ -569,6 +569,57 @@ Polonius::Block Polonius::File::search(uint64_t start, int64_t length, const std
 }
 
 /**
+ * @brief Scans backwards in the file from the given start position for a specific query.
+ */
+Polonius::Block Polonius::File::search_backwards(uint64_t start, int64_t length, const std::string& query) const {
+	Polonius::Block result;
+
+	// Calculate the end position
+	uint64_t end;
+
+	if (length < 0 || start < static_cast<uint64_t>(length)) {
+		end = 0;
+	} else {
+		end = start - static_cast<uint64_t>(length);
+	}
+
+	if (start > size) {
+		start = size;
+	}
+
+	// Scan in block_size chunks backwards from the start position
+	uint64_t bs = Polonius::block_size;
+	if (bs <= query.length()) {
+		bs = query.length() + 1; // Ensure block size is at least the length of the search query
+	}
+	for (uint64_t pos = start; pos >= end; pos -= bs) {
+		uint64_t remaining = pos - end;
+		if (remaining == 0) {
+			break; // No more data to read
+		}
+		if (bs > remaining) {
+			bs = remaining; // Adjust block size to the remaining bytes
+		}
+
+		std::string data = readFromFile(pos - bs, static_cast<int64_t>(bs)).contents;
+
+		// Check if the search query is in the data
+		size_t search_result = data.rfind(query);
+		if (search_result == std::string::npos) {
+			continue; // No match found, continue to the next chunk
+		}
+		// Match found
+		result.start = pos - bs + search_result;
+		result.contents = data.substr(search_result, query.length());
+		result.initialized = true;
+		return result;
+	}
+	// If we reach here, no match was found in the entire file
+	Polonius::exit_code = EXIT_FAILURE;
+	return result;
+}
+
+/**
  * @brief Performs a regex search on the file.
  * 
  * A regex search in Polonius should happen this way:

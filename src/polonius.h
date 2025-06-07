@@ -74,6 +74,7 @@ class File {
 		void executeInstructions();
 
 		Polonius::Block search(uint64_t start, int64_t length, const std::string& query) const;
+		Polonius::Block search_backwards(uint64_t start, int64_t length, const std::string& query) const;
 		Polonius::Block regex_search(uint64_t start, int64_t length, const std::string& query) const;
 
 		Polonius::Block readFromFile(uint64_t start = Polonius::Reader::start_position,
