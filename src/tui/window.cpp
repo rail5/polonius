@@ -211,6 +211,12 @@ int Polonius::TUI::Window::run() {
 					cursor_x = textDisplay->getLeftEdge(); // Move to the leftmost position of the next line
 				}
 				break;
+			case KEY_NPAGE: // Page down
+				textDisplay->pageDown();
+				break;
+			case KEY_PPAGE: // Page up
+				textDisplay->pageUp();
+				break;
 			case 20: // Ctrl+T
 				command_key_pressed = !command_key_pressed; // Toggle Ctrl+T state
 				break;

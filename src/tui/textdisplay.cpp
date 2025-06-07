@@ -128,6 +128,32 @@ void Polonius::TUI::TextDisplay::scrollDown() {
 	parent->refreshScreen(); // Refresh the screen to reflect the scroll change
 }
 
+void Polonius::TUI::TextDisplay::pageUp() {
+	if (bufferStart == parent->getFile()->getSize() - 1) {
+		return; // No more to load from the file
+	}
+}
+
+void Polonius::TUI::TextDisplay::pageDown() {
+	if (bufferEnd == parent->getFile()->getSize() - 1) {
+		return; // No more to load from the file
+	}
+	// What's the last line currently being displayed on screen?
+	int numberOfLinesBeingDisplayed = editorBottom - editorTop + 1;
+	int lastLineBeingDisplayed = scrollOffset + numberOfLinesBeingDisplayed;
+	// Calculate the new start position of the buffer
+	uint64_t newBufferStart = bufferEnd + 1;
+	for (int i = static_cast<int>(lines.size()) - 1; i >= lastLineBeingDisplayed; i--) {
+		newBufferStart -= lines[static_cast<size_t>(i)].length() + 1;
+	}
+	Polonius::Block newBuffer = parent->getFile()->readFromFile(newBufferStart, static_cast<int64_t>(Polonius::block_size), true);
+	bufferStart = newBuffer.start;
+	bufferEnd = newBuffer.end();
+	setBuffer(newBuffer.contents);
+	scrollOffset = 0;
+	parent->refreshScreen();
+}
+
 void Polonius::TUI::TextDisplay::clearBuffer() {
 	lines.clear();
 	scrollOffset = 0; // Reset scroll offset when clearing the buffer

@@ -125,6 +125,8 @@ class TextDisplay : public Widget {
 
 		void scrollUp(); // Scroll up in the buffer
 		void scrollDown(); // Scroll down in the buffer
+		void pageUp(); // Scroll up one page
+		void pageDown(); // Scroll down one page
 		void clearBuffer(); // Clear the buffer
 };
 
