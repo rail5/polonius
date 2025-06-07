@@ -34,7 +34,50 @@ void Polonius::TUI::TextDisplay::setBuffer(const std::string& newBuffer) {
 	scrollOffset = 0; // Reset scroll offset when setting a new buffer
 }
 
-void Polonius::TUI::TextDisplay::refreshBuffer() {
+/**
+ * @brief Refresh the text buffer with new content from the file (upward)
+ * 
+ * The procedure is:
+ * 		1. Find the most recent newline character before the start of the current buffer
+ * 		2. Set the new buffer start to be just after that newline character
+ * 			Thereby loading one full line from above into the buffer
+ * 		3. Set the buffer. Start position: that one, size: the block size
+ */
+void Polonius::TUI::TextDisplay::refreshBuffer_upward() {
+	// Find the most recent newline before the start of the current buffer
+	Polonius::Block previous_newline = parent->getFile()->search_backwards(bufferStart - 1, -1, "\n");
+	// Mark that position as the start of the new buffer (loading one full line into the buffer)
+	uint64_t newBufferStart = previous_newline.start + 1; // +1 to skip the newline character
+	Polonius::Block newBuffer = parent->getFile()->readFromFile(newBufferStart, static_cast<int64_t>(Polonius::block_size), true);
+	bufferStart = newBuffer.start;
+	bufferEnd = newBuffer.end();
+	setBuffer(newBuffer.contents);
+}
+
+/**
+ * @brief Refresh the text buffer with new content from the file (downward)
+ * 
+ * The procedure is:
+ * 	1. Calculate the new buffer's size
+ * 		This will be the maximum of:
+ * 			- The block size
+ * 			- The current buffer size
+ * 
+ * 	2. Calculate the new buffer's start position
+ * 		Start with the current buffer's start position
+ * 		Iterate through all of the lines in the current buffer
+ * 			that will not be displayed in the new buffer
+ * 			and add up the bytes in each of those lines
+ * 		Finally, set the new buffer's start position as:
+ * 			The old start position + the sum of those bytes
+ * 
+ * 	3. Set the new buffer
+ * 		Call Polonius::File::readFromFile(new start, new size, true)
+ * 		Where 'true' signifies that readFromFile should not stop reading
+ * 			until it hits a newline character
+ */
+void Polonius::TUI::TextDisplay::refreshBuffer_downward() {
+	std::cerr << "Refreshing downward" << std::endl;
 	uint64_t newBufferStart = bufferStart;
 	int64_t newBufferSize = static_cast<int64_t>(std::max(Polonius::block_size, bufferEnd - bufferStart + 1));
 	// Which line is the first line being displayed on screen?
@@ -59,8 +102,10 @@ void Polonius::TUI::TextDisplay::setInitialBuffer(const Polonius::Block& initial
 void Polonius::TUI::TextDisplay::scrollUp() {
 	if (scrollOffset > 0) {
 		scrollOffset--;
-		parent->refreshScreen(); // Refresh the screen to reflect the scroll change
+	} else {
+		refreshBuffer_upward();
 	}
+	parent->refreshScreen(); // Refresh the screen to reflect the scroll change
 }
 
 void Polonius::TUI::TextDisplay::scrollDown() {
@@ -69,7 +114,7 @@ void Polonius::TUI::TextDisplay::scrollDown() {
 		scrollOffset++;
 	} else {
 		// Load more from the file if we're at the end of the buffer
-		refreshBuffer();
+		refreshBuffer_downward();
 	}
 	parent->refreshScreen(); // Refresh the screen to reflect the scroll change
 }

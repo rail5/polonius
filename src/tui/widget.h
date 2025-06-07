@@ -106,7 +106,8 @@ class TextDisplay : public Widget {
 		uint64_t bufferEnd = 0;
 
 		void setBuffer(const std::string& newBuffer); // Set the buffer to a new string
-		void refreshBuffer(); // Refresh the buffer with new content from the file
+		void refreshBuffer_downward(); // Refresh the buffer with new content from the file
+		void refreshBuffer_upward();
 		void drawText(WINDOW* window); // Draw the text in the buffer to the window
 
 	public:
@@ -117,10 +118,6 @@ class TextDisplay : public Widget {
 		int getBottomEdge() const;
 		int getLeftEdge() const;
 		int getRightEdge() const;
-
-		int getScrollOffset() const {
-			return scrollOffset;
-		}
 
 		void draw() override;
 
