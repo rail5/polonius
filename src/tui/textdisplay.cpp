@@ -77,7 +77,6 @@ void Polonius::TUI::TextDisplay::refreshBuffer_upward() {
  * 			until it hits a newline character
  */
 void Polonius::TUI::TextDisplay::refreshBuffer_downward() {
-	std::cerr << "Refreshing downward" << std::endl;
 	uint64_t newBufferStart = bufferStart;
 	int64_t newBufferSize = static_cast<int64_t>(std::max(Polonius::block_size, bufferEnd - bufferStart + 1));
 	// Which line is the first line being displayed on screen?
