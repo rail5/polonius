@@ -132,7 +132,7 @@ void Polonius::TUI::TextDisplay::pageUp() {
 	if (bufferStart == 0) {
 		return; // No more to load from the file
 	}
-	uint64_t newBufferEnd = bufferStart;
+	uint64_t newBufferEnd = bufferStart - 1;
 	for (size_t i = 0; i < static_cast<size_t>(scrollOffset) && i < lines.size(); i++) {
 		newBufferEnd += lines[i].length() + 1; // +1 for the newline character
 	}

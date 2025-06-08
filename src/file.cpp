@@ -506,6 +506,43 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
 	return result;
 }
 
+Polonius::Block Polonius::File::readLines(uint64_t start, int number_of_lines, bool stop_at_blocksize) const {
+	Polonius::Block result;
+	if (!file || start >= size) {
+		return result;
+	}
+
+	uint64_t current_position = start;
+	fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
+	std::string line;
+	while (number_of_lines > 0 && (stop_at_blocksize ? result.contents.size() < Polonius::block_size : true)) {
+		char c;
+		if (fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET) != 0 || fread(&c, 1, 1, file) != 1) {
+			if (feof(file)) {
+				break;
+			}
+			throw std::runtime_error("Error reading from file at position " + std::to_string(current_position));
+		}
+		line += c;
+		switch (c) {
+			case '\n':
+				result.contents += line;
+				line.clear();
+				number_of_lines--;
+				break;
+			default:
+				break;
+		}
+		current_position++;
+	}
+	if (!line.empty()) {
+		result.contents += line;
+	}
+	result.start = start;
+	result.initialized = true;
+	return result;
+}
+
 /**
  * @brief Reads lines from the file backwards starting from a specific position.
  * 
@@ -516,13 +553,9 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
  * @return A Polonius::Block containing the lines read from the file.
  * 		The end position of the block (its last byte) is the given 'start' position.
  */
-Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_of_lines, bool stop_at_blocksize) {
+Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_of_lines, bool stop_at_blocksize) const {
 	Polonius::Block result;
-	if (!file) {
-		return result;
-	}
-
-	if (start >= size) {
+	if (!file || start >= size) {
 		return result;
 	}
 
@@ -531,9 +564,10 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 	fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
 	std::string line;
 	bool hit_beginning_of_file = false;
-	while (number_of_lines >= 0 && (stop_at_blocksize ? result.contents.size() < Polonius::block_size : true)) {
+	int lines_left = number_of_lines;
+	while (lines_left >= 0 && (stop_at_blocksize ? result.contents.size() < Polonius::block_size : true)) {
 		char c;
-		if (fseek(file, static_cast<int64_t>(current_position), SEEK_SET) != 0 || fread(&c, 1, 1, file) != 1) {
+		if (fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET) != 0 || fread(&c, 1, 1, file) != 1) {
 			if (feof(file)) {
 				break; // End of file reached
 			}
@@ -545,7 +579,7 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 					std::reverse(line.begin(), line.end());
 					lines.push_front(line);
 					line.clear();
-					number_of_lines--;
+					lines_left--;
 				}
 				line += c;
 				break;
@@ -568,6 +602,15 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 	for (const auto& l : lines) {
 		result.contents += l;
 	}
+
+	// If we hit the beginning of the file early, we may not have read enough lines to satisfy the request
+	// If this is the case, continue reading forward from the start position until we have enough lines
+	if (lines.size() < static_cast<size_t>(number_of_lines)) {
+		// Read forward from the start position until we have enough lines
+		int difference = number_of_lines - static_cast<int>(lines.size()); // How many did we miss?
+		result.contents += readLines(start + 1, difference, stop_at_blocksize).contents;
+	}
+
 	result.start = current_position + 1; // Set the start position to the first character of the first line read
 	result.initialized = true;
 	return result;
