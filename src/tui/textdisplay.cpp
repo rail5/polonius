@@ -188,14 +188,15 @@ void Polonius::TUI::TextDisplay::drawText(WINDOW* window) {
 			std::size_t index = static_cast<std::size_t>(i + scrollOffset);
 			std::string line = lines[index];
 			// Truncate the line if it exceeds the width of the window
-			{
-				int maxWidth = parent->getRight() - parent->getLeft();
-				std::size_t widthSz = maxWidth > 0 ? static_cast<std::size_t>(maxWidth) : 0;
-				if (line.length() > widthSz) {
-					line = line.substr(0, widthSz);
-				}
+			int maxWidth = parent->getRight() - parent->getLeft();
+			std::size_t widthSz = maxWidth > 0 ? static_cast<std::size_t>(maxWidth) : 0;
+			mvwprintw(window, i, 0, "%s", line.substr(0, widthSz).c_str()); // Print the line to the window
+			if (line.length() > widthSz) {
+				// Add a trailing '>' if the line is truncated
+				wattron(window, A_STANDOUT); // Highlight the '>' character
+				mvwaddch(window, i, widthSz - 1, '>'); // Add '>' at the end of the line
+				wattroff(window, A_STANDOUT); // Turn off the highlight
 			}
-			mvwprintw(window, i, 0, "%s", line.c_str()); // Print the line to the window
 		}
 	}
 }
