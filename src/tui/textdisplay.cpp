@@ -136,7 +136,7 @@ void Polonius::TUI::TextDisplay::pageUp() {
 	for (size_t i = 0; i < static_cast<size_t>(scrollOffset) && i < lines.size(); i++) {
 		newBufferEnd += lines[i].length() + 1; // +1 for the newline character
 	}
-	Polonius::Block newBuffer = parent->getFile()->readLines_backwards(newBufferEnd, editorBottom - editorTop + 1, true);
+	Polonius::Block newBuffer = parent->getFile()->readLines_backwards(newBufferEnd, editorBottom - editorTop + 1);
 	bufferStart = newBuffer.start;
 	bufferEnd = newBuffer.end();
 	setBuffer(newBuffer.contents);
@@ -162,7 +162,7 @@ void Polonius::TUI::TextDisplay::pageDown() {
 	for (int i = static_cast<int>(lines.size()) - 1; i >= lastLineBeingDisplayed; i--) {
 		newBufferStart -= lines[static_cast<size_t>(i)].length() + 1;
 	}
-	Polonius::Block newBuffer = parent->getFile()->readFromFile(newBufferStart, static_cast<int64_t>(Polonius::block_size), true);
+	Polonius::Block newBuffer = parent->getFile()->readLines(newBufferStart, numberOfLinesBeingDisplayed);
 	bufferStart = newBuffer.start;
 	bufferEnd = newBuffer.end();
 	setBuffer(newBuffer.contents);
