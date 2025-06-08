@@ -129,9 +129,19 @@ void Polonius::TUI::TextDisplay::scrollDown() {
 }
 
 void Polonius::TUI::TextDisplay::pageUp() {
-	if (bufferStart == parent->getFile()->getSize() - 1) {
+	if (bufferStart == 0) {
 		return; // No more to load from the file
 	}
+	uint64_t newBufferEnd = bufferStart;
+	for (size_t i = 0; i < static_cast<size_t>(scrollOffset) && i < lines.size(); i++) {
+		newBufferEnd += lines[i].length() + 1; // +1 for the newline character
+	}
+	Polonius::Block newBuffer = parent->getFile()->readLines_backwards(newBufferEnd, editorBottom - editorTop + 1, true);
+	bufferStart = newBuffer.start;
+	bufferEnd = newBuffer.end();
+	setBuffer(newBuffer.contents);
+	scrollOffset = 0; // Reset scroll offset when paging up
+	parent->refreshScreen(); // Refresh the screen to reflect the scroll change
 }
 
 void Polonius::TUI::TextDisplay::pageDown() {

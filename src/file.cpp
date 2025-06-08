@@ -507,6 +507,73 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
 }
 
 /**
+ * @brief Reads lines from the file backwards starting from a specific position.
+ * 
+ * @param start The position to start reading from.
+ * @param number_of_lines The number of lines to read.
+ * @param stop_at_blocksize If true, stops reading when the block size is reached, regardless of line count.
+ * 
+ * @return A Polonius::Block containing the lines read from the file.
+ * 		The end position of the block (its last byte) is the given 'start' position.
+ */
+Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_of_lines, bool stop_at_blocksize) {
+	Polonius::Block result;
+	if (!file) {
+		return result;
+	}
+
+	if (start >= size) {
+		return result;
+	}
+
+	std::deque<std::string> lines;
+	uint64_t current_position = start;
+	fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
+	std::string line;
+	bool hit_beginning_of_file = false;
+	while (number_of_lines >= 0 && (stop_at_blocksize ? result.contents.size() < Polonius::block_size : true)) {
+		char c;
+		if (fseek(file, static_cast<int64_t>(current_position), SEEK_SET) != 0 || fread(&c, 1, 1, file) != 1) {
+			if (feof(file)) {
+				break; // End of file reached
+			}
+			throw std::runtime_error("Error reading from file at position " + std::to_string(current_position));
+		}
+		switch (c) {
+			case '\n':
+				if (!line.empty()) {
+					std::reverse(line.begin(), line.end());
+					lines.push_front(line);
+					line.clear();
+					number_of_lines--;
+				}
+				line += c;
+				break;
+			default:
+				line += c;
+				break;
+		}
+		current_position--;
+		if (hit_beginning_of_file) {
+			break;
+		}
+		if (current_position == 0) {
+			hit_beginning_of_file = true; // Read only one more character
+		}
+	}
+	if (!line.empty() && line.back() != '\n') {
+		std::reverse(line.begin(), line.end());
+		lines.push_front(line); // Add the last line if it exists
+	}
+	for (const auto& l : lines) {
+		result.contents += l;
+	}
+	result.start = current_position + 1; // Set the start position to the first character of the first line read
+	result.initialized = true;
+	return result;
+}
+
+/**
  * @brief Searches for a specific query in the file.
  * 
  * This function searches for the specified search query in the file starting from the position defined by `Polonius::Reader::start_position`.

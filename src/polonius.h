@@ -79,7 +79,9 @@ class File {
 
 		Polonius::Block readFromFile(uint64_t start = Polonius::Reader::start_position,
 			int64_t length = Polonius::Reader::amount_to_read,
-			bool to_nearest_newline = false) const;
+			bool to_next_newline = false) const;
+		
+			Polonius::Block readLines_backwards(uint64_t start, int number_of_lines, bool stop_at_blocksize = false);
 };
 
 } // namespace Polonius
