@@ -6,6 +6,7 @@
 #include <string>
 
 #include <getopt.h>
+#include <unistd.h>
 
 #include "../polonius.h"
 #include "../read/reader.h"
@@ -20,8 +21,6 @@ int main(int argc, char* argv[]) {
 	Polonius::reader_mode = true;
 	Polonius::editor_mode = true;
 	Polonius::File file;
-
-	Polonius::TUI::Window window;
 
 	const char* help_string = "polonius " program_version "\n"
 		"Usage: polonius [file] [options]\n"
@@ -46,6 +45,11 @@ int main(int argc, char* argv[]) {
 		"\n"
 		"You should have received a copy of the GNU General Public License\n"
 		"along with this program. If not, see http://www.gnu.org/licenses/.\n";
+
+	if (!isatty(fileno(stdin))) {
+		std::cerr << "Standard input is not a terminal" << std::endl;
+		return EXIT_FAILURE;
+	}
 
 	// getopt
 	int opt;
@@ -112,6 +116,8 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 	}
+
+	Polonius::TUI::Window window;
 
 	// If we haven't received a file, we're creating a new one
 	window.setFile(&file);
