@@ -59,7 +59,7 @@ class Widget {
 
 		virtual ~Widget();
 
-		virtual void draw() = 0; // Pure virtual function for drawing the widget
+		virtual void draw();
 
 		void setParent(Polonius::TUI::Window* parent);
 
@@ -67,7 +67,6 @@ class Widget {
 		int getY() const;
 		int getWidth() const;
 		int getHeight() const;
-		int getAbsoluteBottom() const;
 		Polonius::TUI::Edge getAnchor() const;
 		bool isRelativelyPositioned() const;
 
@@ -76,6 +75,8 @@ class Widget {
 		void setWidth(int w);
 		void setHeight(int h);
 		void setPositioning(Polonius::TUI::Positioning pos);
+
+		virtual void handleKeyPress(int ch);
 };
 
 /**
@@ -133,6 +134,30 @@ class TextDisplay : public Widget {
 		void pageUp(); // Scroll up one page
 		void pageDown(); // Scroll down one page
 		void clearBuffer(); // Clear the buffer
+
+		void handleKeyPress(int ch) override;
+};
+
+/**
+ * @class SearchPane
+ * @brief A pane that allows searching through the text in the Terminal UI
+ */
+class SearchPane : public Widget {
+	private:
+		std::string searchInput;
+		bool escapeSequencesEnabled = false;
+		std::string searchLabel = "Search: ";
+
+	public:
+		SearchPane(int x, int y, int w, int h);
+		SearchPane(Polonius::TUI::Edge anchor, int width, int height);
+
+		void setSearchInput(const std::string& input);
+		void toggleEscapeSequences();
+
+		void draw() override;
+
+		void handleKeyPress(int ch) override;
 };
 
 /**

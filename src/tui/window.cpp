@@ -146,8 +146,9 @@ void Polonius::TUI::Window::initialize() {
 
 	textDisplay = std::make_shared<Polonius::TUI::TextDisplay>
 		(Polonius::TUI::TOP, Polonius::TUI::FULL, Polonius::TUI::FULL);
-
-	widgets.push_back(textDisplay);
+	
+	// Give the text display focus
+	focused_widget = textDisplay.get();
 
 	initialized = true;
 }
@@ -162,6 +163,29 @@ void Polonius::TUI::Window::drawWidgets() {
 		widget->draw();
 		updateBoundaries(widget); // Update boundaries based on the widget's position
 	}
+
+	// Finally, draw the text display widget after all others
+	if (textDisplay) {
+		textDisplay->setParent(this);
+		textDisplay->draw();
+		updateBoundaries(textDisplay);
+	}
+}
+
+void Polonius::TUI::Window::moveCursor(int x, int y) {
+	if (!screen) {
+		throw std::runtime_error("Screen is not initialized");
+	}
+
+	cursor_x = std::min(x, COLS);
+	cursor_y = std::min(y, LINES);
+}
+
+Polonius::TUI::Cursor Polonius::TUI::Window::getCursorPosition() const {
+	if (!screen) {
+		throw std::runtime_error("Screen is not initialized");
+	}
+	return {cursor_x, cursor_y};
 }
 
 int Polonius::TUI::Window::run() {
@@ -181,43 +205,25 @@ int Polonius::TUI::Window::run() {
 				// Handle window resize
 				refreshScreen();
 				break;
-			case KEY_UP:
-				if (cursor_y > textDisplay->getTopEdge()) {
-					cursor_y--;
-				} else {
-					textDisplay->scrollUp();
-				}
-				break;
-			case KEY_DOWN:
-				if (cursor_y < textDisplay->getBottomEdge()) {
-					cursor_y++;
-				} else {
-					textDisplay->scrollDown();
-				}
-				break;
-			case KEY_LEFT:
-				if (cursor_x > textDisplay->getLeftEdge()) {
-					cursor_x--;
-				} else if (cursor_y > textDisplay->getTopEdge()) {
-					// Move up one line, and land at the rightmost position
-					cursor_y--;
-					cursor_x = textDisplay->getRightEdge(); // Move to the rightmost position of the previous line
-				}
-				break;
-			case KEY_RIGHT:
-				if (cursor_x < textDisplay->getRightEdge()) {
-					cursor_x++;
-				} else if (cursor_y < textDisplay->getBottomEdge()) {
-					// Move down one line, and land at the leftmost position
-					cursor_y++;
-					cursor_x = textDisplay->getLeftEdge(); // Move to the leftmost position of the next line
-				}
-				break;
 			case KEY_NPAGE: // Page down
 				textDisplay->pageDown();
 				break;
 			case KEY_PPAGE: // Page up
 				textDisplay->pageUp();
+				break;
+			case 23: // Ctrl+W
+				// If the search pane is up, shut it down
+				if (dynamic_cast<Polonius::TUI::SearchPane*>(widgets.back().get()) != nullptr) {
+					widgets.pop_back();
+					focused_widget = textDisplay.get(); // Set focus back to the text display
+				} else {
+					// Otherwise, create a new search pane
+					std::shared_ptr<Polonius::TUI::SearchPane> search_pane = std::make_shared<Polonius::TUI::SearchPane>
+						(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 1);
+					widgets.push_back(search_pane);
+					focused_widget = search_pane.get(); // Set focus to the new search pane
+				}
+				refreshScreen();
 				break;
 			case 20: // Ctrl+T
 				command_key_pressed = !command_key_pressed; // Toggle Ctrl+T state
@@ -226,8 +232,8 @@ int Polonius::TUI::Window::run() {
 				clear();
 				return 0; // Exit the application
 			default:
-				// Handle other keys or input
-				//buffer += static_cast<char>(ch);
+				// Pass the key to whichever widget has focus
+				focused_widget->handleKeyPress(ch);
 				break;
 		}
 
@@ -372,6 +378,13 @@ void Polonius::TUI::Window::restoreCursorPosition() {
 	// Highlight the current position
 	attron(A_REVERSE);
 	refresh();
+}
+
+void Polonius::TUI::Window::setFocus(Polonius::TUI::Widget* widget) {
+	if (!widget) {
+		return;
+	}
+	focused_widget = widget;
 }
 
 void Polonius::TUI::Window::handleInterrupt(int signal) {

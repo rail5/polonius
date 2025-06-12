@@ -29,7 +29,8 @@ SHARED_OBJS = \
 	bin/obj/polonius/widget.o \
 	bin/obj/polonius/helppane.o \
 	bin/obj/polonius/textdisplay.o \
-	bin/obj/polonius/message.o
+	bin/obj/polonius/message.o \
+	bin/obj/polonius/searchpane.o
 
 all: src/shared/version.h
 	$(MAKE) bin/polonius-editor bin/polonius-reader

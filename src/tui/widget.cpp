@@ -17,6 +17,14 @@ Polonius::TUI::Widget::Widget(Polonius::TUI::Edge anchor, int width, int height)
 
 Polonius::TUI::Widget::~Widget() = default;
 
+/**
+ * @brief Draw the widget to the screen
+ * 
+ * The default implementation does nothing.
+ * Derived classes should override this method to provide their own drawing logic.
+ */
+void Polonius::TUI::Widget::draw() {}
+
 WINDOW* Polonius::TUI::Widget::getSubwindow() {
 	// Calculate positioning
 	if (!parent) {
@@ -167,3 +175,10 @@ void Polonius::TUI::Widget::setHeight(int h) {
 void Polonius::TUI::Widget::setPositioning(Polonius::TUI::Positioning pos) {
 	position = pos;
 }
+
+/**
+ * @brief Handle keypresses sent to the widget
+ * 
+ * The default implementation ignores all keypresses
+ */
+void Polonius::TUI::Widget::handleKeyPress(int ch) {}

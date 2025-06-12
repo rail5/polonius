@@ -28,6 +28,11 @@ class Window;
 [[maybe_unused]] static Polonius::TUI::Window* mainWindow;
 [[maybe_unused]] static bool command_key_pressed = false;
 
+struct Cursor {
+	int x = 0;
+	int y = 0;
+};
+
 /**
  * @class Window
  * @brief Represents a window in the Terminal UI
@@ -49,6 +54,8 @@ class Window {
 
 		int cursor_x = 0;
 		int cursor_y = 0;
+
+		Polonius::TUI::Widget* focused_widget = nullptr;
 
 		std::vector<std::shared_ptr<Polonius::TUI::Widget>> widgets;
 		std::shared_ptr<Polonius::TUI::Message> current_message;
@@ -86,6 +93,11 @@ class Window {
 		void showMessage();
 
 		void restoreCursorPosition();
+		void moveCursor(int x, int y);
+
+		Polonius::TUI::Cursor getCursorPosition() const;
+
+		void setFocus(Polonius::TUI::Widget* widget);
 
 		// Interrupt handling
 		static void handleInterrupt(int signal);
