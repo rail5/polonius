@@ -33,6 +33,11 @@ struct Cursor {
 	int y = 0;
 };
 
+struct KeyShortcut {
+	std::string key; // E.g: "^S" for Ctrl+S
+	std::string description; // E.g: "Save"
+};
+
 /**
  * @class Window
  * @brief Represents a window in the Terminal UI
@@ -44,6 +49,7 @@ class Window {
 		WINDOW* screen;
 		Polonius::File* file;
 		std::shared_ptr<Polonius::TUI::TextDisplay> textDisplay;
+		std::shared_ptr<Polonius::TUI::HelpPane> helpPane;
 		int width = 80;
 		int height = 24;
 		int top = 0;
@@ -98,6 +104,8 @@ class Window {
 		Polonius::TUI::Cursor getCursorPosition() const;
 
 		void setFocus(Polonius::TUI::Widget* widget);
+
+		void setHelpPaneKeyShortcuts(const std::vector<Polonius::TUI::KeyShortcut>& shortcuts);
 
 		// Interrupt handling
 		static void handleInterrupt(int signal);

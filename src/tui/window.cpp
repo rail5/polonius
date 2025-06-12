@@ -133,22 +133,18 @@ void Polonius::TUI::Window::initialize() {
 		throw std::runtime_error("Screen is not initialized");
 	}
 
-	std::shared_ptr<Polonius::TUI::HelpPane> bottom_pane = std::make_shared<Polonius::TUI::HelpPane>
-		(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 4, "Polonius v" program_version);
-
+	helpPane = std::make_shared<Polonius::TUI::HelpPane>(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 4, "Polonius v" program_version);
 	if (file) {
-		bottom_pane->setBottomLabel(file->getPath());
+		helpPane->setBottomLabel(file->getPath());
 	} else {
-		bottom_pane->setBottomLabel("New File");
+		helpPane->setBottomLabel("New File");
 	}
-
-	widgets.push_back(bottom_pane);
 
 	textDisplay = std::make_shared<Polonius::TUI::TextDisplay>
 		(Polonius::TUI::TOP, Polonius::TUI::FULL, Polonius::TUI::FULL);
 	
 	// Give the text display focus
-	focused_widget = textDisplay.get();
+	setFocus(textDisplay.get());
 
 	initialized = true;
 }
@@ -158,6 +154,15 @@ void Polonius::TUI::Window::drawWidgets() {
 		return; // Ensure screen is initialized
 	}
 	resetBoundaries(); // Reset boundaries before drawing widgets
+
+	// First, draw the help pane at the bottom
+	if (helpPane) {
+		helpPane->setParent(this);
+		helpPane->draw();
+		updateBoundaries(helpPane); // Update boundaries based on the help pane's position
+	}
+
+	// Next, draw all the widgets
 	for (auto& widget : widgets) {
 		widget->setParent(this); // Set the parent window for the widget
 		widget->draw();
@@ -213,15 +218,15 @@ int Polonius::TUI::Window::run() {
 				break;
 			case 23: // Ctrl+W
 				// If the search pane is up, shut it down
-				if (dynamic_cast<Polonius::TUI::SearchPane*>(widgets.back().get()) != nullptr) {
+				if (!widgets.empty() && dynamic_cast<Polonius::TUI::SearchPane*>(widgets.back().get()) != nullptr) {
 					widgets.pop_back();
-					focused_widget = textDisplay.get(); // Set focus back to the text display
+					setFocus(textDisplay.get()); // Set focus back to the text display
 				} else {
 					// Otherwise, create a new search pane
 					std::shared_ptr<Polonius::TUI::SearchPane> search_pane = std::make_shared<Polonius::TUI::SearchPane>
 						(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 1);
 					widgets.push_back(search_pane);
-					focused_widget = search_pane.get(); // Set focus to the new search pane
+					setFocus(search_pane.get()); // Set focus to the new search pane
 				}
 				refreshScreen();
 				break;
@@ -385,6 +390,13 @@ void Polonius::TUI::Window::setFocus(Polonius::TUI::Widget* widget) {
 		return;
 	}
 	focused_widget = widget;
+	helpPane->setShortcuts(focused_widget->widgetShortcuts());
+}
+
+void Polonius::TUI::Window::setHelpPaneKeyShortcuts(const std::vector<Polonius::TUI::KeyShortcut>& shortcuts) {
+	if (helpPane) {
+		helpPane->setShortcuts(shortcuts);
+	}
 }
 
 void Polonius::TUI::Window::handleInterrupt(int signal) {

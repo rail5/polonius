@@ -50,3 +50,13 @@ void Polonius::TUI::SearchPane::handleKeyPress(int ch) {
 			break;
 	}
 }
+
+const std::vector<Polonius::TUI::KeyShortcut> Polonius::TUI::SearchPane::widgetShortcuts() const {
+	return {
+		{"^X", "Cancel"},
+		{"^R", "Reg.exp."},
+		{"^E", "Esc. seq. (like \\n)"},
+		{"^C", "Case Sens"},
+		{"^B", "Backwards"}
+	};
+}

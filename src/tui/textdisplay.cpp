@@ -278,3 +278,14 @@ void Polonius::TUI::TextDisplay::handleKeyPress(int ch) {
 	// Update the cursor position in the parent window
 	parent->moveCursor(cursor_x, cursor_y);
 }
+
+const std::vector<Polonius::TUI::KeyShortcut> Polonius::TUI::TextDisplay::widgetShortcuts() const {
+	return {
+		{"^S", "Save"},
+		{"^K", "Cut"},
+		{"^W", "Where Is"},
+		{"^X", "Exit"},
+		{"^U", "Paste"},
+		{"^/", "Go to line"}
+	};
+}

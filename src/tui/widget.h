@@ -76,6 +76,8 @@ class Widget {
 		void setHeight(int h);
 		void setPositioning(Polonius::TUI::Positioning pos);
 
+		virtual const std::vector<Polonius::TUI::KeyShortcut> widgetShortcuts() const;
+
 		virtual void handleKeyPress(int ch);
 };
 
@@ -136,6 +138,8 @@ class TextDisplay : public Widget {
 		void clearBuffer(); // Clear the buffer
 
 		void handleKeyPress(int ch) override;
+
+		const std::vector<Polonius::TUI::KeyShortcut> widgetShortcuts() const override;
 };
 
 /**
@@ -158,6 +162,8 @@ class SearchPane : public Widget {
 		void draw() override;
 
 		void handleKeyPress(int ch) override;
+
+		const std::vector<Polonius::TUI::KeyShortcut> widgetShortcuts() const override;
 };
 
 /**
@@ -171,12 +177,16 @@ class HelpPane : public Widget {
 	private:
 		std::string topLabel;
 		std::string bottomLabel;
+
+		std::vector<Polonius::TUI::KeyShortcut> shortcuts;
 	public:
 		HelpPane(int x, int y, int w, int h, const std::string& label);
 		HelpPane(Polonius::TUI::Edge anchor, int width, int height, const std::string& label);
 		void setBottomLabel(const std::string& label);
 
 		void draw() override;
+
+		void setShortcuts(const std::vector<Polonius::TUI::KeyShortcut>& newShortcuts);
 };
 
 enum Color : uint8_t {

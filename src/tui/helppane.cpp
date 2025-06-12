@@ -55,14 +55,6 @@ void Polonius::TUI::HelpPane::draw() {
 
 	// Place some helpful text in the pane
 	// Describing keyboard shortcuts
-	constexpr std::array<const char*, 6> shortcuts = {
-		"^S Save",
-		"^K Cut",
-		"^W Where Is",
-		"^X Exit",
-		"^U Paste",
-		"^/ Go to line"
-	};
 
 	int num_columns = std::max(shortcuts.size() / 2, static_cast<size_t>(1));
 	int num_rows = height / 2;
@@ -90,16 +82,20 @@ void Polonius::TUI::HelpPane::draw() {
 		// Divide the width by the number of columns
 		int x_position = (col - 1) * (width / num_columns) + 1;
 		
-		// Print the first two chars with a standout (or bold) attribute
+		// Print the key combination with a standout (or bold) attribute
 		wattron(pane, A_STANDOUT);
-		mvwprintw(pane, row, x_position, "%.*s", 2, shortcuts[i]);
+		mvwprintw(pane, row, x_position, "%.*s", 2, shortcuts[i].key.c_str());
 		wattroff(pane, A_STANDOUT);
 
-		// print the rest normally
-		mvwprintw(pane, row, x_position + 2, "%s", shortcuts[i] + 2);
+		// Print the description normally
+		mvwprintw(pane, row, x_position + 2, " %s", shortcuts[i].description.c_str());
 		col++;
 	}
 
 	wrefresh(pane); // Refresh the pane to show the changes
 	delwin(pane); // Delete the pane window after drawing
+}
+
+void Polonius::TUI::HelpPane::setShortcuts(const std::vector<Polonius::TUI::KeyShortcut>& newShortcuts) {
+	shortcuts = newShortcuts;
 }

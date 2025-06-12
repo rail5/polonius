@@ -182,3 +182,8 @@ void Polonius::TUI::Widget::setPositioning(Polonius::TUI::Positioning pos) {
  * The default implementation ignores all keypresses
  */
 void Polonius::TUI::Widget::handleKeyPress(int ch) {}
+
+
+const std::vector<Polonius::TUI::KeyShortcut> Polonius::TUI::Widget::widgetShortcuts() const {
+	return {};
+}
