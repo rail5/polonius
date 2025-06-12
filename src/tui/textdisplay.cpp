@@ -201,14 +201,6 @@ void Polonius::TUI::TextDisplay::drawText(WINDOW* window) {
 }
 
 void Polonius::TUI::TextDisplay::draw() {
-	// Get the width and height
-	int width, height;
-	int x = x_;
-	int y = y_;
-
-	int available_width = parent->getRight() - parent->getLeft();
-	int available_height = parent->getBottom() - parent->getTop();
-
 	// If the window margins have changed, refresh the buffer
 	if (editorTop != parent->getTop() || editorBottom != parent->getBottom() - 1 ||
 		editorLeft != parent->getLeft() || editorRight != parent->getRight() - 1) {
@@ -226,70 +218,8 @@ void Polonius::TUI::TextDisplay::draw() {
 		bufferInitialized = true;
 	}
 
-	switch (w_) {
-		case Polonius::TUI::FULL:
-			width = available_width; // Full width
-			break;
-		case Polonius::TUI::HALF:
-			width = available_width / 2; // Half width
-			break;
-		case Polonius::TUI::QUARTER:
-			width = available_width / 4; // Quarter width
-			break;
-		case Polonius::TUI::THREE_QUARTERS:
-			width = (available_width * 3) / 4; // Three-quarters width
-			break;
-		default:
-			width = w_ <= 0 ? available_width : w_; // Use the specified width or default to COLS
-			break;
-	}
-
-	switch (h_) {
-		case Polonius::TUI::FULL:
-			height = available_height; // Full height
-			break;
-		case Polonius::TUI::HALF:
-			height = available_height / 2; // Half height
-			break;
-		case Polonius::TUI::QUARTER:
-			height = available_height / 4; // Quarter height
-			break;
-		case Polonius::TUI::THREE_QUARTERS:
-			height = (available_height * 3) / 4; // Three-quarters height
-			break;
-		default:
-			height = h_ <= 0 ? available_height : h_; // Use the specified height or default to LINES
-			break;
-	}
-
-	if (position == Polonius::TUI::RELATIVE) {
-		switch (anchor) {
-			case Polonius::TUI::LEFT:
-				x = 0; // Left edge
-				y = (available_height - height) / 2; // Center vertically
-				break;
-			case Polonius::TUI::RIGHT:
-				x = COLS - width; // Right edge
-				y = (available_height - height) / 2; // Center vertically
-				break;
-			case Polonius::TUI::TOP:
-				x = (available_width - width) / 2; // Center horizontally
-				y = 0; // Top edge
-				break;
-			case Polonius::TUI::BOTTOM:
-				x = (available_width - width) / 2; // Center horizontally
-				y = available_height - height; // Bottom edge
-				break;
-		}
-	} else {
-		// If absolute positioning, use the specified x and y
-		if (x < 0) x = 0; // Ensure x is not negative
-		if (y < 0) y = 0; // Ensure y is not negative
-		if (x + width > available_width) width = COLS - x; // Ensure width does not exceed screen width
-		if (y + height > available_height) height = LINES - y; // Ensure height does not exceed screen height
-	}
 	// Create a sub-window for the text display
-	WINDOW* textWindow = subwin(parent->getScreen(), height, width, y, x);
+	WINDOW* textWindow = getSubwindow();
 	if (!textWindow) {
 		return; // Ensure the window was created successfully
 	}

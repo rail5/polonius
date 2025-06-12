@@ -17,6 +17,80 @@ Polonius::TUI::Widget::Widget(Polonius::TUI::Edge anchor, int width, int height)
 
 Polonius::TUI::Widget::~Widget() = default;
 
+WINDOW* Polonius::TUI::Widget::getSubwindow() {
+	// Calculate positioning
+	if (!parent) {
+		throw std::runtime_error("Parent window is not set for the widget");
+	}
+	// Get the width and height
+	int x = x_;
+	int y = y_;
+
+	int available_width = parent->getRight() - parent->getLeft();
+	int available_height = parent->getBottom() - parent->getTop();
+
+	switch (w_) {
+		case Polonius::TUI::FULL:
+			width = available_width; // Full width
+			break;
+		case Polonius::TUI::HALF:
+			width = available_width / 2; // Half width
+			break;
+		case Polonius::TUI::QUARTER:
+			width = available_width / 4; // Quarter width
+			break;
+		case Polonius::TUI::THREE_QUARTERS:
+			width = (available_width * 3) / 4; // Three-quarters width
+			break;
+		default:
+			width = w_ <= 0 ? available_width : w_; // Use the specified width or default to full width
+			break;
+	}
+
+	switch (h_) {
+		case Polonius::TUI::FULL:
+			height = available_height; // Full height
+			break;
+		case Polonius::TUI::HALF:
+			height = available_height / 2; // Half height
+			break;
+		case Polonius::TUI::QUARTER:
+			height = available_height / 4; // Quarter height
+			break;
+		case Polonius::TUI::THREE_QUARTERS:
+			height = (available_height * 3) / 4; // Three-quarters height
+			break;
+		default:
+			height = h_ <= 0 ? available_height : h_; // Use the specified height or default to full height
+			break;
+	}
+
+	// Are we relatively or absolutely positioned?
+	if (position == Polonius::TUI::RELATIVE) {
+		// If relative, we need to calculate the position based on the anchor and width/height
+		switch (anchor) {
+			case Polonius::TUI::LEFT:
+				x = 0; // Left edge
+				y = (available_height - height) / 2; // Center vertically
+				break;
+			case Polonius::TUI::RIGHT:
+				x = available_width - width; // Right edge
+				y = (available_height - height) / 2; // Center vertically
+				break;
+			case Polonius::TUI::TOP:
+				x = (available_width - width) / 2; // Center horizontally
+				y = 0; // Top edge
+				break;
+			case Polonius::TUI::BOTTOM:
+				x = (available_width - width) / 2; // Center horizontally
+				y = available_height - height; // Bottom edge
+				break;
+		}
+	}
+
+	return subwin(parent->getScreen(), height, width, y, x);
+}
+
 void Polonius::TUI::Widget::setParent(Polonius::TUI::Window* parent) {
 	this->parent = parent;
 }

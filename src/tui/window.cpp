@@ -205,7 +205,6 @@ int Polonius::TUI::Window::run() {
 				}
 				break;
 			case KEY_RIGHT:
-				//if (cursor_x < COLS - 1) cursor_x++;
 				if (cursor_x < textDisplay->getRightEdge()) {
 					cursor_x++;
 				} else if (cursor_y < textDisplay->getBottomEdge()) {

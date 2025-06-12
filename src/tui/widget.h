@@ -47,8 +47,11 @@ class Widget {
 		int y_ = 0;
 		int w_ = Polonius::TUI::FULL; // Default to full width
 		int h_ = Polonius::TUI::FULL; // Default to full height
+		int width = 0; // Actual width of the widget
+		int height = 0; // Actual height of the widget
 		Polonius::TUI::Positioning position = Polonius::TUI::RELATIVE;
 		Polonius::TUI::Edge anchor = Polonius::TUI::BOTTOM;
+		WINDOW* getSubwindow();
 	public:
 		Widget();
 		Widget(int x, int y, int w, int h);
