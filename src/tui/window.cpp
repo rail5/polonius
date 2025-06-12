@@ -44,6 +44,10 @@ Polonius::TUI::Window::Window() : screen(nullptr) {
 	init_pair(Polonius::TUI::Color::YELLOW, COLOR_WHITE, COLOR_YELLOW); // Warning color pair
 }
 
+Polonius::TUI::Window::Window(Polonius::File* file) : Window() {
+	this->file = file; // Set the file for this window
+}
+
 Polonius::TUI::Window::~Window() {
 	endwin(); // End ncurses mode
 }
@@ -142,7 +146,6 @@ void Polonius::TUI::Window::initialize() {
 
 	textDisplay = std::make_shared<Polonius::TUI::TextDisplay>
 		(Polonius::TUI::TOP, Polonius::TUI::FULL, Polonius::TUI::FULL);
-	textDisplay->setInitialBuffer(file->readFromFile(0, static_cast<int64_t>(Polonius::block_size), true));
 
 	widgets.push_back(textDisplay);
 

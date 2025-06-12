@@ -27,11 +27,32 @@ int Polonius::TUI::TextDisplay::getRightEdge() const {
 	return editorRight;
 }
 
-void Polonius::TUI::TextDisplay::setBuffer(const std::string& newBuffer) {
+void Polonius::TUI::TextDisplay::setBufferTextLines(const std::string& newBuffer) {
 	lines.clear();
 	lines = explode(newBuffer, '\n', false, 0, true);
 	lines.pop_back(); // Remove the last empty line if it exists
 	scrollOffset = 0; // Reset scroll offset when setting a new buffer
+}
+
+void Polonius::TUI::TextDisplay::refreshBuffer(uint64_t newBufferStart) {
+	// Read enough lines from the file to fill the screen
+	Polonius::Block newBuffer = parent->getFile()->readLines(newBufferStart, editorBottom - editorTop + 1);
+	// TODO(@rail5): Handle extremely long lines. We don't want the program to crash on long lines
+	//  Crashing on long lines is the kind of failing in other editors that we're trying to avoid
+	//  Proposal: A readLines() function in Polonius::File that returns a non-contiguous Polonius::Block
+	//     Which, when it detects too long a line, will stop reading until the next line
+	//     And set a marker signifying that a line was truncated
+	//     The format of Blocks will allow an obvious signifier in the non-contiguous jump in position
+	bufferStart = newBuffer.start;
+	bufferEnd = newBuffer.end();
+	setBufferTextLines(newBuffer.contents);
+}
+
+void Polonius::TUI::TextDisplay::refreshBuffer_backwards(uint64_t newBufferEnd) {
+	Polonius::Block newBuffer = parent->getFile()->readLines_backwards(newBufferEnd, editorBottom - editorTop + 1);
+	bufferStart = newBuffer.start;
+	bufferEnd = newBuffer.end();
+	setBufferTextLines(newBuffer.contents);
 }
 
 /**
@@ -52,13 +73,10 @@ void Polonius::TUI::TextDisplay::refreshBuffer_upward() {
 	// Mark that position as the start of the new buffer (loading one full line into the buffer)
 	uint64_t newBufferStart = 0;
 	if (previous_newline.initialized) {
-	newBufferStart = previous_newline.start + 1; // +1 to skip the newline character
+		newBufferStart = previous_newline.start + 1; // +1 to skip the newline character
 	}
 	// If no match was found, the new start of the buffer is the start of the file
-	Polonius::Block newBuffer = parent->getFile()->readFromFile(newBufferStart, static_cast<int64_t>(Polonius::block_size), true);
-	bufferStart = newBuffer.start;
-	bufferEnd = newBuffer.end();
-	setBuffer(newBuffer.contents);
+	refreshBuffer(newBufferStart);
 }
 
 /**
@@ -88,24 +106,13 @@ void Polonius::TUI::TextDisplay::refreshBuffer_downward() {
 		return; // No more to load from the file
 	}
 	uint64_t newBufferStart = bufferStart;
-	int64_t newBufferSize = static_cast<int64_t>(std::max(Polonius::block_size, bufferEnd - bufferStart + 1));
 	// Which line is the first line being displayed on screen?
 	// If the scroll offset is 0, we are displaying the first line of the buffer
 	// If the scroll offset is greater than 0, we are displaying the line at scrollOffset
 	for (size_t i = 0; i < static_cast<size_t>(scrollOffset) + 1 && i < lines.size(); i++) {
 		newBufferStart += lines[i].length() + 1; // +1 for the newline character
 	}
-	Polonius::Block newBuffer = parent->getFile()->readFromFile(newBufferStart, newBufferSize, true);
-	bufferStart = newBuffer.start;
-	bufferEnd = newBuffer.end();
-	setBuffer(newBuffer.contents);
-	scrollOffset = 0;
-}
-
-void Polonius::TUI::TextDisplay::setInitialBuffer(const Polonius::Block& initialBuffer) {
-	bufferStart = initialBuffer.start;
-	bufferEnd = initialBuffer.end();
-	setBuffer(initialBuffer.contents);
+	refreshBuffer(newBufferStart);
 }
 
 void Polonius::TUI::TextDisplay::scrollUp() {
@@ -136,11 +143,7 @@ void Polonius::TUI::TextDisplay::pageUp() {
 	for (size_t i = 0; i < static_cast<size_t>(scrollOffset) && i < lines.size(); i++) {
 		newBufferEnd += lines[i].length() + 1; // +1 for the newline character
 	}
-	Polonius::Block newBuffer = parent->getFile()->readLines_backwards(newBufferEnd, editorBottom - editorTop + 1);
-	bufferStart = newBuffer.start;
-	bufferEnd = newBuffer.end();
-	setBuffer(newBuffer.contents);
-	scrollOffset = 0; // Reset scroll offset when paging up
+	refreshBuffer_backwards(newBufferEnd);
 	parent->refreshScreen(); // Refresh the screen to reflect the scroll change
 }
 
@@ -162,11 +165,7 @@ void Polonius::TUI::TextDisplay::pageDown() {
 	for (int i = static_cast<int>(lines.size()) - 1; i >= lastLineBeingDisplayed; i--) {
 		newBufferStart -= lines[static_cast<size_t>(i)].length() + 1;
 	}
-	Polonius::Block newBuffer = parent->getFile()->readLines(newBufferStart, numberOfLinesBeingDisplayed);
-	bufferStart = newBuffer.start;
-	bufferEnd = newBuffer.end();
-	setBuffer(newBuffer.contents);
-	scrollOffset = 0;
+	refreshBuffer(newBufferStart);
 	parent->refreshScreen();
 }
 
@@ -215,6 +214,11 @@ void Polonius::TUI::TextDisplay::draw() {
 	editorBottom = parent->getBottom() - 1; 
 	editorLeft = parent->getLeft();
 	editorRight = parent->getRight() - 1;
+
+	if (!bufferInitialized) {
+		refreshBuffer(0);
+		bufferInitialized = true;
+	}
 
 	switch (w_) {
 		case Polonius::TUI::FULL:

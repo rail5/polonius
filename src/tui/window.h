@@ -60,6 +60,7 @@ class Window {
 
 	public:
 		Window();
+		explicit Window(Polonius::File* file);
 		~Window();
 		int run();
 

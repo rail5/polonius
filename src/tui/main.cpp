@@ -117,10 +117,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	Polonius::TUI::Window window;
-
-	// If we haven't received a file, we're creating a new one
-	window.setFile(&file);
+	Polonius::TUI::Window window(&file);
 
 	return window.run();
 }

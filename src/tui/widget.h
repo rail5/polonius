@@ -95,6 +95,7 @@ class TextDisplay : public Widget {
 	private:
 		std::vector<std::string> lines; // The lines of text in the buffer
 		int scrollOffset = 0; // The offset for scrolling through the buffer
+		bool bufferInitialized = false;
 
 		// Margins of the editor window:
 		int editorTop = 0;
@@ -105,7 +106,7 @@ class TextDisplay : public Widget {
 		uint64_t bufferStart = 0;
 		uint64_t bufferEnd = 0;
 
-		void setBuffer(const std::string& newBuffer); // Set the buffer to a new string
+		void setBufferTextLines(const std::string& newBuffer); // Set the buffer to a new string
 		void refreshBuffer_downward(); // Refresh the buffer with new content from the file
 		void refreshBuffer_upward();
 		void drawText(WINDOW* window); // Draw the text in the buffer to the window
@@ -121,7 +122,8 @@ class TextDisplay : public Widget {
 
 		void draw() override;
 
-		void setInitialBuffer(const Polonius::Block& initialBuffer);
+		void refreshBuffer(uint64_t newBufferStart);
+		void refreshBuffer_backwards(uint64_t newBufferEnd);
 
 		void scrollUp(); // Scroll up in the buffer
 		void scrollDown(); // Scroll down in the buffer
