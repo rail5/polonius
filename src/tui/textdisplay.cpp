@@ -209,6 +209,12 @@ void Polonius::TUI::TextDisplay::draw() {
 	int available_width = parent->getRight() - parent->getLeft();
 	int available_height = parent->getBottom() - parent->getTop();
 
+	// If the window margins have changed, refresh the buffer
+	if (editorTop != parent->getTop() || editorBottom != parent->getBottom() - 1 ||
+		editorLeft != parent->getLeft() || editorRight != parent->getRight() - 1) {
+		bufferInitialized = false; // Reset buffer initialization flag
+	}
+
 	// Store the editor window margins
 	editorTop = parent->getTop();
 	editorBottom = parent->getBottom() - 1; 
@@ -216,7 +222,7 @@ void Polonius::TUI::TextDisplay::draw() {
 	editorRight = parent->getRight() - 1;
 
 	if (!bufferInitialized) {
-		refreshBuffer(0);
+		refreshBuffer(bufferStart); // bufferStart is initialized to 0 by default
 		bufferInitialized = true;
 	}
 
