@@ -56,31 +56,40 @@ void Polonius::TUI::HelpPane::draw() {
 	// Place some helpful text in the pane
 	// Describing keyboard shortcuts
 
-	int num_columns = std::max(shortcuts.size() / 2, static_cast<size_t>(1));
+	int num_shortcuts = static_cast<int>(shortcuts.size());
+	int num_columns = (num_shortcuts / 2) + (num_shortcuts % 2);
+	if (num_columns < 1) {
+		num_columns = 1;
+	}
 	int num_rows = height / 2;
 
-	int row = 1;
-	int col = 1;
+	int row = 0;
+	int col = 0;
+
+	/**
+	 * Print the shortcuts in a grid-like format
+	 * Row 1, col 1
+	 * Then row 2, col 1
+	 * Then row 1, col 2
+	 * Then row 2, col 2
+	 * And so on
+	 * 
+	 * Briefly:
+	 * 		The row number == i % 2
+	 * 		The column number == ceil([i+1] / 2)
+	 */
 
 	for (size_t i = 0; i < shortcuts.size(); i++) {
 		// Calculate row and column number
-		// We should print like this:
-		// Row 1, column 1
-		// Then row 1, column 2
-		// Etc to the max column number
-		// Then row 2, column 1
-		// And so on
-		if (col > num_columns) {
-			col = 1; // Reset column to 1
-			row++; // Move to the next row
-		}
+		row++;
 		if (row > num_rows) {
-			break; // Stop if we exceed the number of rows
+			row = 1; // Reset row to 1 if it exceeds the number of rows
+			col++; // Move to the next column
 		}
 
 		// Calculate the actual x position based on the column number
 		// Divide the width by the number of columns
-		int x_position = (col - 1) * (width / num_columns) + 1;
+		int x_position = col * (width / num_columns) + 1;
 		
 		// Print the key combination with a standout (or bold) attribute
 		wattron(pane, A_STANDOUT);
@@ -88,8 +97,7 @@ void Polonius::TUI::HelpPane::draw() {
 		wattroff(pane, A_STANDOUT);
 
 		// Print the description normally
-		mvwprintw(pane, row, x_position + 2, " %s", shortcuts[i].description.c_str());
-		col++;
+		mvwprintw(pane, row, x_position + 3, "%s", shortcuts[i].description.c_str());
 	}
 
 	wrefresh(pane); // Refresh the pane to show the changes

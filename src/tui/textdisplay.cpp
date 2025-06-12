@@ -282,10 +282,10 @@ void Polonius::TUI::TextDisplay::handleKeyPress(int ch) {
 const std::vector<Polonius::TUI::KeyShortcut> Polonius::TUI::TextDisplay::widgetShortcuts() const {
 	return {
 		{"^S", "Save"},
-		{"^K", "Cut"},
-		{"^W", "Where Is"},
 		{"^X", "Exit"},
+		{"^K", "Cut"},
 		{"^U", "Paste"},
+		{"^W", "Where Is"},
 		{"^/", "Go to line"}
 	};
 }
