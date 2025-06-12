@@ -70,20 +70,20 @@ WINDOW* Polonius::TUI::Widget::getSubwindow() {
 		// If relative, we need to calculate the position based on the anchor and width/height
 		switch (anchor) {
 			case Polonius::TUI::LEFT:
-				x = 0; // Left edge
+				x = parent->getLeft(); // Left edge
 				y = (available_height - height) / 2; // Center vertically
 				break;
 			case Polonius::TUI::RIGHT:
-				x = available_width - width; // Right edge
+				x = parent->getRight() - width; // Right edge
 				y = (available_height - height) / 2; // Center vertically
 				break;
 			case Polonius::TUI::TOP:
 				x = (available_width - width) / 2; // Center horizontally
-				y = 0; // Top edge
+				y = parent->getTop(); // Top edge
 				break;
 			case Polonius::TUI::BOTTOM:
 				x = (available_width - width) / 2; // Center horizontally
-				y = available_height - height; // Bottom edge
+				y = parent->getBottom() - height; // Bottom edge
 				break;
 		}
 	}

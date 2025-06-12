@@ -253,101 +253,102 @@ void Polonius::TUI::Window::addWidget(std::shared_ptr<Polonius::TUI::Widget> wid
 void Polonius::TUI::Window::updateBoundaries(std::shared_ptr<Polonius::TUI::Widget> widget) {
 	// Update the top, bottom, left, and right boundaries if necessary
 	// Only if the widget is positioned relatively
-	if (widget->isRelativelyPositioned()) {
-		switch (widget->getAnchor()) {
-			case Polonius::TUI::LEFT:
-				switch (widget->getWidth()) {
-					case Polonius::TUI::FULL:
-						left = 0;
-						right = 0;
-						break;
-					case Polonius::TUI::HALF:
-						left /= 2;
-						break;
-					case Polonius::TUI::QUARTER:
-						left /= 4;
-						break;
-					case Polonius::TUI::THREE_QUARTERS:
-						left = (left * 3) / 4;
-						break;
-					default:
-						left += widget->getWidth();
-						if (left > COLS) {
-							left = COLS; // Ensure left does not exceed screen width
-						}
-						break;
-				}
-				break;
-			case Polonius::TUI::RIGHT:
-				switch (widget->getWidth()) {
-					case Polonius::TUI::FULL:
-						right = 0;
-						left = 0;
-						break;
-					case Polonius::TUI::HALF:
-						right /= 2;
-						break;
-					case Polonius::TUI::QUARTER:
-						right /= 4;
-						break;
-					case Polonius::TUI::THREE_QUARTERS:
-						right = (right * 3) / 4;
-						break;
-					default:
-						right -= widget->getWidth();
-						if (right < left) {
-							right = left; // Ensure right does not exceed left
-						}
-						break;
-				}
-				break;
-			case Polonius::TUI::TOP:
-				switch (widget->getHeight()) {
-					case Polonius::TUI::FULL:
-						top = 0;
-						bottom = 0;
-						break;
-					case Polonius::TUI::HALF:
-						top /= 2;
-						break;
-					case Polonius::TUI::QUARTER:
-						top /= 4;
-						break;
-					case Polonius::TUI::THREE_QUARTERS:
-						top = (top * 3) / 4;
-						break;
-					default:
-						top += widget->getHeight();
-						if (top > LINES) {
-							top = LINES; // Ensure top does not exceed screen height
-						}
-						break;
-				}
-				break;
-			case Polonius::TUI::BOTTOM:
-				switch (widget->getHeight()) {
-					case Polonius::TUI::FULL:
-						bottom = 0;
-						top = 0;
-						break;
-					case Polonius::TUI::HALF:
-						bottom /= 2;
-						break;
-					case Polonius::TUI::QUARTER:
-						bottom /= 4;
-						break;
-					case Polonius::TUI::THREE_QUARTERS:
-						bottom = (bottom * 3) / 4;
-						break;
-					default:
-						bottom -= widget->getHeight();
-						if (bottom < top) {
-							bottom = top; // Ensure bottom does not exceed top
-						}
-						break;
-				}
-				break;
-		}
+	if (!widget->isRelativelyPositioned()) {
+		return; // No need to update boundaries for absolutely positioned widgets
+	}
+	switch (widget->getAnchor()) {
+		case Polonius::TUI::LEFT:
+			switch (widget->getWidth()) {
+				case Polonius::TUI::FULL:
+					left = 0;
+					right = 0;
+					break;
+				case Polonius::TUI::HALF:
+					left /= 2;
+					break;
+				case Polonius::TUI::QUARTER:
+					left /= 4;
+					break;
+				case Polonius::TUI::THREE_QUARTERS:
+					left = (left * 3) / 4;
+					break;
+				default:
+					left += widget->getWidth();
+					if (left > COLS) {
+						left = COLS; // Ensure left does not exceed screen width
+					}
+					break;
+			}
+			break;
+		case Polonius::TUI::RIGHT:
+			switch (widget->getWidth()) {
+				case Polonius::TUI::FULL:
+					right = 0;
+					left = 0;
+					break;
+				case Polonius::TUI::HALF:
+					right /= 2;
+					break;
+				case Polonius::TUI::QUARTER:
+					right /= 4;
+					break;
+				case Polonius::TUI::THREE_QUARTERS:
+					right = (right * 3) / 4;
+					break;
+				default:
+					right -= widget->getWidth();
+					if (right < left) {
+						right = left; // Ensure right does not exceed left
+					}
+					break;
+			}
+			break;
+		case Polonius::TUI::TOP:
+			switch (widget->getHeight()) {
+				case Polonius::TUI::FULL:
+					top = 0;
+					bottom = 0;
+					break;
+				case Polonius::TUI::HALF:
+					top = (bottom - top) / 2;
+					break;
+				case Polonius::TUI::QUARTER:
+					top = (bottom - top) / 4;
+					break;
+				case Polonius::TUI::THREE_QUARTERS:
+					top = ((bottom - top) * 3) / 4;
+					break;
+				default:
+					top += widget->getHeight();
+					if (top > LINES) {
+						top = LINES; // Ensure top does not exceed screen height
+					}
+					break;
+			}
+			break;
+		case Polonius::TUI::BOTTOM:
+			switch (widget->getHeight()) {
+				case Polonius::TUI::FULL:
+					bottom = 0;
+					top = 0;
+					break;
+				case Polonius::TUI::HALF:
+					bottom /= 2;
+					break;
+				case Polonius::TUI::QUARTER:
+					bottom /= 4;
+					break;
+				case Polonius::TUI::THREE_QUARTERS:
+					bottom = (bottom * 3) / 4;
+					break;
+				default:
+					bottom -= widget->getHeight();
+					if (bottom < top) {
+						bottom = top; // Ensure bottom does not exceed top
+					}
+					break;
+			}
+			break;
 	}
 }
 
