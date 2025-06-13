@@ -160,6 +160,7 @@ class SearchPane : public Widget {
 		std::string searchInput;
 		bool escapeSequencesEnabled = false;
 		std::string searchLabel = "Search: ";
+		bool initialized = false;
 
 	public:
 		SearchPane(int x, int y, int w, int h);

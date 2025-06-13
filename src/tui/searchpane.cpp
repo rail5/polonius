@@ -39,9 +39,15 @@ void Polonius::TUI::SearchPane::draw() {
 	int label_length = static_cast<int>(searchLabel.length());
 	wmove(pane, 0, label_length);
 
+	// Print the search input
+	mvwprintw(pane, 0, label_length, "%s", searchInput.c_str());
+
 	// Calculate the cursor position
-	cursorPosition.x = label_length;
-	cursorPosition.y = absoluteTop;
+	if (!initialized) {
+		cursorPosition.x = label_length + static_cast<int>(searchInput.length());
+		cursorPosition.y = absoluteTop;
+	}
+	initialized = true;
 
 	wrefresh(pane);
 	delwin(pane);
@@ -49,9 +55,43 @@ void Polonius::TUI::SearchPane::draw() {
 
 void Polonius::TUI::SearchPane::handleKeyPress(int ch) {
 	switch (ch) {
+		case KEY_LEFT:
+			if (cursorPosition.x > static_cast<int>(searchLabel.length())) {
+				cursorPosition.x--;
+			}
+			break;
+		case KEY_RIGHT:
+			if (cursorPosition.x < static_cast<int>(searchLabel.length() + searchInput.length())) {
+				cursorPosition.x++;
+			}
+			break;
+		case KEY_DOWN:
+		case KEY_UP:
+			// Do nothing for up/down keys in search pane
+			break;
+		case KEY_BACKSPACE:
+			// Delete the character before the cursor
+			if (cursorPosition.x > static_cast<int>(searchLabel.length())) {
+				searchInput.erase(static_cast<size_t>(cursorPosition.x) - searchLabel.length() - 1, 1);
+				cursorPosition.x--;
+			}
+			break;
+		case KEY_DC: // Delete key
+			// Delete the character at the cursor
+			if (cursorPosition.x >= static_cast<int>(searchLabel.length())) {
+				searchInput.erase(static_cast<size_t>(cursorPosition.x) - searchLabel.length(), 1);
+			}
+			break;
+		case 10: // Enter key
+			// TBD
+			break;
 		default:
+			// Write the character to the search input
+			searchInput += static_cast<char>(ch);
+			cursorPosition.x++;
 			break;
 	}
+	parent->refreshScreen();
 }
 
 const std::vector<Polonius::TUI::KeyShortcut> Polonius::TUI::SearchPane::widgetShortcuts() const {
