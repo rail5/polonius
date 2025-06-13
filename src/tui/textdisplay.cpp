@@ -232,40 +232,37 @@ void Polonius::TUI::TextDisplay::draw() {
 
 void Polonius::TUI::TextDisplay::handleKeyPress(int ch) {
 	// Handle key presses in the text display
-	Polonius::TUI::Cursor cursorPosition = parent->getCursorPosition();
-	int cursor_x = cursorPosition.x;
-	int cursor_y = cursorPosition.y;
 	switch (ch) {
 		case KEY_UP:
-			if (cursor_y > getTopEdge()) {
-				cursor_y--;
+			if (cursorPosition.y > getTopEdge()) {
+				cursorPosition.y--;
 			} else {
 				scrollUp();
 			}
 			break;
 		case KEY_DOWN:
-			if (cursor_y < getBottomEdge()) {
-				cursor_y++;
+			if (cursorPosition.y < getBottomEdge()) {
+				cursorPosition.y++;
 			} else {
 				scrollDown();
 			}
 			break;
 		case KEY_LEFT:
-			if (cursor_x > getLeftEdge()) {
-				cursor_x--;
-			} else if (cursor_y > getTopEdge()) {
+			if (cursorPosition.x > getLeftEdge()) {
+				cursorPosition.x--;
+			} else if (cursorPosition.y > getTopEdge()) {
 				// Move up one line, and land at the rightmost position
-				cursor_y--;
-				cursor_x = getRightEdge(); // Move to the rightmost position of the previous line
+				cursorPosition.y--;
+				cursorPosition.x = getRightEdge(); // Move to the rightmost position of the previous line
 			}
 			break;
 		case KEY_RIGHT:
-			if (cursor_x < getRightEdge()) {
-				cursor_x++;
-			} else if (cursor_y < getBottomEdge()) {
+			if (cursorPosition.x < getRightEdge()) {
+				cursorPosition.x++;
+			} else if (cursorPosition.y < getBottomEdge()) {
 				// Move down one line, and land at the leftmost position
-				cursor_y++;
-				cursor_x = getLeftEdge(); // Move to the leftmost position of the next line
+				cursorPosition.y++;
+				cursorPosition.x = getLeftEdge(); // Move to the leftmost position of the next line
 			}
 			break;
 		case KEY_NPAGE: // Page down
@@ -276,7 +273,7 @@ void Polonius::TUI::TextDisplay::handleKeyPress(int ch) {
 			break;
 	}
 	// Update the cursor position in the parent window
-	parent->moveCursor(cursor_x, cursor_y);
+	parent->moveCursor(cursorPosition);
 }
 
 const std::vector<Polonius::TUI::KeyShortcut> Polonius::TUI::TextDisplay::widgetShortcuts() const {

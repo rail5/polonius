@@ -52,6 +52,10 @@ class Widget {
 		Polonius::TUI::Positioning position = Polonius::TUI::RELATIVE;
 		Polonius::TUI::Edge anchor = Polonius::TUI::BOTTOM;
 		WINDOW* getSubwindow();
+		Polonius::TUI::Cursor cursorPosition;
+
+		int absoluteTop = 0;
+		int absoluteLeft = 0;
 	public:
 		Widget();
 		Widget(int x, int y, int w, int h);
@@ -70,11 +74,16 @@ class Widget {
 		Polonius::TUI::Edge getAnchor() const;
 		bool isRelativelyPositioned() const;
 
+		int getAbsoluteTop() const;
+		int getAbsoluteLeft() const;
+
 		void setX(int x);
 		void setY(int y);
 		void setWidth(int w);
 		void setHeight(int h);
 		void setPositioning(Polonius::TUI::Positioning pos);
+
+		void takeCursor();
 
 		virtual const std::vector<Polonius::TUI::KeyShortcut> widgetShortcuts() const;
 

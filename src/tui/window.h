@@ -100,6 +100,7 @@ class Window {
 
 		void restoreCursorPosition();
 		void moveCursor(int x, int y);
+		void moveCursor(const Polonius::TUI::Cursor& position);
 
 		Polonius::TUI::Cursor getCursorPosition() const;
 

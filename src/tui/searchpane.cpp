@@ -38,7 +38,10 @@ void Polonius::TUI::SearchPane::draw() {
 	// Move cursor to the end of the label
 	int label_length = static_cast<int>(searchLabel.length());
 	wmove(pane, 0, label_length);
-	wattroff(pane, A_REVERSE);
+
+	// Calculate the cursor position
+	cursorPosition.x = label_length;
+	cursorPosition.y = absoluteTop;
 
 	wrefresh(pane);
 	delwin(pane);
@@ -54,9 +57,9 @@ void Polonius::TUI::SearchPane::handleKeyPress(int ch) {
 const std::vector<Polonius::TUI::KeyShortcut> Polonius::TUI::SearchPane::widgetShortcuts() const {
 	return {
 		{"^C", "Case Sens"},
-		{"^X", "Cancel"},
-		{"^R", "Reg.exp."},
+		{"^W", "Cancel"},
+		{"^R", "Regex"},
 		{"^B", "Backwards"},
-		{"^E", "Esc. seq. (like \\n)"}
+		{"^E", "Esc.Seq."}
 	};
 }

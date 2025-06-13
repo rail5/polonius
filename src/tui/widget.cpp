@@ -96,6 +96,9 @@ WINDOW* Polonius::TUI::Widget::getSubwindow() {
 		}
 	}
 
+	absoluteTop = y;
+	absoluteLeft = x;
+
 	return subwin(parent->getScreen(), height, width, y, x);
 }
 
@@ -125,6 +128,14 @@ Polonius::TUI::Edge Polonius::TUI::Widget::getAnchor() const {
 
 bool Polonius::TUI::Widget::isRelativelyPositioned() const {
 	return position == Polonius::TUI::RELATIVE;
+}
+
+int Polonius::TUI::Widget::getAbsoluteTop() const {
+	return absoluteTop;
+}
+
+int Polonius::TUI::Widget::getAbsoluteLeft() const {
+	return absoluteLeft;
 }
 
 void Polonius::TUI::Widget::setX(int x) {
@@ -174,6 +185,14 @@ void Polonius::TUI::Widget::setHeight(int h) {
  */
 void Polonius::TUI::Widget::setPositioning(Polonius::TUI::Positioning pos) {
 	position = pos;
+}
+
+void Polonius::TUI::Widget::takeCursor() {
+	if (!parent) {
+		return;
+	}
+
+	parent->moveCursor(cursorPosition);
 }
 
 /**

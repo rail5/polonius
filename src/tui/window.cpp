@@ -167,6 +167,9 @@ void Polonius::TUI::Window::drawWidgets() {
 		widget->setParent(this); // Set the parent window for the widget
 		widget->draw();
 		updateBoundaries(widget); // Update boundaries based on the widget's position
+		if (focused_widget == widget.get()) {
+			widget->takeCursor();
+		}
 	}
 
 	// Finally, draw the text display widget after all others
@@ -174,6 +177,9 @@ void Polonius::TUI::Window::drawWidgets() {
 		textDisplay->setParent(this);
 		textDisplay->draw();
 		updateBoundaries(textDisplay);
+		if (focused_widget == textDisplay.get()) {
+			textDisplay->takeCursor(); // Ensure the text display has the cursor
+		}
 	}
 }
 
@@ -184,6 +190,15 @@ void Polonius::TUI::Window::moveCursor(int x, int y) {
 
 	cursor_x = std::min(x, COLS);
 	cursor_y = std::min(y, LINES);
+}
+
+void Polonius::TUI::Window::moveCursor(const Polonius::TUI::Cursor& position) {
+	if (!screen) {
+		throw std::runtime_error("Screen is not initialized");
+	}
+
+	cursor_x = std::min(position.x, COLS);
+	cursor_y = std::min(position.y, LINES);
 }
 
 Polonius::TUI::Cursor Polonius::TUI::Window::getCursorPosition() const {
@@ -225,7 +240,7 @@ int Polonius::TUI::Window::run() {
 					// Otherwise, create a new search pane
 					std::shared_ptr<Polonius::TUI::SearchPane> search_pane = std::make_shared<Polonius::TUI::SearchPane>
 						(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 1);
-					widgets.push_back(search_pane);
+					addWidget(search_pane);
 					setFocus(search_pane.get()); // Set focus to the new search pane
 				}
 				refreshScreen();
@@ -258,6 +273,7 @@ void Polonius::TUI::Window::setFile(Polonius::File* file) {
 }
 
 void Polonius::TUI::Window::addWidget(std::shared_ptr<Polonius::TUI::Widget> widget) {
+	widget->setParent(this);
 	widgets.push_back(widget);
 }
 
