@@ -85,10 +85,13 @@ void Polonius::TUI::SearchPane::handleKeyPress(int ch) {
 		case 10: // Enter key
 			// TBD
 			break;
-		default:
+		case 32 ... 126: // Printable characters
 			// Write the character to the search input
 			searchInput += static_cast<char>(ch);
 			cursorPosition.x++;
+			break;
+		default:
+			// Ignore
 			break;
 	}
 	parent->refreshScreen();
@@ -100,6 +103,7 @@ const std::vector<Polonius::TUI::KeyShortcut> Polonius::TUI::SearchPane::widgetS
 		{"^W", "Cancel"},
 		{"^R", "Regex"},
 		{"^B", "Backwards"},
-		{"^E", "Esc.Seq."}
+		{"^E", "Esc.Seq."},
+		{"^N", "Next"}
 	};
 }

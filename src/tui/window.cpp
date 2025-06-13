@@ -225,12 +225,6 @@ int Polonius::TUI::Window::run() {
 				// Handle window resize
 				refreshScreen();
 				break;
-			case KEY_NPAGE: // Page down
-				textDisplay->pageDown();
-				break;
-			case KEY_PPAGE: // Page up
-				textDisplay->pageUp();
-				break;
 			case 23: // Ctrl+W
 				// If the search pane is up, shut it down
 				if (!widgets.empty() && dynamic_cast<Polonius::TUI::SearchPane*>(widgets.back().get()) != nullptr) {
