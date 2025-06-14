@@ -33,6 +33,26 @@ void Polonius::TUI::SearchPane::draw() {
 		}
 	}
 
+	std::string label = "Search";
+	if (regexEnabled) {
+		label += " [Regex]";
+	}
+
+	if (caseSensitive) {
+		label += " [Case Sensitive]";
+	}
+
+	if (escapeSequencesEnabled) {
+		label += " [Esc]";
+	}
+
+	if (searchBackwards) {
+		label += " [Backwards]";
+	}
+
+	label += ": ";
+	searchLabel = label;
+
 	// "Search: " label
 	mvwprintw(pane, 0, 0, "%s", searchLabel.c_str());
 	// Move cursor to the end of the label
@@ -42,12 +62,8 @@ void Polonius::TUI::SearchPane::draw() {
 	// Print the search input
 	mvwprintw(pane, 0, label_length, "%s", searchInput.c_str());
 
-	// Calculate the cursor position
-	if (!initialized) {
-		cursorPosition.x = label_length + static_cast<int>(searchInput.length());
-		cursorPosition.y = absoluteTop;
-	}
-	initialized = true;
+	cursorPosition.x = label_length + static_cast<int>(searchInput.length());
+	cursorPosition.y = absoluteTop;
 
 	wrefresh(pane);
 	delwin(pane);
@@ -81,6 +97,18 @@ void Polonius::TUI::SearchPane::handleKeyPress(int ch) {
 			if (cursorPosition.x >= static_cast<int>(searchLabel.length())) {
 				searchInput.erase(static_cast<size_t>(cursorPosition.x) - searchLabel.length(), 1);
 			}
+			break;
+		case 18: // Ctrl+R
+			regexEnabled = !regexEnabled;
+			break;
+		case 3: // Ctrl+C
+			caseSensitive = !caseSensitive;
+			break;
+		case 5: // Ctrl+E
+			escapeSequencesEnabled = !escapeSequencesEnabled;
+			break;
+		case 2: // Ctrl+B
+			searchBackwards = !searchBackwards;
 			break;
 		case 10: // Enter key
 			// TBD

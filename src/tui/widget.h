@@ -158,9 +158,12 @@ class TextDisplay : public Widget {
 class SearchPane : public Widget {
 	private:
 		std::string searchInput;
-		bool escapeSequencesEnabled = false;
 		std::string searchLabel = "Search: ";
-		bool initialized = false;
+
+		bool escapeSequencesEnabled = false;
+		bool regexEnabled = false;
+		bool caseSensitive = false;
+		bool searchBackwards = false;
 
 	public:
 		SearchPane(int x, int y, int w, int h);
