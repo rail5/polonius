@@ -92,21 +92,14 @@ class Window {
 		void setLeft(int left);
 		void setRight(int right);
 
-		int getTop() const;
-		int getBottom() const;
-		int getLeft() const;
-		int getRight() const;
-
 		void setFile(Polonius::File* file);
 
 		void addWidget(std::shared_ptr<Polonius::TUI::Widget> widget);
-		void showMessage();
+		void showMessage(const std::string& message, Polonius::TUI::Color color);
 
 		void restoreCursorPosition();
 		void moveCursor(int x, int y);
 		void moveCursor(const Polonius::TUI::Cursor& position);
-
-		Polonius::TUI::Cursor getCursorPosition() const;
 
 		void setFocus(Polonius::TUI::Widget* widget);
 
@@ -114,6 +107,13 @@ class Window {
 
 		// Interrupt handling
 		static void handleInterrupt(int signal);
+
+		Polonius::TUI::Cursor getCursorPosition() const;
+
+		int getTop() const;
+		int getBottom() const;
+		int getLeft() const;
+		int getRight() const;
 };
 } // namespace TUI
 } // namespace Polonius

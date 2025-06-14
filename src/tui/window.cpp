@@ -252,7 +252,9 @@ int Polonius::TUI::Window::run() {
 				break;
 		}
 
-		showMessage();
+		if (current_message) {
+			current_message->draw();
+		}
 
 		move(cursor_y, cursor_x);
 		// Highlight the current position
@@ -382,10 +384,12 @@ void Polonius::TUI::Window::resetBoundaries() {
 	right = COLS;
 }
 
-void Polonius::TUI::Window::showMessage() {
-	if (current_message) {
-		current_message->draw();
-	}
+void Polonius::TUI::Window::showMessage(const std::string& message, Polonius::TUI::Color color) {
+	current_message = std::make_shared<Polonius::TUI::Message>();
+	current_message->setMessage("[ " + message + " ]");
+	current_message->setColor(color);
+	current_message->setParent(this);
+	current_message->draw();
 }
 
 void Polonius::TUI::Window::restoreCursorPosition() {
@@ -432,12 +436,7 @@ void Polonius::TUI::Window::handleInterrupt(int signal) {
 				Polonius::TUI::mainWindow->restoreCursorPosition();
 			} else {
 				// Draw a message indicating that Ctrl+T is required to suspend
-				std::shared_ptr<Polonius::TUI::Message> msg = std::make_shared<Polonius::TUI::Message>();
-				msg->setMessage("[ To suspend, type ^T^Z ]");
-				msg->setColor(Polonius::TUI::RED);
-				msg->setParent(Polonius::TUI::mainWindow);
-				Polonius::TUI::mainWindow->current_message = msg;
-				msg->draw();
+				Polonius::TUI::mainWindow->showMessage("To suspend, type ^T^Z", Polonius::TUI::RED);
 			}
 			break;
 	}
