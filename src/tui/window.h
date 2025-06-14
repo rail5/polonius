@@ -18,6 +18,7 @@ namespace Polonius {
 namespace TUI {
 class Widget;
 class TextDisplay;
+class SearchPane;
 class HelpPane;
 class Message;
 
@@ -68,6 +69,9 @@ class Window {
 		void drawWidgets();
 		void updateBoundaries(std::shared_ptr<Polonius::TUI::Widget> widget);
 		void resetBoundaries();
+
+		// Widgets that may or may not be present
+		std::shared_ptr<Polonius::TUI::SearchPane> searchPane;
 
 		void initialize();
 

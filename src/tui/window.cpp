@@ -232,10 +232,11 @@ int Polonius::TUI::Window::run() {
 					setFocus(textDisplay.get()); // Set focus back to the text display
 				} else {
 					// Otherwise, create a new search pane
-					std::shared_ptr<Polonius::TUI::SearchPane> search_pane = std::make_shared<Polonius::TUI::SearchPane>
-						(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 1);
-					addWidget(search_pane);
-					setFocus(search_pane.get()); // Set focus to the new search pane
+					if (!searchPane) {
+						searchPane = std::make_shared<Polonius::TUI::SearchPane>(Polonius::TUI::BOTTOM, Polonius::TUI::FULL, 1);
+					}
+					addWidget(searchPane);
+					setFocus(searchPane.get()); // Set focus to the new search pane
 				}
 				refreshScreen();
 				break;
