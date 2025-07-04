@@ -10,12 +10,14 @@ Polonius::Block::Block(const Polonius::Block& other) {
 	this->start_position = other.start_position;
 	this->contents = other.contents;
 	this->op = other.op;
+	this->is_initialized = other.is_initialized;
 }
 
 Polonius::Block::Block(Polonius::Block&& other) noexcept {
 	this->start_position = other.start_position;
 	this->contents = std::move(other.contents);
 	this->op = other.op;
+	this->is_initialized = other.is_initialized;
 	other.contents.clear();
 }
 
@@ -24,6 +26,7 @@ Polonius::Block& Polonius::Block::operator=(Polonius::Block&& other) noexcept {
 		this->start_position = other.start_position;
 		this->contents = std::move(other.contents);
 		this->op = other.op;
+		this->is_initialized = other.is_initialized;
 		other.contents.clear();
 	}
 	return *this;
