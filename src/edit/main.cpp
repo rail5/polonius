@@ -96,12 +96,8 @@ int main(int argc, char* argv[]) {
 						return EXIT_FAILURE;
 					}
 					// Add the entire file content to the instructions string
-					std::string line;
-					while (std::getline(instruction_file, line)) {
-						if (!line.empty()) {
-							instructions += line + '\n';
-						}
-					}
+					instructions += std::string((std::istreambuf_iterator<char>(instruction_file)),
+						std::istreambuf_iterator<char>());
 					instruction_file.close();
 				}
 				break;
