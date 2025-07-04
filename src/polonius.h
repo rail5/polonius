@@ -132,8 +132,8 @@ class Block {
 		BlockOverlap overlap(uint64_t start_position, uint64_t end_position) const;
 };
 
-Block combine_inserts(const Block& lhs, const Block& rhs);
-Block combine_removes(const Block& lhs, const Block& rhs);
+Polonius::Block combine_inserts(const Polonius::Block& lhs, const Polonius::Block& rhs);
+Polonius::Block combine_removes(const Polonius::Block& lhs, const Polonius::Block& rhs);
 
 class File {
 	private:

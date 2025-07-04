@@ -198,7 +198,7 @@ void Polonius::Editor::Expression::_insert(Polonius::Block&& block) {
 							// be executed on a single pass of the file
 							// E.g, 'insert 0 abc' followed by 'insert 1 x'
 							// *must* become 'insert 0 axbc'
-							Polonius::Block combined = combine_inserts(*last, block);
+							Polonius::Block combined = Polonius::combine_inserts(*last, block);
 							if (!combined.empty()) {
 								block = std::move(combined);
 							} else {
@@ -438,7 +438,7 @@ void Polonius::Editor::Expression::_remove(Polonius::Block&& block) {
 					case Polonius::InstructionType::REMOVE:
 						// Ensure our REMOVE instructions are always sorted
 						{
-							Polonius::Block combined = combine_removes(*last, block);
+							Polonius::Block combined = Polonius::combine_removes(*last, block);
 							if (!combined.empty()) {
 								block = std::move(combined);
 							} else {

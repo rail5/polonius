@@ -212,6 +212,7 @@ Polonius::BlockOverlap Polonius::Block::overlap(uint64_t start_position, uint64_
 	return result;
 }
 
+namespace Polonius {
 Polonius::Block combine_inserts(const Polonius::Block& lhs, const Polonius::Block& rhs) {
 	// Verify they're both inserts
 	if (lhs.get_operator() != Polonius::InstructionType::INSERT || rhs.get_operator() != Polonius::InstructionType::INSERT) {
@@ -274,3 +275,4 @@ Polonius::Block combine_removes(const Polonius::Block& lhs, const Polonius::Bloc
 
 	return combined;
 }
+} // namespace Polonius
