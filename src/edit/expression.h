@@ -6,6 +6,7 @@
 #define SRC_EDIT_EXPRESSION_H_
 
 #include "../polonius.h"
+#include "../block.h"
 
 #include <deque>
 #include <string>
@@ -38,7 +39,7 @@ namespace Polonius::Editor {
 class Expression {
 	private:
 		std::deque<Block> blocks;
-		uint8_t optimization_level = 0;
+		uint8_t optimization_level = 2;
 
 		void re_evaluate();
 
@@ -52,13 +53,36 @@ class Expression {
 		void remove(Block&& block);
 		void replace(Block&& block);
 
+		void add_term(Polonius::InstructionType op, uint64_t start, const std::string& text);
+		void add_term(Polonius::InstructionType op, uint64_t start, uint64_t end);
+
 		// Operator overloads
 		Expression operator+(Block&& block);
 		Expression operator-(Block&& block);
 		Expression operator*(Block&& block);
 
 		void set_optimization_level(uint8_t level);
+
+		bool empty() const;
+
+		void clear();
+
+		auto begin() {
+			return blocks.begin();
+		}
+
+		auto end() {
+			return blocks.end();
+		}
+
+		auto cbegin() const {
+			return blocks.cbegin();
+		}
+
+		auto cend() const {
+			return blocks.cend();
+		}
 };
-}
+} // namespace Polonius::Editor
 
 #endif // SRC_EDIT_EXPRESSION_H_

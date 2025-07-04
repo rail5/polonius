@@ -10,7 +10,9 @@
 #include <getopt.h>
 
 #include "../polonius.h"
+#include "../file.h"
 #include "editor.h"
+#include "expression.h"
 #include "../shared/version.h"
 #include "../shared/parse_block_units.h"
 
@@ -19,6 +21,7 @@ int main(int argc, char* argv[]) {
 	Polonius::reader_mode = false; // Disable reader mode for the editor
 	Polonius::File file;
 	std::string instructions;
+	uint8_t optimization_level = 2;
 
 	const char* help_string = "polonius-editor " program_version "\n"
 		"Usage: polonius-editor <file> [options]\n"
@@ -30,6 +33,11 @@ int main(int argc, char* argv[]) {
 		"  -f, --instruction-file <file>    Read instructions from a file\n"
 		"  -c, --special-chars              Process escaped chars in instructions\n"
 		"                                    (\\n, \\t, \\\\, \\x00 through \\xFF)\n"
+		"  -O, --optimization-level <level> Set the optimization level for instructions\n"
+		"                                    0 - No optimization\n"
+		"                                    1 - Low optimization\n"
+		"                                    2 - High optimization (default)\n"
+		"                                    See the manual for more details\n"
 		"  -n, --no-newline                 Do not add a newline to the end of the file\n"
 		"  -b, --block-size <size>          Set the block size for file operations\n"
 		"                                    Default is 10K\n"
@@ -59,6 +67,7 @@ int main(int argc, char* argv[]) {
 	static struct option long_options[] = {
 		{"add", required_argument, nullptr, 'a'},
 		{"block-size", required_argument, nullptr, 'b'},
+		{"optimization-level", required_argument, nullptr, 'O'},
 		{"special-chars", no_argument, nullptr, 'c'},
 		{"instruction-file", required_argument, nullptr, 'f'},
 		{"help", no_argument, nullptr, 'h'},
@@ -67,7 +76,7 @@ int main(int argc, char* argv[]) {
 		{nullptr, 0, nullptr, 0} // Sentinel
 	};
 
-	while ((opt = getopt_long(argc, argv, "a:b:cf:hnV", long_options, nullptr)) != -1) {
+	while ((opt = getopt_long(argc, argv, "a:b:cf:hnO:V", long_options, nullptr)) != -1) {
 		switch (opt) {
 			case 'a':
 				instructions += optarg;
@@ -95,7 +104,7 @@ int main(int argc, char* argv[]) {
 						std::cerr << "Error opening instruction file: " << optarg << std::endl;
 						return EXIT_FAILURE;
 					}
-					// Add the entire file content to the instructions string
+					// Add the entire file to the instructions string
 					instructions += std::string((std::istreambuf_iterator<char>(instruction_file)),
 						std::istreambuf_iterator<char>());
 					instruction_file.close();
@@ -106,6 +115,14 @@ int main(int argc, char* argv[]) {
 				return EXIT_SUCCESS;
 			case 'n':
 				Polonius::Editor::append_newline = false;
+				break;
+			case 'O':
+				try {
+					optimization_level = static_cast<uint8_t>(std::stoi(optarg));
+				} catch (const std::exception& e) {
+					std::cerr << "Error parsing optimization level: " << e.what() << std::endl;
+					return EXIT_FAILURE;
+				}
 				break;
 			case 'V':
 				std::cout << version_string;
@@ -142,6 +159,8 @@ int main(int argc, char* argv[]) {
 		std::cerr << help_string;
 		return EXIT_FAILURE;
 	}
+
+	file.set_optimization_level(optimization_level);
 
 	try {
 		file.parseInstructions(instructions);

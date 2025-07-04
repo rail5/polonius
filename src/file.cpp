@@ -3,6 +3,7 @@
  */
 
 #include "polonius.h"
+#include "file.h"
 
 #include "shared/explode.h"
 #include "shared/to_lower.h"
@@ -166,6 +167,21 @@ uint64_t Polonius::File::getSize() const {
 	return size;
 }
 
+bool Polonius::File::ends_with_newline() const {
+	if (size == 0) {
+		return false; // An empty file does not end with a newline
+	}
+
+	// Move the file pointer to the end of the file
+	fseek(file, -1, SEEK_END);
+	char last_char;
+	if (fread(&last_char, 1, 1, file) != 1) {
+		throw std::runtime_error("Failed to read last character of file: " + path.string());
+	}
+
+	return last_char == '\n';
+}
+
 /**
  * @brief Validates the instruction sequence for the file.
  * 
@@ -176,16 +192,19 @@ uint64_t Polonius::File::getSize() const {
 void Polonius::File::validateInstructions() {
 	// Keep a running tally of the size of the file
 	uint64_t size_after_last_instruction = size;
+	if (ends_with_newline()) {
+		size_after_last_instruction--; // If the file ends with a newline, we do not count it in the size
+	}
 	for (const auto& instruction : instructions) {
-		switch (instruction.type()) {
-			case Polonius::Editor::INSERT:
+		switch (instruction.get_operator()) {
+			case Polonius::InstructionType::INSERT:
 				if (instruction.start() > size_after_last_instruction) {
 					instructions_valid = false;
 					throw std::out_of_range("Insert position is out of bounds: " + std::to_string(instruction.start()));
 				}
 				size_after_last_instruction += instruction.size();
 				break;
-			case Polonius::Editor::REMOVE:
+			case Polonius::InstructionType::REMOVE:
 				if (instruction.end() >= size_after_last_instruction || size_after_last_instruction == 0) {
 					instructions_valid = false;
 					throw std::out_of_range("Remove position is out of bounds: " + std::to_string(instruction.start()) + " - " + std::to_string(instruction.end()));
@@ -196,8 +215,8 @@ void Polonius::File::validateInstructions() {
 				}
 				size_after_last_instruction -= instruction.size();
 				break;
-			case Polonius::Editor::REPLACE:
-				if (instruction.start() > size_after_last_instruction || instruction.start() + instruction.size() > size_after_last_instruction) {
+			case Polonius::InstructionType::REPLACE:
+				if (instruction.start() + instruction.size() > size_after_last_instruction) {
 					instructions_valid = false;
 					throw std::out_of_range("Replace position is out of bounds: " + std::to_string(instruction.start()));
 				}
@@ -248,15 +267,15 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 			throw std::invalid_argument("Invalid instruction format: " + parts[0]);
 		}
 
-		Polonius::Editor::InstructionType type;
+		Polonius::InstructionType type;
 		// Case-insensitive comparison for the operation type
 		std::string op = to_lower(first_part[0]);
 		if (op == "insert") {
-			type = Polonius::Editor::INSERT;
+			type = Polonius::InstructionType::INSERT;
 		} else if (op == "remove") {
-			type = Polonius::Editor::REMOVE;
+			type = Polonius::InstructionType::REMOVE;
 		} else if (op == "replace") {
-			type = Polonius::Editor::REPLACE;
+			type = Polonius::InstructionType::REPLACE;
 		} else {
 			instructions_valid = false;
 			throw std::invalid_argument("Unknown instruction type: " + first_part[0]);
@@ -269,16 +288,16 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 		}
 		uint64_t start_position = std::stoull(first_part[1]);
 
-		if (type == Polonius::Editor::INSERT || type == Polonius::Editor::REPLACE) {
+		if (type == Polonius::InstructionType::INSERT || type == Polonius::InstructionType::REPLACE) {
 			std::string text = first_part[2];
-			this->instructions.emplace_back(type, start_position, text);
-		} else if (type == Polonius::Editor::REMOVE) {
+			this->instructions.add_term(type, start_position, text);
+		} else if (type == Polonius::InstructionType::REMOVE) {
 			if (!is_number(first_part[2])) {
 				instructions_valid = false;
 				throw std::invalid_argument("Invalid end position for remove operation: " + first_part[2]);
 			}
 			uint64_t end_position = std::stoull(first_part[2]);
-			this->instructions.emplace_back(type, start_position, end_position);
+			this->instructions.add_term(type, start_position, end_position);
 		}
 
 		for (size_t i = 1; i < parts.size(); ++i) {
@@ -299,16 +318,16 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 				throw std::invalid_argument("Invalid start position: " + additional_parts[0]);
 			}
 			uint64_t additional_start_position = std::stoull(additional_parts[0]);
-			if (type == Polonius::Editor::INSERT || type == Polonius::Editor::REPLACE) {
+			if (type == Polonius::InstructionType::INSERT || type == Polonius::InstructionType::REPLACE) {
 				std::string additional_text = additional_parts[1];
-				this->instructions.emplace_back(type, additional_start_position, additional_text);
-			} else if (type == Polonius::Editor::REMOVE) {
+				this->instructions.add_term(type, additional_start_position, additional_text);
+			} else if (type == Polonius::InstructionType::REMOVE) {
 				if (!is_number(additional_parts[1])) {
 					instructions_valid = false;
 					throw std::invalid_argument("Invalid end position for remove operation: " + additional_parts[1]);
 				}
 				uint64_t additional_end_position = std::stoull(additional_parts[1]);
-				this->instructions.emplace_back(type, additional_start_position, additional_end_position);
+				this->instructions.add_term(type, additional_start_position, additional_end_position);
 			}
 		}
 	}
@@ -429,15 +448,15 @@ void Polonius::File::replace(uint64_t position, const std::string& text) {
 void Polonius::File::executeInstructions() {
 	validateInstructions();
 	for (const auto& instruction : instructions) {
-		switch (instruction.type()) {
-			case Polonius::Editor::INSERT:
-				insert(instruction.start(), instruction.get_text());
+		switch (instruction.get_operator()) {
+			case Polonius::InstructionType::INSERT:
+				insert(instruction.start(), instruction.get_contents());
 				break;
-			case Polonius::Editor::REMOVE:
+			case Polonius::InstructionType::REMOVE:
 				remove(instruction.start(), instruction.end());
 				break;
-			case Polonius::Editor::REPLACE:
-				replace(instruction.start(), instruction.get_text());
+			case Polonius::InstructionType::REPLACE:
+				replace(instruction.start(), instruction.get_contents());
 				break;
 		}
 	}
@@ -452,6 +471,10 @@ void Polonius::File::executeInstructions() {
 		}
 	}
 	instructions.clear(); // Clear instructions after execution
+}
+
+void Polonius::File::set_optimization_level(uint8_t level) {
+	instructions.set_optimization_level(level);
 }
 
 /**

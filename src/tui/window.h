@@ -6,6 +6,7 @@
 #define SRC_TUI_WINDOW_H_
 
 #include "../polonius.h"
+#include "../file.h"
 #include <ncurses.h>
 #include <string>
 #include <cstdint>

@@ -8,6 +8,7 @@
 #include <getopt.h>
 
 #include "../polonius.h"
+#include "../file.h"
 #include "reader.h"
 
 #include "../shared/version.h"

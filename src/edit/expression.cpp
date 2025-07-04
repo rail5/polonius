@@ -12,7 +12,7 @@ Polonius::Editor::Expression::Expression(uint8_t optimization_level) {
 
 
 void Polonius::Editor::Expression::set_optimization_level(uint8_t level) {
-	optimization_level = level;
+	this->optimization_level = level;
 
 	// If we change the optimization level, we need to re-evaluate the expression
 	// If we don't do this, the expression will not be optimized correctly when we add more terms
@@ -521,6 +521,51 @@ void Polonius::Editor::Expression::replace(Polonius::Block&& block) {
 			}
 			break;
 	}
+}
+
+void Polonius::Editor::Expression::add_term(Polonius::InstructionType op, uint64_t start, const std::string& text) {
+	Polonius::Block block;
+	block.set_operator(op);
+	block.add(start, text);
+	switch (op) {
+		case Polonius::InstructionType::INSERT:
+			insert(std::move(block));
+			break;
+		case Polonius::InstructionType::REPLACE:
+			replace(std::move(block));
+			break;
+		case Polonius::InstructionType::REMOVE:
+			throw std::invalid_argument("add_term(InstructionType, start, text) called with REMOVE operation. "
+				"Use add_term(InstructionType, start, end) instead.");
+			break;
+	}
+	re_evaluate();
+}
+
+void Polonius::Editor::Expression::add_term(Polonius::InstructionType op, uint64_t start, uint64_t end) {
+	Polonius::Block block;
+	block.set_operator(op);
+	block.add(start, end);
+	switch (op) {
+		case Polonius::InstructionType::INSERT:
+			[[ fallthrough ]];
+		case Polonius::InstructionType::REPLACE:
+			throw std::invalid_argument("add_term(InstructionType, start, end) called with INSERT or REPLACE operation. "
+				"Use add_term(InstructionType, start, text) instead.");
+			break;
+		case Polonius::InstructionType::REMOVE:
+			remove(std::move(block));
+			break;
+	}
+	re_evaluate();
+}
+
+bool Polonius::Editor::Expression::empty() const {
+	return blocks.empty();
+}
+
+void Polonius::Editor::Expression::clear() {
+	blocks.clear();
 }
 
 Polonius::Editor::Expression Polonius::Editor::Expression::operator+(Polonius::Block&& block) {

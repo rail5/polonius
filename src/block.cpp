@@ -3,6 +3,8 @@
  */
 
 #include "polonius.h"
+#include "block.h"
+#include "shared/process_special_chars.h"
 
 #include <stdexcept>
 
@@ -69,7 +71,13 @@ char Polonius::Block::at(uint64_t index) const {
 void Polonius::Block::add(uint64_t start_position, const std::string& value) {
 	contents.clear();
 	this->start_position = start_position;
-	contents = value;
+	if (Polonius::special_chars) {
+		// Process special characters if enabled
+		contents = process_special_chars(value);
+	} else {
+		// Otherwise, just copy the value as is
+		contents = value;
+	}
 }
 
 void Polonius::Block::add(uint64_t start_position, uint64_t end_position) {
