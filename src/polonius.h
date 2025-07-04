@@ -92,6 +92,7 @@ class Block {
 		uint64_t start_position = 0;
 		std::string contents = "";
 		InstructionType op;
+		bool is_initialized = false;
 
 	public:
 		Block() = default;
@@ -123,6 +124,9 @@ class Block {
 		bool shift_right(uint64_t shift_amount);
 
 		bool empty() const;
+
+		void set_initialized(bool initialized = true);
+		bool initialized() const;
 		
 		BlockOverlap overlap(const Block& b) const;
 		BlockOverlap overlap(uint64_t start_position, uint64_t end_position) const;

@@ -143,6 +143,14 @@ bool Polonius::Block::empty() const {
 	return contents.empty();
 }
 
+void Polonius::Block::set_initialized(bool initialized) {
+	is_initialized = initialized;
+}
+
+bool Polonius::Block::initialized() const {
+	return is_initialized;
+}
+
 /**
  * @brief Calculates the overlap of two blocks.
  * 

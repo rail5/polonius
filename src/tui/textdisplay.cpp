@@ -43,16 +43,16 @@ void Polonius::TUI::TextDisplay::refreshBuffer(uint64_t newBufferStart) {
 	//     Which, when it detects too long a line, will stop reading until the next line
 	//     And set a marker signifying that a line was truncated
 	//     The format of Blocks will allow an obvious signifier in the non-contiguous jump in position
-	bufferStart = newBuffer.start;
+	bufferStart = newBuffer.start();
 	bufferEnd = newBuffer.end();
-	setBufferTextLines(newBuffer.contents);
+	setBufferTextLines(newBuffer.get_contents());
 }
 
 void Polonius::TUI::TextDisplay::refreshBuffer_backwards(uint64_t newBufferEnd) {
 	Polonius::Block newBuffer = parent->getFile()->readLines_backwards(newBufferEnd, editorBottom - editorTop + 1);
-	bufferStart = newBuffer.start;
+	bufferStart = newBuffer.start();
 	bufferEnd = newBuffer.end();
-	setBufferTextLines(newBuffer.contents);
+	setBufferTextLines(newBuffer.get_contents());
 }
 
 /**
@@ -72,8 +72,8 @@ void Polonius::TUI::TextDisplay::refreshBuffer_upward() {
 	Polonius::Block previous_newline = parent->getFile()->search_backwards(bufferStart - 1, -1, "\n");
 	// Mark that position as the start of the new buffer (loading one full line into the buffer)
 	uint64_t newBufferStart = 0;
-	if (previous_newline.initialized) {
-		newBufferStart = previous_newline.start + 1; // +1 to skip the newline character
+	if (previous_newline.initialized()) {
+		newBufferStart = previous_newline.start() + 1; // +1 to skip the newline character
 	}
 	// If no match was found, the new start of the buffer is the start of the file
 	refreshBuffer(newBufferStart);

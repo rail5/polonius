@@ -479,8 +479,8 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
 	// Read the file as directed by the start and end positions
 	if (to_nearest_newline) {
 		Polonius::Block next_newline = search(end_position, -1, "\n");
-		if (next_newline.initialized) {
-			end_position = next_newline.start + 1;
+		if (next_newline.initialized()) {
+			end_position = next_newline.start() + 1;
 		}
 	}
 	uint64_t bytes_to_read = end_position - start;
@@ -496,9 +496,8 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
 		return result; // EOF reached, return empty block
 	}
 	// If we read some data, set the contents of the result block
-	result.contents = std::string(buffer.data(), bytes_read);
-	result.start = start;
-	result.initialized = true;
+	result.add(start, std::string(buffer.data(), bytes_read));
+	result.set_initialized();
 	
 	if (ferror(file)) {
 		throw std::runtime_error("Error reading from file");
@@ -514,8 +513,9 @@ Polonius::Block Polonius::File::readLines(uint64_t start, int number_of_lines, b
 
 	uint64_t current_position = start;
 	fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
+	std::string contents;
 	std::string line;
-	while (number_of_lines > 0 && (stop_at_blocksize ? result.contents.size() < Polonius::block_size : true)) {
+	while (number_of_lines > 0 && (stop_at_blocksize ? result.get_contents().size() < Polonius::block_size : true)) {
 		char c;
 		if (fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET) != 0 || fread(&c, 1, 1, file) != 1) {
 			if (feof(file)) {
@@ -526,7 +526,7 @@ Polonius::Block Polonius::File::readLines(uint64_t start, int number_of_lines, b
 		line += c;
 		switch (c) {
 			case '\n':
-				result.contents += line;
+				contents += line;
 				line.clear();
 				number_of_lines--;
 				break;
@@ -536,10 +536,10 @@ Polonius::Block Polonius::File::readLines(uint64_t start, int number_of_lines, b
 		current_position++;
 	}
 	if (!line.empty()) {
-		result.contents += line;
+		contents += line;
 	}
-	result.start = start;
-	result.initialized = true;
+	result.add(start, contents);
+	result.set_initialized();
 	return result;
 }
 
@@ -562,10 +562,11 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 	std::deque<std::string> lines;
 	uint64_t current_position = start;
 	fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
+	std::string contents;
 	std::string line;
 	bool hit_beginning_of_file = false;
 	int lines_left = number_of_lines;
-	while (lines_left >= 0 && (stop_at_blocksize ? result.contents.size() < Polonius::block_size : true)) {
+	while (lines_left >= 0 && (stop_at_blocksize ? result.get_contents().size() < Polonius::block_size : true)) {
 		char c;
 		if (fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET) != 0 || fread(&c, 1, 1, file) != 1) {
 			if (feof(file)) {
@@ -600,7 +601,7 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 		lines.push_front(line); // Add the last line if it exists
 	}
 	for (const auto& l : lines) {
-		result.contents += l;
+		contents += l;
 	}
 
 	// If we hit the beginning of the file early, we may not have read enough lines to satisfy the request
@@ -608,11 +609,11 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 	if (lines.size() < static_cast<size_t>(number_of_lines)) {
 		// Read forward from the start position until we have enough lines
 		int difference = number_of_lines - static_cast<int>(lines.size()); // How many did we miss?
-		result.contents += readLines(start + 1, difference, stop_at_blocksize).contents;
+		contents += readLines(start + 1, difference, stop_at_blocksize).get_contents();
 	}
 
-	result.start = current_position + 1; // Set the start position to the first character of the first line read
-	result.initialized = true;
+	result.add(current_position + 1, contents);
+	result.set_initialized();
 	return result;
 }
 
@@ -659,7 +660,7 @@ Polonius::Block Polonius::File::search(uint64_t start, int64_t length, const std
 			shift_amount = remaining;
 		}
 
-		std::string data = readFromFile(pos, static_cast<int64_t>(bs)).contents;
+		std::string data = readFromFile(pos, static_cast<int64_t>(bs)).get_contents();
 
 		// Check if the search query is in the data
 		size_t search_result = data.find(query);
@@ -667,9 +668,8 @@ Polonius::Block Polonius::File::search(uint64_t start, int64_t length, const std
 			continue; // No match found, continue to the next chunk
 		}
 		// Match found
-		result.start = pos + search_result;
-		result.contents = data.substr(search_result, query_length);
-		result.initialized = true;
+		result.add(pos + search_result, data.substr(search_result, query_length));
+		result.set_initialized();
 		return result;
 	}
 
@@ -711,7 +711,7 @@ Polonius::Block Polonius::File::search_backwards(uint64_t start, int64_t length,
 			bs = remaining; // Adjust block size to the remaining bytes
 		}
 
-		std::string data = readFromFile(pos - bs, static_cast<int64_t>(bs)).contents;
+		std::string data = readFromFile(pos - bs, static_cast<int64_t>(bs)).get_contents();
 
 		// Check if the search query is in the data
 		size_t search_result = data.rfind(query);
@@ -719,9 +719,8 @@ Polonius::Block Polonius::File::search_backwards(uint64_t start, int64_t length,
 			continue; // No match found, continue to the next chunk
 		}
 		// Match found
-		result.start = pos - bs + search_result;
-		result.contents = data.substr(search_result, query.length());
-		result.initialized = true;
+		result.add(pos - bs + search_result, data.substr(search_result, query.length()));
+		result.set_initialized();
 		return result;
 	}
 	// If we reach here, no match was found in the entire file
@@ -776,7 +775,7 @@ Polonius::Block Polonius::File::regex_search(uint64_t start, int64_t length, con
 			bs = remaining; // Adjust block size to the remaining bytes
 		}
 
-		std::string data = readFromFile(pos, static_cast<int64_t>(bs)).contents;
+		std::string data = readFromFile(pos, static_cast<int64_t>(bs)).get_contents();
 		boost::smatch regex_search_result;
 
 		boost::regex expression(query);
@@ -798,9 +797,8 @@ Polonius::Block Polonius::File::regex_search(uint64_t start, int64_t length, con
 			}
 		} else {
 			// Full match found
-			result.start = pos + static_cast<uint64_t>(regex_search_result.prefix().length());
-			result.contents = regex_search_result[0];
-			result.initialized = true;
+			result.add(pos + static_cast<uint64_t>(regex_search_result.prefix().length()), regex_search_result[0]);
+			result.set_initialized();
 			return result;
 		}
 	}
