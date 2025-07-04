@@ -3,6 +3,7 @@
  */
 
 #include "polonius.h"
+#include "file.h"
 
 #include "shared/explode.h"
 #include "shared/to_lower.h"
@@ -166,6 +167,21 @@ uint64_t Polonius::File::getSize() const {
 	return size;
 }
 
+bool Polonius::File::ends_with_newline() const {
+	if (size == 0) {
+		return false; // An empty file does not end with a newline
+	}
+
+	// Move the file pointer to the end of the file
+	fseek(file, -1, SEEK_END);
+	char last_char;
+	if (fread(&last_char, 1, 1, file) != 1) {
+		throw std::runtime_error("Failed to read last character of file: " + path.string());
+	}
+
+	return last_char == '\n';
+}
+
 /**
  * @brief Validates the instruction sequence for the file.
  * 
@@ -176,16 +192,19 @@ uint64_t Polonius::File::getSize() const {
 void Polonius::File::validateInstructions() {
 	// Keep a running tally of the size of the file
 	uint64_t size_after_last_instruction = size;
+	if (ends_with_newline()) {
+		size_after_last_instruction--; // If the file ends with a newline, we do not count it in the size
+	}
 	for (const auto& instruction : instructions) {
-		switch (instruction.type()) {
-			case Polonius::Editor::INSERT:
+		switch (instruction.get_operator()) {
+			case Polonius::InstructionType::INSERT:
 				if (instruction.start() > size_after_last_instruction) {
 					instructions_valid = false;
 					throw std::out_of_range("Insert position is out of bounds: " + std::to_string(instruction.start()));
 				}
 				size_after_last_instruction += instruction.size();
 				break;
-			case Polonius::Editor::REMOVE:
+			case Polonius::InstructionType::REMOVE:
 				if (instruction.end() >= size_after_last_instruction || size_after_last_instruction == 0) {
 					instructions_valid = false;
 					throw std::out_of_range("Remove position is out of bounds: " + std::to_string(instruction.start()) + " - " + std::to_string(instruction.end()));
@@ -196,8 +215,8 @@ void Polonius::File::validateInstructions() {
 				}
 				size_after_last_instruction -= instruction.size();
 				break;
-			case Polonius::Editor::REPLACE:
-				if (instruction.start() > size_after_last_instruction || instruction.start() + instruction.size() > size_after_last_instruction) {
+			case Polonius::InstructionType::REPLACE:
+				if (instruction.start() + instruction.size() > size_after_last_instruction) {
 					instructions_valid = false;
 					throw std::out_of_range("Replace position is out of bounds: " + std::to_string(instruction.start()));
 				}
@@ -248,15 +267,15 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 			throw std::invalid_argument("Invalid instruction format: " + parts[0]);
 		}
 
-		Polonius::Editor::InstructionType type;
+		Polonius::InstructionType type;
 		// Case-insensitive comparison for the operation type
 		std::string op = to_lower(first_part[0]);
 		if (op == "insert") {
-			type = Polonius::Editor::INSERT;
+			type = Polonius::InstructionType::INSERT;
 		} else if (op == "remove") {
-			type = Polonius::Editor::REMOVE;
+			type = Polonius::InstructionType::REMOVE;
 		} else if (op == "replace") {
-			type = Polonius::Editor::REPLACE;
+			type = Polonius::InstructionType::REPLACE;
 		} else {
 			instructions_valid = false;
 			throw std::invalid_argument("Unknown instruction type: " + first_part[0]);
@@ -269,16 +288,16 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 		}
 		uint64_t start_position = std::stoull(first_part[1]);
 
-		if (type == Polonius::Editor::INSERT || type == Polonius::Editor::REPLACE) {
+		if (type == Polonius::InstructionType::INSERT || type == Polonius::InstructionType::REPLACE) {
 			std::string text = first_part[2];
-			this->instructions.emplace_back(type, start_position, text);
-		} else if (type == Polonius::Editor::REMOVE) {
+			this->instructions.add_term(type, start_position, text);
+		} else if (type == Polonius::InstructionType::REMOVE) {
 			if (!is_number(first_part[2])) {
 				instructions_valid = false;
 				throw std::invalid_argument("Invalid end position for remove operation: " + first_part[2]);
 			}
 			uint64_t end_position = std::stoull(first_part[2]);
-			this->instructions.emplace_back(type, start_position, end_position);
+			this->instructions.add_term(type, start_position, end_position);
 		}
 
 		for (size_t i = 1; i < parts.size(); ++i) {
@@ -299,16 +318,16 @@ void Polonius::File::parseInstructions(const std::string& instructions) {
 				throw std::invalid_argument("Invalid start position: " + additional_parts[0]);
 			}
 			uint64_t additional_start_position = std::stoull(additional_parts[0]);
-			if (type == Polonius::Editor::INSERT || type == Polonius::Editor::REPLACE) {
+			if (type == Polonius::InstructionType::INSERT || type == Polonius::InstructionType::REPLACE) {
 				std::string additional_text = additional_parts[1];
-				this->instructions.emplace_back(type, additional_start_position, additional_text);
-			} else if (type == Polonius::Editor::REMOVE) {
+				this->instructions.add_term(type, additional_start_position, additional_text);
+			} else if (type == Polonius::InstructionType::REMOVE) {
 				if (!is_number(additional_parts[1])) {
 					instructions_valid = false;
 					throw std::invalid_argument("Invalid end position for remove operation: " + additional_parts[1]);
 				}
 				uint64_t additional_end_position = std::stoull(additional_parts[1]);
-				this->instructions.emplace_back(type, additional_start_position, additional_end_position);
+				this->instructions.add_term(type, additional_start_position, additional_end_position);
 			}
 		}
 	}
@@ -429,15 +448,15 @@ void Polonius::File::replace(uint64_t position, const std::string& text) {
 void Polonius::File::executeInstructions() {
 	validateInstructions();
 	for (const auto& instruction : instructions) {
-		switch (instruction.type()) {
-			case Polonius::Editor::INSERT:
-				insert(instruction.start(), instruction.get_text());
+		switch (instruction.get_operator()) {
+			case Polonius::InstructionType::INSERT:
+				insert(instruction.start(), instruction.get_contents());
 				break;
-			case Polonius::Editor::REMOVE:
+			case Polonius::InstructionType::REMOVE:
 				remove(instruction.start(), instruction.end());
 				break;
-			case Polonius::Editor::REPLACE:
-				replace(instruction.start(), instruction.get_text());
+			case Polonius::InstructionType::REPLACE:
+				replace(instruction.start(), instruction.get_contents());
 				break;
 		}
 	}
@@ -452,6 +471,10 @@ void Polonius::File::executeInstructions() {
 		}
 	}
 	instructions.clear(); // Clear instructions after execution
+}
+
+void Polonius::File::set_optimization_level(uint8_t level) {
+	instructions.set_optimization_level(level);
 }
 
 /**
@@ -479,8 +502,8 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
 	// Read the file as directed by the start and end positions
 	if (to_nearest_newline) {
 		Polonius::Block next_newline = search(end_position, -1, "\n");
-		if (next_newline.initialized) {
-			end_position = next_newline.start + 1;
+		if (next_newline.initialized()) {
+			end_position = next_newline.start() + 1;
 		}
 	}
 	uint64_t bytes_to_read = end_position - start;
@@ -496,9 +519,8 @@ Polonius::Block Polonius::File::readFromFile(uint64_t start, int64_t length, boo
 		return result; // EOF reached, return empty block
 	}
 	// If we read some data, set the contents of the result block
-	result.contents = std::string(buffer.data(), bytes_read);
-	result.start = start;
-	result.initialized = true;
+	result.add(start, std::string(buffer.data(), bytes_read));
+	result.set_initialized();
 	
 	if (ferror(file)) {
 		throw std::runtime_error("Error reading from file");
@@ -514,8 +536,9 @@ Polonius::Block Polonius::File::readLines(uint64_t start, int number_of_lines, b
 
 	uint64_t current_position = start;
 	fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
+	std::string contents;
 	std::string line;
-	while (number_of_lines > 0 && (stop_at_blocksize ? result.contents.size() < Polonius::block_size : true)) {
+	while (number_of_lines > 0 && (stop_at_blocksize ? result.get_contents().size() < Polonius::block_size : true)) {
 		char c;
 		if (fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET) != 0 || fread(&c, 1, 1, file) != 1) {
 			if (feof(file)) {
@@ -526,7 +549,7 @@ Polonius::Block Polonius::File::readLines(uint64_t start, int number_of_lines, b
 		line += c;
 		switch (c) {
 			case '\n':
-				result.contents += line;
+				contents += line;
 				line.clear();
 				number_of_lines--;
 				break;
@@ -536,10 +559,10 @@ Polonius::Block Polonius::File::readLines(uint64_t start, int number_of_lines, b
 		current_position++;
 	}
 	if (!line.empty()) {
-		result.contents += line;
+		contents += line;
 	}
-	result.start = start;
-	result.initialized = true;
+	result.add(start, contents);
+	result.set_initialized();
 	return result;
 }
 
@@ -562,10 +585,11 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 	std::deque<std::string> lines;
 	uint64_t current_position = start;
 	fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET);
+	std::string contents;
 	std::string line;
 	bool hit_beginning_of_file = false;
 	int lines_left = number_of_lines;
-	while (lines_left >= 0 && (stop_at_blocksize ? result.contents.size() < Polonius::block_size : true)) {
+	while (lines_left >= 0 && (stop_at_blocksize ? result.get_contents().size() < Polonius::block_size : true)) {
 		char c;
 		if (fseeko64(file, static_cast<int64_t>(current_position), SEEK_SET) != 0 || fread(&c, 1, 1, file) != 1) {
 			if (feof(file)) {
@@ -600,7 +624,7 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 		lines.push_front(line); // Add the last line if it exists
 	}
 	for (const auto& l : lines) {
-		result.contents += l;
+		contents += l;
 	}
 
 	// If we hit the beginning of the file early, we may not have read enough lines to satisfy the request
@@ -608,11 +632,11 @@ Polonius::Block Polonius::File::readLines_backwards(uint64_t start, int number_o
 	if (lines.size() < static_cast<size_t>(number_of_lines)) {
 		// Read forward from the start position until we have enough lines
 		int difference = number_of_lines - static_cast<int>(lines.size()); // How many did we miss?
-		result.contents += readLines(start + 1, difference, stop_at_blocksize).contents;
+		contents += readLines(start + 1, difference, stop_at_blocksize).get_contents();
 	}
 
-	result.start = current_position + 1; // Set the start position to the first character of the first line read
-	result.initialized = true;
+	result.add(current_position + 1, contents);
+	result.set_initialized();
 	return result;
 }
 
@@ -659,7 +683,7 @@ Polonius::Block Polonius::File::search(uint64_t start, int64_t length, const std
 			shift_amount = remaining;
 		}
 
-		std::string data = readFromFile(pos, static_cast<int64_t>(bs)).contents;
+		std::string data = readFromFile(pos, static_cast<int64_t>(bs)).get_contents();
 
 		// Check if the search query is in the data
 		size_t search_result = data.find(query);
@@ -667,9 +691,8 @@ Polonius::Block Polonius::File::search(uint64_t start, int64_t length, const std
 			continue; // No match found, continue to the next chunk
 		}
 		// Match found
-		result.start = pos + search_result;
-		result.contents = data.substr(search_result, query_length);
-		result.initialized = true;
+		result.add(pos + search_result, data.substr(search_result, query_length));
+		result.set_initialized();
 		return result;
 	}
 
@@ -711,7 +734,7 @@ Polonius::Block Polonius::File::search_backwards(uint64_t start, int64_t length,
 			bs = remaining; // Adjust block size to the remaining bytes
 		}
 
-		std::string data = readFromFile(pos - bs, static_cast<int64_t>(bs)).contents;
+		std::string data = readFromFile(pos - bs, static_cast<int64_t>(bs)).get_contents();
 
 		// Check if the search query is in the data
 		size_t search_result = data.rfind(query);
@@ -719,9 +742,8 @@ Polonius::Block Polonius::File::search_backwards(uint64_t start, int64_t length,
 			continue; // No match found, continue to the next chunk
 		}
 		// Match found
-		result.start = pos - bs + search_result;
-		result.contents = data.substr(search_result, query.length());
-		result.initialized = true;
+		result.add(pos - bs + search_result, data.substr(search_result, query.length()));
+		result.set_initialized();
 		return result;
 	}
 	// If we reach here, no match was found in the entire file
@@ -776,7 +798,7 @@ Polonius::Block Polonius::File::regex_search(uint64_t start, int64_t length, con
 			bs = remaining; // Adjust block size to the remaining bytes
 		}
 
-		std::string data = readFromFile(pos, static_cast<int64_t>(bs)).contents;
+		std::string data = readFromFile(pos, static_cast<int64_t>(bs)).get_contents();
 		boost::smatch regex_search_result;
 
 		boost::regex expression(query);
@@ -798,9 +820,8 @@ Polonius::Block Polonius::File::regex_search(uint64_t start, int64_t length, con
 			}
 		} else {
 			// Full match found
-			result.start = pos + static_cast<uint64_t>(regex_search_result.prefix().length());
-			result.contents = regex_search_result[0];
-			result.initialized = true;
+			result.add(pos + static_cast<uint64_t>(regex_search_result.prefix().length()), regex_search_result[0]);
+			result.set_initialized();
 			return result;
 		}
 	}

@@ -23,7 +23,9 @@ SHARED_OBJS = \
 	bin/obj/shared/parse_block_units.o \
 	bin/obj/shared/process_special_chars.o \
 	bin/obj/shared/parse_regex.o \
+	bin/obj/block.o \
 	bin/obj/file.o \
+	bin/obj/polonius-editor/expression.o \
 	bin/obj/polonius-editor/instruction.o \
 	bin/obj/polonius/window.o \
 	bin/obj/polonius/widget.o \

@@ -8,6 +8,7 @@
 #include <getopt.h>
 
 #include "../polonius.h"
+#include "../file.h"
 #include "reader.h"
 
 #include "../shared/version.h"
@@ -182,11 +183,11 @@ int main(int argc, char* argv[]) {
 					break;
 			}
 
-			if (search_result.initialized) {
+			if (search_result.initialized()) {
 				if (Polonius::Reader::output_positions) {
-					std::cout << search_result.start << " " << search_result.end() << std::endl;
+					std::cout << search_result.start() << " " << search_result.end() << std::endl;
 				} else {
-					std::cout << search_result.contents << std::endl;
+					std::cout << search_result.get_contents() << std::endl;
 				}
 				return EXIT_SUCCESS;
 			} else {
@@ -207,10 +208,10 @@ int main(int argc, char* argv[]) {
 			actual_start_position = 0;
 		}
 
-		while (read_result.initialized && read_result.end() < requested_end_position) {
+		while (read_result.initialized() && read_result.end() < requested_end_position) {
 			actual_end_position = read_result.end();
 			if (!Polonius::Reader::output_positions) {
-				std::cout << read_result.contents;
+				std::cout << read_result.get_contents();
 			}
 			read_result = file.readFromFile(read_result.end() + 1,
 				std::min(static_cast<int64_t>(Polonius::block_size), Polonius::Reader::amount_to_read));
