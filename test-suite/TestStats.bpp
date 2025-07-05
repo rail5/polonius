@@ -47,12 +47,15 @@
 	}
 
 	@public @method toPrimitive {
-		echo "Tests Passed: @this.getPassCount"
-		echo "Tests Failed: @this.getFailCount"
-		echo "Tests Untested: @this.getUntestedCount"
-		if [[ @this.getFailCount -gt 0 ]] || [[ @this.getUntestedCount -gt 0 ]]; then
-			echo "There were failed tests. Details are available in the logs directory."
-		fi
+		local pass_count=@this.getPassCount
+		local fail_count=@this.getFailCount
+		local untested_count=@this.getUntestedCount
+		echo "Tests Passed: $pass_count"
+		echo "Tests Failed: $fail_count"
+		echo "Tests Untested: $untested_count"
 		@this.clean
+		if [[ $fail_count -gt 0 ]] || [[ $untested_count -gt 0 ]]; then
+			exit 1
+		fi
 	}
 }

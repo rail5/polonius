@@ -12,6 +12,8 @@ CXX = g++
 CXXFLAGS = -O2 -std=gnu++20 -Wall -Wextra
 LDFLAGS = -s -lboost_regex -lncurses -ltinfo
 
+BPP = bpp
+
 # Install directories
 PREFIX ?= /usr/local
 BINDIR = $(PREFIX)/bin
@@ -81,12 +83,15 @@ manual:
 	pandoc --standalone --to man "$(WIKIDIRECTORY)/Polonius-Editor.md" -o debian/polonius-editor.1
 	pandoc --standalone --to man "$(WIKIDIRECTORY)/Polonius-Reader.md" -o debian/polonius-reader.1
 
-test:
+test-suite/run.sh: test-suite/run.bpp test-suite/TestRunner.bpp test-suite/Test.bpp test-suite/TestStats.bpp
+	@$(BPP) -o test-suite/run.sh test-suite/run.bpp
+
+test: test-suite/run.sh
 	@if [ ! -f bin/polonius-editor ] || [ ! -f bin/polonius-reader ]; then \
 		echo "Binaries not found. Please run 'make all' first."; \
 		exit 1; \
 	fi
-	@cd tests && ./run-tests
+	@cd test-suite && ./run.sh
 
 clean: clean-manual clean-binaries clean-tests clean-wiki
 	@rm -f bin/obj/*.o

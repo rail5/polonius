@@ -1,7 +1,7 @@
 Source: polonius
 Priority: optional
 Maintainer: rail5 <andrew@rail5.org>
-Build-Depends: debhelper (>= 10), libboost-regex1.81-dev, pandoc, libncurses-dev
+Build-Depends: debhelper (>= 10), libboost-regex1.81-dev, pandoc, libncurses-dev, bpp
 Standards-Version: 3.9.3
 Section: utils
 
