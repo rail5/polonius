@@ -1,0 +1,4 @@
+insert 0 0123456789
+remove 5 8
+remove 3 4
+insert 4 a

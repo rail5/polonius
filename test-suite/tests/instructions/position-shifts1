@@ -1,0 +1,6 @@
+insert 0 abcdefg
+remove 5 5
+remove 5 5
+insert 4 xyzhij
+remove 5 5
+insert 0 x

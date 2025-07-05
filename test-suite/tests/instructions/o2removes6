@@ -1,0 +1,6 @@
+insert 0 0123456789
+insert 5 abc
+replace 0 xyz
+remove 0 0
+remove 0 0
+remove 0 0

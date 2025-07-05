@@ -1,0 +1,4 @@
+insert 0 0123456789
+replace 3 abc
+insert 9 XYZ
+remove 6 11

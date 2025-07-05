@@ -1,0 +1,3 @@
+insert 0 abcd
+replace 3 e
+insert 0 xyz

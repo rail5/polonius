@@ -1,0 +1,196 @@
+@include_once "detect-tty.bpp"
+@include_once "TestStats.bpp"
+
+@class Test {
+	@public name
+	@public status="untested"
+	@public program_should_return_zero=1
+	@public program_did_return_zero=1
+	@public log
+	@public @TestStats* stats=@nullptr
+
+	@virtual @public @method finishTest {
+		# First, ensure that:
+		## 1. The program returned zero if `program_should_return_zero` is 1
+		## 2. The program returned non-zero if `program_should_return_zero` is 0
+		if [[ @this.program_should_return_zero -ne @this.program_did_return_zero ]]; then
+			@this.status="fail"
+			@this.log+="Error: Program did not return the expected exit code for test '@{this.name}'.\n"
+			@this.log+="Should the program have returned zero? @this.program_should_return_zero\n"
+			@this.log+="Did the program return zero? @this.program_did_return_zero\n"
+		fi
+
+		# Update the test stats object if it exists
+		if [[ @this.stats != @nullptr ]]; then
+			case "@this.status" in
+				"untested")
+					@this.stats.incrementUntestedTests
+					;;
+				"pass")
+					@this.stats.incrementPassedTests
+					;;
+				"fail")
+					@this.stats.incrementFailedTests
+					;;
+				*)
+					@this.stats.incrementUntestedTests
+					;;
+			esac
+		fi
+		@this.toPrimitive
+
+		# Write the log to logs/{test_name}.log
+		if [[ "@this.status" != "pass" ]]; then
+			local log_file="logs/@{this.name}.log"
+			# Ensure the logs directory exists
+			mkdir -p "$(dirname "$log_file")"
+			# Write the log to the file
+			echo -e "@{this.log}" > "$log_file"
+		fi
+	}
+
+	# This method should be overridden by subclasses to implement the actual test logic.
+	@virtual @public @method run {
+		>&2 echo "Error: run method not implemented for test '@{this.name}'."
+		@this.status="fail"
+		@this.finishTest
+		return 1
+	}
+
+	@public @method toPrimitive {
+		# Display the test name and status
+		# In the format:
+		# TestName: Status
+		# The status should be colored green if pass, red if fail, and yellow if untested
+
+		local statusColor="33"
+		if [[ "@this.status" == "pass" ]]; then
+			statusColor="32"
+		elif [[ "@this.status" == "fail" ]]; then
+			statusColor="31"
+		fi
+
+		local colorize="\033[1;${statusColor}m" uncolorize="\033[0m"
+
+		if [[ "$in_tty" == "false" ]]; then
+			colorize=""
+			uncolorize=""
+		fi
+
+		echo -n -e "@{this.name}: ${colorize}@{this.status}${uncolorize}\n"
+	}
+}
+
+@class EditorTest : Test {
+	@public instruction_file
+	@public expected_output_file
+	@public input_file
+	@public file_should_exist=1
+	@public file_did_exist=1
+	@public create_new_file=0
+
+	@public @method toPrimitive {
+		@super.toPrimitive
+	}
+
+	@public @method finishTest {
+		if [[ @this.file_should_exist -ne @this.file_did_exist ]]; then
+			@this.status="fail"
+			@this.log+="Error: File existence mismatch for test '@{this.instruction_file}'.\n"
+			@this.log+="Should the file exist? @this.file_should_exist\n"
+			@this.log+="Did the file exist? @this.file_did_exist\n"
+		fi
+		@super.finishTest
+	}
+
+	@public @method run optimization_level {
+		if [[ -z "@this.instruction_file" ]]; then
+			@this.log+="Error: instruction_file or expected_output_file is not set.\n"
+			@this.status="untested"
+			@this.finishTest
+			return 1
+		fi
+
+		if [[ ! -f "@this.instruction_file" ]]; then
+			@this.log+="Error: instruction_file '@this.instruction_file' does not exist.\n"
+			@this.status="untested"
+			@this.finishTest
+			return 1
+		fi
+
+		if [[ -z "@this.expected_output_file" ]]; then
+			@this.file_should_exist=0
+		else
+			@this.file_should_exist=1
+		fi
+
+		if [[ -z "@this.input_file" ]]; then
+			@this.create_new_file=1
+		else
+			@this.create_new_file=0
+		fi
+
+		@this.status="pass" # Pre-emptively set 'pass' if we've made it this far
+		# From here out, any trouble will set the status to 'fail' explicitly
+
+		local expected_output="@(cat "@this.expected_output_file")"
+		local input_file_contents=""
+		local actual_output
+		local temp_file=@(mktemp)
+
+		if [[ ! -z "@this.input_file" ]]; then
+			if [[ ! -f "@this.input_file" ]]; then
+				@this.log+="Error: input_file '@this.input_file' does not exist.\n"
+				@this.status="untested"
+				@this.finishTest
+				rm -f "${temp_file}"
+				return 1
+			fi
+			# Copy the input file to a temporary file
+			cp "@this.input_file" "${temp_file}"
+		fi
+
+		if [[ -z "$optimization_level" ]]; then
+			optimization_level=0
+		fi
+
+		if [[ @this.create_new_file -eq 1 ]]; then
+			rm -f "${temp_file}"
+		fi
+
+		# Get the output
+		if $POLONIUS_EDITOR "${temp_file}" -O${optimization_level} -f "@this.instruction_file" -c &>/dev/null; then
+			@this.program_did_return_zero=1
+		else
+			@this.program_did_return_zero=0
+		fi
+
+		if [[ -f "${temp_file}" ]]; then
+			@this.file_did_exist=1
+			actual_output="@(cat "${temp_file}")"
+			rm -f "${temp_file}"
+		else
+			@this.file_did_exist=0
+		fi
+
+		if [[ @this.file_should_exist -eq 0 ]]; then
+			# If the file shouldn't exist, we don't need to compare outputs
+			@this.finishTest
+			return 0
+		fi
+
+		# Compare the original output with the expected output
+		if [[ "${actual_output}" != "${expected_output}" ]]; then
+			@this.log+="Error: Original output does not match expected output for test '@{this.instruction_file}'.\n"
+			@this.log+="\n------EXPECTED OUTPUT------\n${expected_output}\n------END------\n"
+			@this.log+="\n------ACTUAL   OUTPUT------\n${actual_output}\n------END------\n"
+			@this.status="fail"
+			@this.finishTest
+			return 1
+		else
+			@this.status="pass"
+		fi
+
+		@this.finishTest
+	}
+}

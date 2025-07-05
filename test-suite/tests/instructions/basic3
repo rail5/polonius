@@ -1,0 +1,3 @@
+insert 0 abcd
+replace 0 def
+insert 4 hij

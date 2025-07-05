@@ -1,0 +1,5 @@
+INSERT 0 hello world
+REMOVE 0 4
+INSERT 0 goodbye
+REPLACE 8 abcde
+REPLACE 8 buddy

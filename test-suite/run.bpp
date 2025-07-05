@@ -1,0 +1,62 @@
+#!/usr/bin/env bpp
+
+# First things first: verify we're IN the test-suite directory
+if [[ ! -d "tests/instructions" ]]; then
+	>&2 echo "Error: This script must be run from the test-suite directory."
+	>&2 echo "Please navigate to the test-suite directory and run this script again."
+	>&2 echo "Current directory: $(pwd)"
+	exit 1
+fi
+
+POLONIUS_EDITOR="../bin/polonius-editor"
+POLONIUS_READER="../bin/polonius-reader"
+
+@include_once static "detect-tty.bpp"
+@include_once static "TestStats.bpp"
+@include_once static "Test.bpp"
+@include_once static "TestRunner.bpp"
+
+@TestRunner runner
+
+# Clear the logs directory
+rm -f logs/*.log
+
+# Add the basic editor tests
+for file in "tests/instructions/"*; do
+	if [[ ! -f "$file" ]]; then
+		continue
+	fi
+
+	test_name="@(basename "$file")"
+	test_expectedoutput_file="tests/expected/$test_name"
+
+	test_should_return_zero=1
+	if [[ "$test_name" == *"invalid"* ]]; then
+		test_should_return_zero=0
+	fi
+
+	test_should_produce_output=1
+	if [[ ! -f $test_expectedoutput_file ]]; then
+		test_should_produce_output=0
+		test_expectedoutput_file=""
+	fi
+
+	test_input_file="tests/sources/$test_name"
+	if [[ ! -f "$test_input_file" ]]; then
+		test_input_file=""
+	fi
+
+	@runner.addEditorTest "$file" "$test_expectedoutput_file" "$test_input_file" $test_should_return_zero $test_should_produce_output
+done
+
+echo "Running tests..."
+echo "----------------"
+for i in @(seq 0 2); do
+	echo "Optimization level: $i"
+	echo "--"
+	@runner.runAllTests $i
+	echo "--"
+done
+echo "----------------"
+
+@runner.stats.toPrimitive

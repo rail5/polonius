@@ -1,0 +1,79 @@
+@include_once "TestStats.bpp"
+@include_once "Test.bpp"
+
+@class TestRunner {
+	@public @TestStats* stats=@new TestStats
+	@public tests=()
+
+	@public @method updateStats @Test* test {
+		if [[ @test == @nullptr ]]; then
+			echo "Error: test is null."
+			return 1
+		fi
+
+		case "@test.status" in
+			"untested")
+				@this.stats.incrementUntestedTests
+				;;
+			"passed")
+				@this.stats.incrementPassedTests
+				;;
+			"failed")
+				@this.stats.incrementFailedTests
+				;;
+			*)
+				echo "Error: Unknown test status '@test.status'."
+				return 1
+				;;
+		esac
+
+		@test.toPrimitive
+	}
+
+	@public @method addEditorTest instruction_file expected_output_file input_file should_return_zero file_should_exist {
+		@EditorTest* test=@new EditorTest
+		@test.instruction_file="$instruction_file"
+		@test.name="@(basename "$instruction_file")"
+		@test.expected_output_file="$expected_output_file"
+		@test.input_file="$input_file"
+		if [[ -n "$should_return_zero" ]]; then
+			@test.program_should_return_zero="$should_return_zero"
+		else
+			@test.program_should_return_zero=1
+		fi
+		if [[ -n "$file_should_exist" ]]; then
+			@test.file_should_exist="$file_should_exist"
+		else
+			@test.file_should_exist=1
+		fi
+		@test.stats=@this.stats
+
+		@this.tests+=("@test")
+	}
+
+	@public @method runAllTests optimization_level {
+		local numberOfCores=@(nproc)
+		local concurrentTests=$((numberOfCores / 2))
+		if [[ $concurrentTests -lt 1 ]]; then
+			concurrentTests=1
+		fi
+
+		for i in @(seq 0 $((@{#this.tests[@]} - 1))); do
+			@Test* test="@{this.tests[$i]}"
+			@EditorTest* editorTest=@dynamic_cast<EditorTest> @test
+			if [[ @editorTest == @nullptr ]] && [[ $optimization_level -gt 0 ]]; then
+				# No need to run non-editor tests with optimization levels
+				continue
+			fi
+			@test.run ${optimization_level} &
+			if [[ $((i % concurrentTests)) -eq 0 ]]; then
+				wait
+			fi
+		done
+		wait
+	}
+
+	@constructor {
+		@this.stats.init
+	}
+}

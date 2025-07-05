@@ -1,0 +1,58 @@
+@include_once <SharedVar>
+@class TestStats {
+	@private @SharedVar* passedTests=@new SharedVar
+	@private @SharedVar* failedTests=@new SharedVar
+	@private @SharedVar* untestedTests=@new SharedVar
+
+	@public @method init {
+		@this.passedTests.set 0
+		@this.failedTests.set 0
+		@this.untestedTests.set 0
+	}
+
+	@public @method clean {
+		@delete @this.passedTests
+		@delete @this.failedTests
+		@delete @this.untestedTests
+	}
+
+	@public @method incrementFailedTests {
+		@this.failedTests.lock
+		@this.failedTests.set $((@this.failedTests.get + 1)) # Increment failed tests
+		@this.failedTests.unlock
+	}
+
+	@public @method incrementPassedTests {
+		@this.passedTests.lock
+		@this.passedTests.set $((@this.passedTests.get + 1)) # Increment passed tests
+		@this.passedTests.unlock
+	}
+
+	@public @method incrementUntestedTests {
+		@this.untestedTests.lock
+		@this.untestedTests.set $((@this.untestedTests.get + 1)) # Increment untested tests
+		@this.untestedTests.unlock
+	}
+
+	@public @method getFailCount {
+		@this.failedTests.get
+	}
+
+	@public @method getPassCount {
+		@this.passedTests.get
+	}
+
+	@public @method getUntestedCount {
+		@this.untestedTests.get
+	}
+
+	@public @method toPrimitive {
+		echo "Tests Passed: @this.getPassCount"
+		echo "Tests Failed: @this.getFailCount"
+		echo "Tests Untested: @this.getUntestedCount"
+		if [[ @this.getFailCount -gt 0 ]] || [[ @this.getUntestedCount -gt 0 ]]; then
+			echo "There were failed tests. Details are available in the logs directory."
+		fi
+		@this.clean
+	}
+}
