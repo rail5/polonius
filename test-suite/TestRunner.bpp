@@ -51,6 +51,15 @@
 		@this.tests+=("@test")
 	}
 
+	@public @method addTest @Test* test {
+		if [[ @test == @nullptr ]]; then
+			echo "Error: test is null."
+			return 1
+		fi
+		@test.stats=@this.stats
+		@this.tests+=("@test")
+	}
+
 	@public @method runAllTests optimization_level {
 		local numberOfCores=@(nproc)
 		local concurrentTests=$((numberOfCores / 2))

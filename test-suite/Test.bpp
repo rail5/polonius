@@ -81,6 +81,97 @@
 	}
 }
 
+@class ReaderTest : Test {
+	@public source_contents
+	@public expected_output
+	@public start_position
+	@public read_length
+	@public search_query
+	@public query_is_regex=0
+	@public output_positions=0
+
+	@public @method toPrimitive {
+		@super.toPrimitive
+	}
+
+	@public @method run {
+		if [[ -z "@this.source_contents" ]]; then
+			@this.log+="Error: source_contents is not set.\n"
+			@this.status="untested"
+			@this.finishTest
+			return 1
+		fi
+
+		if [[ -z "@this.expected_output" ]] && [[ @this.program_should_return_zero -eq 1 ]]; then
+			@this.log+="Error: expected_output is not set.\n"
+			@this.status="untested"
+			@this.finishTest
+			return 1
+		fi
+
+		@this.status="pass" # Pre-emptively set 'pass' if we've made it this far
+		# From here out, any trouble will set the status to 'fail' explicitly
+
+		local actual_output command_flags=()
+
+		if [[ @this.start_position != "" ]]; then
+			command_flags+=("-s")
+			command_flags+=("@this.start_position")
+		fi
+		if [[ @this.read_length != "" ]]; then
+			command_flags+=("-l")
+			command_flags+=("@this.read_length")
+		fi
+		if [[ @this.search_query != "" ]]; then
+			command_flags+=("-f")
+			command_flags+=("@this.search_query")
+		fi
+		if [[ @this.query_is_regex -eq 1 ]]; then
+			command_flags+=("-e")
+		fi
+		if [[ @this.output_positions -eq 1 ]]; then
+			command_flags+=("-p")
+		fi
+		command_flags+=("-c")
+		@this.log+="Flags: ${command_flags[@]}\n"
+
+		local temp_file=@(mktemp) output_temp_file=@(mktemp)
+		echo "@{this.source_contents}" > "${temp_file}"
+
+		if $POLONIUS_READER "${temp_file}" ${command_flags[@]} &>"$output_temp_file"; then
+			@this.program_did_return_zero=1
+		else
+			@this.program_did_return_zero=0
+		fi
+
+		rm -f "${temp_file}"
+
+		if [[ -f "${output_temp_file}" ]]; then
+			actual_output=$(< "${output_temp_file}")
+			rm -f "${output_temp_file}"
+		fi
+
+		if [[ @this.program_should_return_zero -eq 0 ]]; then
+			@this.finishTest
+			return 0
+		fi
+
+		if [[ "${actual_output}" != "@{this.expected_output}" ]]; then
+			@this.log+="Error: Actual output does not match expected output for test '@{this.name}'.\n"
+			@this.log+="\n------EXPECTED OUTPUT------\n@{this.expected_output}\n------END------\n"
+			@this.log+="\n------ACTUAL   OUTPUT------\n${actual_output}\n------END------\n"
+			@this.status="fail"
+			@this.finishTest
+			rm -f "${temp_file}"
+			return 1
+		else
+			@this.status="pass"
+		fi
+
+		@this.finishTest
+	}
+}
+
 @class EditorTest : Test {
 	@public instruction_file
 	@public expected_output_file

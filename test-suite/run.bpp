@@ -49,6 +49,130 @@ for file in "tests/instructions/"*; do
 	@runner.addEditorTest "$file" "$test_expectedoutput_file" "$test_input_file" $test_should_return_zero $test_should_produce_output
 done
 
+# Add reader tests
+
+## Basic reads
+@ReaderTest basicread1
+@basicread1.name="Basic File Reads"
+@basicread1.source_contents="0123456789"
+@basicread1.expected_output="0123456789"
+@runner.addTest &@basicread1
+
+@ReaderTest basicread2
+@basicread2.name="Basic File Reads 2"
+@basicread2.source_contents="0123456789"
+@basicread2.expected_output="012"
+@basicread2.read_length=3
+@runner.addTest &@basicread2
+
+@ReaderTest basicread3
+@basicread3.name="Basic File Reads 3"
+@basicread3.source_contents="0123456789"
+@basicread3.expected_output="789"
+@basicread3.start_position=7
+@runner.addTest &@basicread3
+
+@ReaderTest basicread4
+@basicread4.name="Basic File Reads 4"
+@basicread4.source_contents="0123456789"
+@basicread4.expected_output="456"
+@basicread4.start_position=4
+@basicread4.read_length=3
+@runner.addTest &@basicread4
+
+## Basic searches
+@ReaderTest basicsearch1
+@basicsearch1.name="Basic Search 1"
+@basicsearch1.source_contents="0123456789"
+@basicsearch1.expected_output="3 5"
+@basicsearch1.output_positions=1
+@basicsearch1.search_query="345"
+@runner.addTest &@basicsearch1
+
+@ReaderTest basicsearch2
+@basicsearch2.name="Basic Search 2"
+@basicsearch2.source_contents="0123456789"
+@basicsearch2.expected_output="678"
+@basicsearch2.search_query="678"
+@runner.addTest &@basicsearch2
+
+@ReaderTest basicsearch3
+@basicsearch3.name="Basic Search 3"
+@basicsearch3.source_contents="012 345 678 9"
+@basicsearch3.expected_output="3 3"
+@basicsearch3.search_query="\x20"
+@basicsearch3.output_positions=1
+@runner.addTest &@basicsearch3
+
+@ReaderTest basicsearch4
+@basicsearch4.name="Basic Search 4"
+@basicsearch4.source_contents="012 345 678 9"
+@basicsearch4.expected_output="7 7"
+@basicsearch4.search_query="\x20"
+@basicsearch4.output_positions=1
+@basicsearch4.start_position=4
+@runner.addTest &@basicsearch4
+
+@ReaderTest basicsearch5
+@basicsearch5.name="Basic Search 5"
+@basicsearch5.source_contents="0123456789"
+@basicsearch5.program_should_return_zero=0
+@basicsearch5.search_query="notfound"
+@runner.addTest &@basicsearch5
+
+## Regex searches
+@ReaderTest regexsearch1
+@regexsearch1.name="Regex Search 1"
+@regexsearch1.source_contents="012 345 678 9"
+@regexsearch1.expected_output="4 6"
+@regexsearch1.search_query="[0-9]{3}"
+@regexsearch1.query_is_regex=1
+@regexsearch1.output_positions=1
+@regexsearch1.start_position=2
+@runner.addTest &@regexsearch1
+
+@ReaderTest regexsearch2
+@regexsearch2.name="Regex Search 2"
+@regexsearch2.source_contents="0123456789"
+@regexsearch2.expected_output="012"
+@regexsearch2.search_query="[0-9]{3}"
+@regexsearch2.query_is_regex=1
+@runner.addTest &@regexsearch2
+
+@ReaderTest regexsearch3
+@regexsearch3.name="Regex Search 3"
+@regexsearch3.source_contents="0123456789"
+@regexsearch3.expected_output="0 9"
+@regexsearch3.search_query="[0-9]+"
+@regexsearch3.query_is_regex=1
+@regexsearch3.output_positions=1
+@runner.addTest &@regexsearch3
+
+@ReaderTest regexsearch4
+@regexsearch4.name="Regex Search 4"
+@regexsearch4.source_contents="here is some random 123-456-7890 data."
+@regexsearch4.expected_output="123-456-7890"
+@regexsearch4.search_query="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+@regexsearch4.query_is_regex=1
+@runner.addTest &@regexsearch4
+
+@ReaderTest regexsearch5
+@regexsearch5.name="Regex Search 5"
+@regexsearch5.source_contents="here is some random 123-456-7890 data."
+@regexsearch5.expected_output="20 31"
+@regexsearch5.search_query="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+@regexsearch5.query_is_regex=1
+@regexsearch5.output_positions=1
+@runner.addTest &@regexsearch5
+
+@ReaderTest regexsearch6
+@regexsearch6.name="Regex Search 6"
+@regexsearch6.source_contents="01234567890"
+@regexsearch6.program_should_return_zero=0
+@regexsearch6.search_query="[a-z]+"
+@regexsearch6.query_is_regex=1
+@runner.addTest &@regexsearch6
+
 echo "Running tests..."
 echo "----------------"
 for i in @(seq 0 2); do
