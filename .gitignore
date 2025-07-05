@@ -2,5 +2,5 @@ src/shared/version.h
 bin/*
 debian/*.1
 .vscode/
-tests/debug/
-tests/results/
+test-suite/logs/*.log
+test-suite/run.sh
