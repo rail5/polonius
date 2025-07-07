@@ -1,3 +1,17 @@
+polonius (0.7.2) UNRELEASED; urgency=medium
+
+
+ -- rail5 <andrew@rail5.org>  Mon, 07 Jul 2025 17:43:49 +0800
+
+polonius (0.7.1) unstable; urgency=medium
+
+  * Makefile: automatic source dependency tracking for rebuilds
+  * Bug fix: do not 'process special chars' in file reads, only when
+    adding instructions
+  * Replaced old test suite with new, more robust one written in Bash++
+
+ -- rail5 <andrew@rail5.org>  Mon, 07 Jul 2025 15:49:03 +0800
+
 polonius (0.7.0) unstable; urgency=medium
 
   * The dream of instruction optimization has finally arrived!
