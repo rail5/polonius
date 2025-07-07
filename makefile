@@ -9,7 +9,7 @@ WIKIUPSTREAM=https://github.com/rail5/polonius.wiki.git
 VERSION=$(shell dpkg-parsechangelog -l debian/changelog --show-field version)
 
 CXX = g++
-CXXFLAGS = -O2 -std=gnu++20 -Wall -Wextra
+CXXFLAGS = -O2 -std=gnu++20 -Wall -Wextra -MMD -MP
 LDFLAGS = -s -lboost_regex -lncurses -ltinfo
 
 BPP = bpp
@@ -28,7 +28,6 @@ SHARED_OBJS = \
 	bin/obj/block.o \
 	bin/obj/file.o \
 	bin/obj/polonius-editor/expression.o \
-	bin/obj/polonius-editor/instruction.o \
 	bin/obj/polonius/window.o \
 	bin/obj/polonius/widget.o \
 	bin/obj/polonius/helppane.o \
@@ -98,6 +97,10 @@ clean: clean-manual clean-binaries clean-tests clean-wiki
 	@rm -f bin/obj/polonius-editor/*.o
 	@rm -f bin/obj/polonius-reader/*.o
 	@rm -f bin/obj/shared/*.o
+	@rm -f bin/obj/*.d
+	@rm -f bin/obj/polonius-editor/*.d
+	@rm -f bin/obj/polonius-reader/*.d
+	@rm -f bin/obj/shared/*.d
 	@rm -f src/shared/version.h
 	@echo "Cleaned up build artifacts."
 
@@ -133,3 +136,5 @@ uninstall:
 	@echo "Uninstalled polonius binaries from $(BINDIR)"
 
 .PHONY: all clean clean-manual clean-binaries clean-tests clean-wiki manual test install uninstall
+
+-include $(shell find bin/obj -name '*.d' 2>/dev/null)
