@@ -1,8 +1,3 @@
-polonius (0.7.2) UNRELEASED; urgency=medium
-
-
- -- rail5 <andrew@rail5.org>  Mon, 07 Jul 2025 17:43:49 +0800
-
 polonius (0.7.1) unstable; urgency=medium
 
   * Makefile: automatic source dependency tracking for rebuilds
