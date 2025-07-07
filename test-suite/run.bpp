@@ -80,6 +80,12 @@ done
 @basicread4.read_length=3
 @runner.addTest &@basicread4
 
+@ReaderTest basicread5
+@basicread5.name="Basic File Reads 5"
+@basicread5.source_contents="\\x25"
+@basicread5.expected_output="\\x25"
+@runner.addTest &@basicread5
+
 ## Basic searches
 @ReaderTest basicsearch1
 @basicsearch1.name="Basic Search 1"
