@@ -3,6 +3,7 @@
  */
 
 #include "expression.h"
+#include "../shared/process_special_chars.h"
 
 Polonius::Editor::Expression::Expression() = default;
 
@@ -526,7 +527,13 @@ void Polonius::Editor::Expression::replace(Polonius::Block&& block) {
 void Polonius::Editor::Expression::add_term(Polonius::InstructionType op, uint64_t start, const std::string& text) {
 	Polonius::Block block;
 	block.set_operator(op);
-	block.add(start, text);
+	if (Polonius::special_chars) {
+		// Process special characters if enabled
+		block.add(start, process_special_chars(text));
+	} else {
+		// Otherwise, just copy the value as is
+		block.add(start, text);
+	}
 	switch (op) {
 		case Polonius::InstructionType::INSERT:
 			insert(std::move(block));
